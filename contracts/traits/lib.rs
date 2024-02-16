@@ -24,3 +24,9 @@ pub trait PSP22Extras {
     #[ink(message)]
     fn burn_from(&mut self, from: AccountId, value: u128) -> Result<(), PSP22Error>;
 }
+
+#[ink::trait_definition]
+pub trait Predictor {
+    #[ink(message)]
+    fn add_collateral(&self, collateral: AccountId, amount: u128);
+}

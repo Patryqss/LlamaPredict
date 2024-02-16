@@ -1,26 +1,17 @@
 #![cfg_attr(not(feature = "std"), no_std, no_main)]
 
 pub use self::market::MarketRef;
-
-
-use ink::primitives::AccountId;
 pub mod errors;
-pub struct MarketState {}
 
-#[ink::trait_definition]
-pub trait Predicter {
-    #[ink(message)]
-    fn add_collateral(&self, collateral: AccountId, amount: u128);
-}
 
 #[ink::contract]
 mod market {
     use ink::contract_ref;
     use ink::prelude::vec;
     use primitive_types::{U128, U256};
-    use crate::{errors::MarketError, Predicter};
+    use crate::errors::MarketError;
     use conditional_psp22::ConditionalPSP22Ref;
-    use traits::PSP22Extras;
+    use traits::{PSP22Extras, Predictor};
     use psp22::PSP22;
 
     fn scale(a: u128, scaler: u16) -> u128 {
@@ -36,7 +27,7 @@ mod market {
 
     #[ink(storage)]
     pub struct Market {
-        predicter: AccountId,
+        predictor: AccountId,
         collateral: AccountId,
         hash: Hash,
         token_a: ConditionalPSP22Ref,
@@ -69,10 +60,10 @@ mod market {
                 .endowment(0)
                 .salt_bytes([0x01])
                 .instantiate();
-            let predicter = Self::env().caller();
+            let predictor = Self::env().caller();
             let resolved_at = expired_at.saturating_sub(resolution_time);
             Self { 
-                predicter,
+                predictor,
                 collateral,
                 hash,
                 token_a,
@@ -89,10 +80,10 @@ mod market {
         #[ink(message)]
         pub fn mint(&mut self, amount: u128) -> Result<(), MarketError>  {
             let collateral = self.collateral;
-            let predicter = self.predicter;
+            let predictor = self.predictor;
 
-            let predicter: contract_ref!(Predicter) = predicter.into();
-            predicter.add_collateral(collateral, amount);
+            let predictor: contract_ref!(Predictor) = predictor.into();
+            predictor.add_collateral(collateral, amount);
 
             let caller = self.env().caller();
             let collateral_rate = self.collateral_rate;
