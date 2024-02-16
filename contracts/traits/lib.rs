@@ -2,6 +2,7 @@
 
 pub mod errors;
 
+use errors::PredictorError;
 use ink::primitives::AccountId;
 use psp22::PSP22Error;
 
@@ -28,5 +29,5 @@ pub trait PSP22Extras {
 #[ink::trait_definition]
 pub trait Predictor {
     #[ink(message)]
-    fn add_collateral(&self, collateral: AccountId, amount: u128);
+    fn add_tokens(&self, underlying_token: AccountId, from: AccountId, amount: u128) -> Result<(), PredictorError>;
 }

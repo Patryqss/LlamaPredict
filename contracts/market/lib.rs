@@ -28,7 +28,7 @@ mod market {
     #[ink(storage)]
     pub struct Market {
         predictor: AccountId,
-        collateral: AccountId,
+        underlying_token: AccountId,
         hash: Hash,
         token_a: ConditionalPSP22Ref,
         token_b: ConditionalPSP22Ref,
@@ -44,7 +44,7 @@ mod market {
         pub fn new(
             token_hash: Hash,
             router: AccountId,
-            collateral: AccountId,
+            underlying_token: AccountId,
             hash: Hash,
             collateral_rate: u16,
             expired_at: Timestamp,
@@ -64,7 +64,7 @@ mod market {
             let resolved_at = expired_at.saturating_sub(resolution_time);
             Self { 
                 predictor,
-                collateral,
+                underlying_token,
                 hash,
                 token_a,
                 token_b,
@@ -79,13 +79,16 @@ mod market {
 
         #[ink(message)]
         pub fn mint(&mut self, amount: u128) -> Result<(), MarketError>  {
-            let collateral = self.collateral;
+            let underlying_token = self.underlying_token;
+            let caller = self.env().caller();
             let predictor = self.predictor;
 
             let predictor: contract_ref!(Predictor) = predictor.into();
-            predictor.add_collateral(collateral, amount);
+            {
+                let r = predictor.add_tokens(underlying_token, caller, amount);
+                r.map_err(|e| MarketError::MintPredictorError(e))?;
+            }
 
-            let caller = self.env().caller();
             let collateral_rate = self.collateral_rate;
             let total_minted = self.total_minted;
             let total_tokens = self.total_tokens;
@@ -116,6 +119,7 @@ mod market {
             token_a.burn_from(caller, amount).ok().ok_or(MarketError::BurnPSP22Error)?;
             token_b.burn_from(caller, amount).ok().ok_or(MarketError::BurnPSP22Error)?;
 
+            let mut underlying_token: contract_ref!(PSP22) = self.underlying_token.into();
             let total_tokens = self.total_tokens;
             let total_minted = self.total_minted;
 
@@ -134,13 +138,14 @@ mod market {
             self.total_minted = new_total_minted;
             self.total_tokens = new_total_tokens;
 
-            let mut collateral_token: contract_ref!(PSP22) = self.collateral.into();
-            collateral_token.transfer(caller, to_withdraw, vec![]).ok().ok_or(MarketError::BurnPSP22Error)?;
+            {
+                let r = underlying_token.transfer(caller, to_withdraw, vec![]);
+                r.ok().ok_or(MarketError::BurnPSP22Error)?;
+            }
 
             Ok(())
 
         }
-
 
         #[ink(message)]
         pub fn account_id(&self) -> AccountId {
