@@ -45,6 +45,7 @@ mod market {
             router: AccountId,
             collateral: AccountId,
             hash: Hash,
+            collateral_rate: u16,
         ) -> Self {
             let token_a = ConditionalPSP22Ref::new(router)
                 .code_hash(token_hash)
@@ -63,7 +64,7 @@ mod market {
                 hash,
                 token_a,
                 token_b,
-                collateral_rate: u16::MAX / 2,
+                collateral_rate,
                 total_minted: 0,
                 total_collateral: 0,
             }
@@ -71,9 +72,14 @@ mod market {
 
         #[ink(message)]
         pub fn mint(&mut self, amount: u128) -> Result<(), MarketError>  {
+            let collateral = self.collateral;
+            let predicter = self.predicter;
+
+            let predicter: contract_ref!(Predicter) = predicter.into();
+            predicter.add_collateral(collateral, amount);
+
             let caller = self.env().caller();
             let collateral_rate = self.collateral_rate;
-            let collateral = self.collateral;
             let total_collateral = self.total_collateral;
             let total_minted = self.total_minted;
 
@@ -81,14 +87,14 @@ mod market {
                 let r = total_collateral.checked_add(amount);
                 r.ok_or(MarketError::MintOverflow)?
             };
-            let minted = scale(amount, collateral_rate);
+            let minted = amount - scale(amount, collateral_rate);
             let new_minted = total_minted + minted;
 
-            let predicter: contract_ref!(Predicter) = self.predicter.into();
-            predicter.add_collateral(collateral, amount);
+            self.total_collateral = new_total_collateral;
+            self.total_minted = new_minted;
 
-            self.token_a.mint_to(caller, minted);
-            self.token_b.mint_to(caller, minted);
+            self.token_a.mint_to(caller, minted).ok().ok_or(MarketError::MintPSP20Error)?;
+            self.token_b.mint_to(caller, minted).ok().ok_or(MarketError::MintPSP20Error)?;
 
             Ok(())
         }
