@@ -42,6 +42,8 @@ mod market {
         token_a: ConditionalPSP22Ref,
         token_b: ConditionalPSP22Ref,
         collateral_rate: u16,
+        expired_at: Timestamp,
+        resolved_at: Timestamp,
         total_minted: u128,
         total_tokens: u128,
     }
@@ -54,6 +56,8 @@ mod market {
             collateral: AccountId,
             hash: Hash,
             collateral_rate: u16,
+            expired_at: Timestamp,
+            resolution_time: u64,
         ) -> Self {
             let token_a = ConditionalPSP22Ref::new(router)
                 .code_hash(token_hash)
@@ -66,6 +70,7 @@ mod market {
                 .salt_bytes([0x01])
                 .instantiate();
             let predicter = Self::env().caller();
+            let resolved_at = expired_at.saturating_sub(resolution_time);
             Self { 
                 predicter,
                 collateral,
@@ -73,6 +78,9 @@ mod market {
                 token_a,
                 token_b,
                 collateral_rate,
+                //no need to validate it
+                expired_at,
+                resolved_at,
                 total_minted: 0,
                 total_tokens: 0,
             }
