@@ -21,8 +21,11 @@
   "dependencies": {
     "@heroicons/vue": "^1.0.6",
     "@kirklin/reset-css": "^0.0.3",
+    "@polkadot/api": "^10.11.2",
+    "@polkadot/extension-dapp": "^0.46.6",
     "@vueuse/core": "^10.5.0",
     "daisyui": "^3.9.2",
+    "mitt": "^3.0.1",
     "nprogress": "^0.2.0",
     "vue": "^3.3.4",
     "vue-router": "^4.2.5"

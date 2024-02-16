@@ -27,7 +27,8 @@ defineOptions({
           </div>
         </RouterLink>
       </div>
-      <div>
+      <div class="flex navbar-end gap-4">
+        <WalletButton />
         <ThemeChange />
       </div>
     </nav>

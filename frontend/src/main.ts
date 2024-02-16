@@ -1,5 +1,7 @@
 import { createApp } from "vue";
+import mitt, { type Emitter } from "mitt";
 import { router } from "./router";
+import type { EmitterEvents } from "./types";
 import App from "~/App.vue";
 
 // reset css
@@ -9,4 +11,7 @@ import "uno.css";
 
 const app = createApp(App);
 app.use(router);
+
+export const emitter: Emitter<EmitterEvents> = mitt<EmitterEvents>();
+
 app.mount("#app");

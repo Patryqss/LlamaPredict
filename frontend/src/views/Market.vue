@@ -102,7 +102,7 @@ function onSubmit() {
               </p>
               <p>{{ formatUSDAmount(position.currentValue) }}</p>
             </div>
-            <button class="btn btn-primary" @click="onClose">
+            <button class="btn btn-accent" @click="onClose">
               Close
             </button>
           </div>
@@ -143,7 +143,7 @@ function onSubmit() {
           </p>
         </div>
 
-        <button class="mt-5 w-full btn btn-primary" @click="onSubmit">
+        <button class="mt-5 w-full btn btn-accent" @click="onSubmit">
           Submit
         </button>
       </div>
