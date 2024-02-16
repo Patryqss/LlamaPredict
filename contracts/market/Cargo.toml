@@ -9,6 +9,10 @@ ink = { version = "4.2.0", default-features = false }
 
 scale = { package = "parity-scale-codec", version = "3", default-features = false, features = ["derive"] }
 scale-info = { version = "2.6", default-features = false, features = ["derive"], optional = true }
+conditional_psp22 = { path = "../conditional_psp22", default-features = false, features = ["ink-as-dependency"] }
+primitive-types = { version = "0.12.1", default-features = false, features = [
+    "codec",
+] }
 
 [dev-dependencies]
 ink_e2e = "4.2.0"

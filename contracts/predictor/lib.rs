@@ -8,6 +8,8 @@ mod predictor {
     #[ink(storage)]
     pub struct Predictor {
         market_hash: Hash,
+        token_hash: Hash,
+        router: AccountId,
         markets: Mapping<u64, AccountId>,
         count: u64,
     }
@@ -16,9 +18,13 @@ mod predictor {
         #[ink(constructor)]
         pub fn new(
             market_hash: Hash,
+            token_hash: Hash,
+            router: AccountId,
         ) -> Self {
             Self { 
                 market_hash,
+                token_hash,
+                router,
                 markets: Default::default(),
                 count: 0,
             }
@@ -27,9 +33,10 @@ mod predictor {
         #[ink(message)]
         pub fn add_market(&mut self, collateral: AccountId, hash: Hash) {
             let count = self.count;
+            let market_hash = self.market_hash;
 
-            let market = MarketRef::new(collateral, hash)
-                .code_hash(self.market_hash)
+            let market = MarketRef::new(token_hash, router, collateral, hash)
+                .code_hash(market_hash)
                 .endowment(0)
                 .salt_bytes(count.to_be_bytes())
                 .instantiate();
