@@ -1,0 +1,44 @@
+[package]
+name = "amm-traits"
+version = "0.2.0"
+authors = ["Cardinal Cryptography"]
+edition = "2021"
+
+[dependencies]
+ink = { version = "=4.3.0", default-features = false }
+ink_metadata = { version = "=4.3.0", features = ["derive"], optional = true }
+
+scale = { package = "parity-scale-codec", version = "3", default-features = false, features = [
+    "derive",
+] }
+scale-info = { version = "2.10", default-features = false, features = [
+    "derive",
+], optional = true }
+
+psp22 = { version = "0.2.1" , default-features = false }
+
+primitive-types = { version = "0.12.1", default-features = false, features = [
+    "codec",
+] }
+sp-arithmetic = { version = "18.0.0", default-features = false }
+amm-helpers = { path = "../helpers", default-features = false }
+
+[lib]
+name = "traits"
+path = "lib.rs"
+crate-type = ["rlib"]
+
+[features]
+default = ["std"]
+std = [
+    "ink/std",
+    "ink_metadata",
+    "ink_metadata/std",
+    "scale/std",
+    "scale-info/std",
+    "psp22/std",
+    "primitive-types/std",
+    "primitive-types/scale-info",
+    "sp-arithmetic/std",
+    "amm-helpers/std",
+]
