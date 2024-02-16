@@ -14,6 +14,7 @@ primitive-types = { version = "0.12.1", default-features = false, features = [
     "codec",
 ] }
 traits = { path = "../traits", default-features = false }
+psp22 = { version = "0.2.1" , default-features = false, features = ["ink-as-dependency"] }
 
 [dev-dependencies]
 ink_e2e = "4.2.0"
@@ -28,6 +29,7 @@ std = [
     "scale/std",
     "scale-info/std",
     "conditional_psp22/std",
+    "psp22/std",
 ]
 ink-as-dependency = []
 e2e-tests = []

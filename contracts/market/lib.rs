@@ -3,7 +3,7 @@
 pub use self::market::MarketRef;
 
 
-use ink::primitives::{AccountId, Hash};
+use ink::primitives::AccountId;
 pub mod errors;
 pub struct MarketState {}
 
@@ -16,14 +16,22 @@ pub trait Predicter {
 #[ink::contract]
 mod market {
     use ink::contract_ref;
+    use ink::prelude::vec;
     use primitive_types::{U128, U256};
     use crate::{errors::MarketError, Predicter};
     use conditional_psp22::ConditionalPSP22Ref;
     use traits::PSP22Extras;
+    use psp22::PSP22;
 
     fn scale(a: u128, scaler: u16) -> u128 {
         let result = U128::from(a).full_mul(U128::from(scaler));
         (result >> u16::BITS).low_u128()
+    }
+
+    fn ratio(a: u128, b: u128, c: u128) -> u128 {
+        let denominator = U128::from(a).full_mul(U128::from(b));
+        let result = denominator / U256::from(c);
+        result.low_u128()
     }
 
     #[ink(storage)]
@@ -35,7 +43,7 @@ mod market {
         token_b: ConditionalPSP22Ref,
         collateral_rate: u16,
         total_minted: u128,
-        total_collateral: u128,
+        total_tokens: u128,
     }
 
     impl Market {
@@ -66,7 +74,7 @@ mod market {
                 token_b,
                 collateral_rate,
                 total_minted: 0,
-                total_collateral: 0,
+                total_tokens: 0,
             }
         }
 
@@ -80,23 +88,58 @@ mod market {
 
             let caller = self.env().caller();
             let collateral_rate = self.collateral_rate;
-            let total_collateral = self.total_collateral;
             let total_minted = self.total_minted;
+            let total_tokens = self.total_tokens;
 
-            let new_total_collateral = {
-                let r = total_collateral.checked_add(amount);
+            let new_total_tokens = {
+                let r = total_tokens.checked_add(amount);
                 r.ok_or(MarketError::MintOverflow)?
             };
-            let minted = amount - scale(amount, collateral_rate);
-            let new_minted = total_minted + minted;
+            let collateral = scale(amount, collateral_rate);
+            let minted = amount - collateral;
+            let new_total_minted = total_minted + minted;
 
-            self.total_collateral = new_total_collateral;
-            self.total_minted = new_minted;
+            self.total_minted = new_total_minted;
+            self.total_tokens = new_total_tokens;
 
-            self.token_a.mint_to(caller, minted).ok().ok_or(MarketError::MintPSP20Error)?;
-            self.token_b.mint_to(caller, minted).ok().ok_or(MarketError::MintPSP20Error)?;
+            self.token_a.mint_to(caller, minted).ok().ok_or(MarketError::MintPSP22Error)?;
+            self.token_b.mint_to(caller, minted).ok().ok_or(MarketError::MintPSP22Error)?;
 
             Ok(())
+        }
+
+        #[ink(message)]
+        pub fn burn(&mut self, amount: u128) -> Result<(), MarketError> {
+            let caller = self.env().caller();
+            let token_a = &mut self.token_a;
+            let token_b = &mut self.token_b;
+
+            token_a.burn_from(caller, amount).ok().ok_or(MarketError::BurnPSP22Error)?;
+            token_b.burn_from(caller, amount).ok().ok_or(MarketError::BurnPSP22Error)?;
+
+            let total_tokens = self.total_tokens;
+            let total_minted = self.total_minted;
+
+            let new_total_minted = {
+                let r = total_minted.checked_sub(amount);
+                r.ok_or(MarketError::BurnOverflow)?
+            };
+
+            let to_withdraw = if total_minted == 0 {
+                0
+            } else {
+                ratio(amount, total_tokens, total_minted)
+            };
+            let new_total_tokens = total_tokens - amount;
+
+            self.total_minted = new_total_minted;
+            self.total_tokens = new_total_tokens;
+
+            let mut collateral_token: contract_ref!(PSP22) = self.collateral.into();
+            collateral_token.transfer(caller, to_withdraw, vec![]).ok().ok_or(MarketError::BurnPSP22Error)?;
+
+            Ok(())
+
         }
 
 
