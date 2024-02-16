@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useColorMode } from "@vueuse/core";
-import { ChevronDownIcon, ColorSwatchIcon } from "@heroicons/vue/outline";
+import { ColorSwatchIcon } from "@heroicons/vue/outline";
 import { themeList } from "./data";
 import type { CustomTheme } from "./types";
 
@@ -45,9 +45,9 @@ const changeTheme = (event: MouseEvent, theme: CustomTheme) => {
   try {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-expect-error
-    if (document.startViewTransition === undefined) {
+    if (document.startViewTransition === undefined)
       throw new Error("document.startViewTransition is undefined, please update your browser to the latest version or use a modern browser.");
-    }
+
     const x = event.clientX;
     const y = event.clientY;
     const endRadius = Math.hypot(
@@ -87,8 +87,6 @@ const changeTheme = (event: MouseEvent, theme: CustomTheme) => {
   <div title="Change Theme" class="dropdown-end dropdown">
     <div tabindex="0" class="btn-ghost btn gap-1 normal-case">
       <ColorSwatchIcon class="w-5 h-5 stroke-current" />
-      <span class="hidden md:inline">Themes</span>
-      <ChevronDownIcon class="w-5 h-5 stroke-current" />
     </div>
     <div
       class="scrollbar dropdown-content rounded-t-box rounded-b-box top-px mt-16 h-[70vh] max-h-96 w-52 overflow-y-auto bg-base-200 text-base-content shadow-2xl"

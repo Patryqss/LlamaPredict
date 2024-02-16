@@ -7,7 +7,10 @@ export {}
 
 declare module 'vue' {
   export interface GlobalComponents {
+    Card: typeof import('./../src/components/Card.vue')['default']
+    MarketCard: typeof import('./../src/components/MarketCard.vue')['default']
     Navbar: typeof import('./../src/components/Navbar.vue')['default']
+    NumberInput: typeof import('./../src/components/NumberInput.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     ThemeChange: typeof import('./../src/components/ThemeChange/index.vue')['default']

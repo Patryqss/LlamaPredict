@@ -19,8 +19,9 @@ defineOptions({
           class="btn-ghost btn px-2"
         >
           <div
-            class="inline-flex text-lg text-primary transition-all duration-200 md:text-3xl"
+            class="inline-flex items-center text-lg text-primary transition-all duration-200 md:text-3xl"
           >
+            <img alt="logo" src="pwa-192x192.png" class="w-10">
             <span class="text-accent">L<span class="lowercase">lama</span></span>
             <span class="text-base-content">B<span class="lowercase">et</span></span>
           </div>
