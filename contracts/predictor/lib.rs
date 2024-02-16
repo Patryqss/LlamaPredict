@@ -10,7 +10,7 @@ mod predictor {
         market_hash: Hash,
         token_hash: Hash,
         router: AccountId,
-        markets: Mapping<u64, AccountId>,
+        markets: Mapping<u64, MarketRef>,
         count: u64,
     }
 
@@ -34,13 +34,14 @@ mod predictor {
         pub fn add_market(&mut self, collateral: AccountId, hash: Hash) {
             let count = self.count;
             let market_hash = self.market_hash;
+            let router = self.router;
+            let token_hash = self.token_hash;
 
             let market = MarketRef::new(token_hash, router, collateral, hash)
                 .code_hash(market_hash)
                 .endowment(0)
                 .salt_bytes(count.to_be_bytes())
                 .instantiate();
-            let market = market.account_id();
 
             self.markets.insert(count, &market);
             self.count += 1;

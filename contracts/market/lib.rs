@@ -1,7 +1,9 @@
 #![cfg_attr(not(feature = "std"), no_std, no_main)]
 
-use ink::primitives::{AccountId, Hash};
 pub use self::market::MarketRef;
+
+
+use ink::primitives::{AccountId, Hash};
 pub mod errors;
 pub struct MarketState {}
 
@@ -11,17 +13,13 @@ pub trait Predicter {
     fn add_collateral(&self, collateral: AccountId, amount: u128);
 }
 
-#[ink::trait_definition]
-pub trait Market {
-    #[ink(message)]
-    fn state(&self) -> (AccountId, Hash);
-}
-
 #[ink::contract]
 mod market {
     use ink::contract_ref;
     use primitive_types::{U128, U256};
     use crate::{errors::MarketError, Predicter};
+    use conditional_psp22::ConditionalPSP22Ref;
+    use traits::PSP22Extras;
 
     fn scale(a: u128, scaler: u16) -> u128 {
         let result = U128::from(a).full_mul(U128::from(scaler));

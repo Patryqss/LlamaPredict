@@ -23,6 +23,7 @@ std = [
     "ink/std",
     "scale/std",
     "scale-info/std",
+    "market/std",
 ]
 ink-as-dependency = []
 e2e-tests = []
