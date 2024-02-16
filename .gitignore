@@ -19,3 +19,6 @@ node_modules
 # Added by cargo
 
 /target
+
+# Very secret things
+.env
