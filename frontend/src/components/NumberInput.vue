@@ -9,6 +9,10 @@ const props = defineProps({
     type: String,
     default: "Amount",
   },
+  max: {
+    type: Number,
+    default: 0,
+  },
   error: {
     type: String,
     default: "",
@@ -22,6 +26,11 @@ watch(
 
 const emit = defineEmits(["input"]);
 const inputValue = ref(props.value);
+
+function setMax() {
+  inputValue.value = props.max;
+  emit("input", props.max);
+}
 
 function onKeyPress(e: KeyboardEvent) {
   const allowedKeys = /[0-9]|\.|,/;
@@ -74,6 +83,12 @@ function onInput() {
     </div>
     <label v-if="error" class="label">
       <span class="label-text-alt text-error">{{ error }}</span>
+    </label>
+    <label v-if="max" class="label">
+      <span></span>
+      <span class="label-text-alt text-neutral-content">
+        <span class="text-accent cursor-pointer" @click="setMax">MAX</span>
+      </span>
     </label>
   </div>
 </template>

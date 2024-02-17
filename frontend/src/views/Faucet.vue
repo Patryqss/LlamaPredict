@@ -42,6 +42,7 @@ async function onMint() {
           class="my-5"
           :value="state.amount"
           label="Amount"
+          :max="1000"
           :error="state.error"
           @input="onAmountChange"
         />

@@ -7,6 +7,8 @@ import {
   validateInput,
 } from "~/utils";
 
+type MarketTxn = "PREDICT" | "ADD_LIQ";
+
 const market = {
   id: 2,
   title: "BTC closing price",
@@ -20,9 +22,10 @@ const market = {
 
 const state = reactive({
   myPrediction: null as boolean | null,
-  betSize: "",
+  amount: "",
   predictError: "",
-  betError: "",
+  amountError: "",
+  type: "PREDICT" as MarketTxn,
   isLoading: false, // TODO: fetch market data and change this to false
   maxWin: 0,
   slippage: 0,
@@ -36,21 +39,23 @@ const position = reactive({
   currentValue: 0,
 });
 
+function onTypeChange() {
+  state.type = state.type === "ADD_LIQ" ? "PREDICT" : "ADD_LIQ";
+  state.amount = "";
+  state.myPrediction = null;
+  state.predictError = "";
+  state.amountError = "";
+}
 function onPredict(value: boolean) {
   state.predictError = "";
   state.myPrediction = value;
 }
-function onBetChange(value: string) {
-  state.betError = "";
-  state.betSize = value;
-  state.betError = validateInput(
-    value,
-    0,
-    Number.POSITIVE_INFINITY, // TODO: change to users balance(?)
-    2,
-  );
+function onAmountChange(value: string) {
+  state.amountError = "";
+  state.amount = value;
+  state.amountError = validateInput(value, 0, accountStore.balance, 6);
 
-  if (!state.betError) calculateStats();
+  if (!state.amountError) calculateStats();
 }
 
 function calculateStats() {
@@ -62,17 +67,20 @@ function onClose() {
 }
 
 function onSubmit() {
-  if (state.myPrediction === null || !state.betSize) {
-    if (state.myPrediction === null)
+  if (
+    (state.type === "PREDICT" && state.myPrediction === null) ||
+    !state.amount
+  ) {
+    if (state.type === "PREDICT" && state.myPrediction === null)
       state.predictError = "A choice is required";
-    if (!state.betSize) state.betError = "This value is required";
+    if (!state.amount) state.amountError = "This value is required";
     return;
   }
   // TODO: perform actual txn
 
   emitter.emit("txn-success", "r812rc08723r8c2b083rb702873b");
   state.myPrediction = null;
-  state.betSize = "";
+  state.amount = "";
 }
 </script>
 
@@ -141,62 +149,93 @@ function onSubmit() {
         </div>
       </div>
       <div class="mt-10 flex-1 md:mt-0">
-        <p class="label-text mb-2 ml-2">Prediction</p>
-        <div class="flex gap-x-5">
-          <button
-            class="btn btn-primary flex-1"
-            :class="
-              state.myPrediction === false &&
-              'outline-accent outline outline-4 outline-offset-2'
-            "
-            @click="() => onPredict(false)"
+        <div class="flex items-center justify-between">
+          <p
+            class="cursor-pointer font-bold hover:opacity-80"
+            :class="state.type === 'PREDICT' && 'text-accent'"
+            @click="state.type = 'PREDICT'"
           >
-            No
-          </button>
-          <button
-            class="btn btn-primary flex-1"
-            :class="
-              state.myPrediction === true &&
-              'outline-accent outline outline-4 outline-offset-2'
-            "
-            @click="() => onPredict(true)"
+            PREDICT
+          </p>
+          <input
+            type="checkbox"
+            class="toggle bg-accent border-accent"
+            :checked="state.type === 'ADD_LIQ'"
+            @input="onTypeChange"
+          />
+          <p
+            class="cursor-pointer text-right font-bold hover:opacity-80"
+            :class="state.type === 'ADD_LIQ' && 'text-accent'"
+            @click="state.type = 'ADD_LIQ'"
           >
-            Yes
-          </button>
+            ADD LIQUIDITY
+          </p>
         </div>
-        <div v-if="state.predictError" class="label">
-          <p class="text-error label-text-alt">{{ state.predictError }}</p>
+
+        <div class="divider" />
+
+        <div v-if="state.type === 'PREDICT'">
+          <p class="label-text mb-2 ml-2">Prediction</p>
+          <div class="flex gap-x-5">
+            <button
+              class="btn btn-primary flex-1"
+              :class="
+                state.myPrediction === false &&
+                'outline-accent outline outline-4 outline-offset-2'
+              "
+              @click="() => onPredict(false)"
+            >
+              No
+            </button>
+            <button
+              class="btn btn-primary flex-1"
+              :class="
+                state.myPrediction === true &&
+                'outline-accent outline outline-4 outline-offset-2'
+              "
+              @click="() => onPredict(true)"
+            >
+              Yes
+            </button>
+          </div>
+          <div v-if="state.predictError" class="label">
+            <p class="text-error label-text-alt">{{ state.predictError }}</p>
+          </div>
         </div>
 
         <NumberInput
           class="my-5"
-          :value="state.betSize"
-          label="Bet Size"
-          :error="state.betError"
-          @input="onBetChange"
+          :value="state.amount"
+          :label="state.type === 'PREDICT' ? 'Bet Size' : 'Amount'"
+          :max="accountStore.balance"
+          :error="state.amountError"
+          @input="onAmountChange"
         />
-        <div class="flex w-full items-center justify-between">
-          <p>Max Win:</p>
-          <p class="text-right">
-            {{ formatUSDAmount(state.maxWin) }}
-          </p>
-        </div>
-        <div class="my-3 flex w-full items-center justify-between">
-          <p>Slippage:</p>
-          <p class="text-right">
-            {{ formatPctValue(state.slippage) }}
-          </p>
-        </div>
-        <div class="flex w-full items-center justify-between">
-          <p>Fee:</p>
-          <p class="text-right">
-            {{ formatPctValue(state.fee) }}
-          </p>
+
+        <div v-if="state.type === 'PREDICT'">
+          <div class="flex w-full items-center justify-between">
+            <p>Max Win:</p>
+            <p class="text-right">
+              {{ formatUSDAmount(state.maxWin) }}
+            </p>
+          </div>
+          <div class="my-3 flex w-full items-center justify-between">
+            <p>Slippage:</p>
+            <p class="text-right">
+              {{ formatPctValue(state.slippage) }}
+            </p>
+          </div>
+          <div class="flex w-full items-center justify-between">
+            <p>Fee:</p>
+            <p class="text-right">
+              {{ formatPctValue(state.fee) }}
+            </p>
+          </div>
         </div>
 
         <button
           class="btn btn-accent mt-5 w-full"
-          :disabled="!!state.betError || !!state.predictError"
+          :disabled="!!state.amountError || !!state.predictError"
           @click="onSubmit"
         >
           <span

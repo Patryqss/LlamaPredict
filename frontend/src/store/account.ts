@@ -57,6 +57,7 @@ class AccountStore {
 
         console.log(this.accounts);
         localStorage.setItem("account", this.activeAccount); // In case of refreshing the page, the user will be automatically reconnected
+        this.udpateBalance();
       }
     } catch (e) {
       console.error(e);
@@ -67,6 +68,7 @@ class AccountStore {
   changeActiveAccount(address: string) {
     this.activeAccount = address;
     localStorage.setItem("account", this.activeAccount);
+    this.udpateBalance();
   }
 
   async mintUSD(amount: string) {
