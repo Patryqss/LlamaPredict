@@ -13,9 +13,9 @@ export class PSP22Client {
     api: ApiPromise;
     contract: ContractPromise;
 
-    constructor(api: ApiPromise, contract_address: string) {
+    constructor(api: ApiPromise, contract_address: string, source: Record<string, unknown> = conditional_psp) {
         this.api = api;
-        this.contract = new ContractPromise(api, conditional_psp, contract_address);
+        this.contract = new ContractPromise(api, source, contract_address);
     }
 
     async balanceOf(
@@ -34,9 +34,7 @@ export class PSP22Client {
 
 export class USDClient extends PSP22Client {
     constructor(api: ApiPromise, contract_address: string) {
-        super(api, contract_address);
-
-        this.contract = new ContractPromise(api, minty_psp, contract_address);
+        super(api, contract_address, minty_psp);
     }
 
     async mint(
@@ -49,7 +47,7 @@ export class USDClient extends PSP22Client {
             sender,
             signer,
             this.contract,
-            "mint",
+            "PSP22Mintable::mint",
             undefined,
             [amount]
         )
