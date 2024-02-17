@@ -9,6 +9,7 @@ mod predictor {
     use ink::storage::Mapping;
     use primitive_types::{U128, U256};
     use psp22::PSP22;
+    use psp22::PSP22Error;
     use ink::prelude::vec;
     use crate::errors::PredictorError;
     #[cfg(feature = "std")]
@@ -30,8 +31,16 @@ mod predictor {
     pub struct Market {
         underlying_token: AccountId,
         hash: Hash,
+        
+        #[cfg(not(test))]
         token_a: ConditionalPSP22Ref,
+        #[cfg(test)]
+        token_a: u64,
+        #[cfg(not(test))]
         token_b: ConditionalPSP22Ref,
+        #[cfg(test)]
+        token_b: u64,
+
         collateral_rate: u16,
         expired_at: Timestamp,
         resolved_at: Timestamp,
@@ -61,6 +70,57 @@ mod predictor {
     }
 
     impl PredictorContract {
+        #[cfg(test)]
+        fn instantiate_token(&self, router: AccountId, token_hash: Hash, salt: u64) -> u64 {
+            salt
+        }
+        #[cfg(not(test))]
+        fn instantiate_token(&self, router: AccountId, token_hash: Hash, salt: u64) -> ConditionalPSP22Ref {
+            ConditionalPSP22Ref::new(router)
+                .code_hash(token_hash)
+                .endowment(0)
+                .salt_bytes(salt.to_be_bytes())
+                .instantiate()
+        }
+        #[cfg(test)]
+        fn market_token_mint_to(&self, token: &u64, caller: AccountId, amount: u128) -> Result<(), PSP22Error>{
+            Ok(())
+        }
+        #[cfg(not(test))]
+        fn market_token_mint_to(
+            &self, 
+            token: &mut ConditionalPSP22Ref, 
+            caller: AccountId, 
+            amount: u128
+        ) -> Result<(), PSP22Error> {
+            token.mint_to(caller, amount)
+        }
+        #[cfg(test)]
+        fn market_token_burn_from(&self, token: &u64, caller: AccountId, amount: u128) -> Result<(), PSP22Error>{
+            Ok(())
+        }
+        #[cfg(not(test))]
+        fn market_token_burn_from(
+            &self, 
+            token: &mut ConditionalPSP22Ref, 
+            caller: AccountId, 
+            amount: u128
+        ) -> Result<(), PSP22Error> {
+            token.burn_from(caller, amount)
+        }
+        #[cfg(test)]
+        fn market_token_balance_of(&self, token: &u64, user: AccountId) -> u128 {
+            0
+        }
+        #[cfg(not(test))]
+        fn market_token_balance_of(
+            &self, 
+            token: &ConditionalPSP22Ref, 
+            user: AccountId, 
+        ) -> u128 {
+            token.balance_of(user)
+        }
+
         #[ink(constructor)]
         pub fn new(
             token_hash: Hash,
@@ -107,16 +167,8 @@ mod predictor {
             let new_count = market_id + 1;
             let token_a_salt = market_id * 2;
             let token_b_salt = token_a_salt + 1;
-            let token_a = ConditionalPSP22Ref::new(router)
-                .code_hash(token_hash)
-                .endowment(0)
-                .salt_bytes(token_a_salt.to_be_bytes())
-                .instantiate();
-            let token_b = ConditionalPSP22Ref::new(router)
-                .code_hash(token_hash)
-                .endowment(0)
-                .salt_bytes(token_b_salt.to_be_bytes())
-                .instantiate();
+            let token_a = self.instantiate_token(router, token_hash, token_a_salt);
+            let token_b = self.instantiate_token(router, token_hash, token_b_salt);
             let expired_at = resolved_at.saturating_add(resolution_time);
 
             let market = Market {
@@ -195,11 +247,11 @@ mod predictor {
 
             // Token A and B are trusted
             {
-                let r = market.token_a.mint_to(caller, minted);
+                let r = self.market_token_mint_to(&mut market.token_a, caller, minted);
                 r.map_err(|e|PredictorError::MintAError(e))?;
             }
             {
-                let r = market.token_b.mint_to(caller, minted);
+                let r = self.market_token_mint_to(&mut market.token_b, caller, minted);
                 r.map_err(|e|PredictorError::MintBError(e))?;
             }
 
@@ -209,9 +261,8 @@ mod predictor {
         #[ink(message)]
         pub fn burn(&mut self, market_id: u64, amount: u128) -> Result<(), PredictorError> {
             let caller = self.env().caller();
-            let markets = &mut self.markets;
             let mut market = {
-                let r = markets.get(&market_id);
+                let r = self.markets.get(&market_id);
                 r.ok_or(PredictorError::BurnForNotExistingMarket)
             }?;
             let amount2 = {
@@ -226,11 +277,11 @@ mod predictor {
 
             // Token A and B are trusted
             {
-                let r = market.token_a.burn_from(caller, amount);
+                let r = self.market_token_burn_from(&mut market.token_a, caller, amount);
                 r.map_err(|e|PredictorError::BurnAError(e))?;
             }
             {
-                let r = market.token_b.burn_from(caller, amount);
+                let r = self.market_token_burn_from(&mut market.token_b, caller, amount);
                 r.map_err(|e|PredictorError::BurnBError(e))?;
             }
 
@@ -245,7 +296,7 @@ mod predictor {
 
             market.total_minted = new_total_minted;
             market.total_tokens = new_total_tokens;
-            markets.insert(market_id, &market);
+            self.markets.insert(market_id, &market);
 
             // TODO: Add user data claimed
 
@@ -282,9 +333,9 @@ mod predictor {
             };
             {
                 let r = if is_a {
-                    market.token_a.burn_from(caller, amount)
+                    self.market_token_burn_from(&mut market.token_a, caller, amount)
                 } else {
-                    market.token_b.burn_from(caller, amount)
+                    self.market_token_burn_from(&mut market.token_b, caller, amount)
                 };
                 r.map_err(|e|PredictorError::GiveUpTokenError(e))?;
             };
@@ -335,17 +386,17 @@ mod predictor {
                 market.abandoned_b
             };
             let abandoned_balance = if is_a {
-                market.token_a.balance_of(caller)
+                self.market_token_balance_of(&mut market.token_a, caller)
             } else {
-                market.token_b.balance_of(caller)
+                self.market_token_balance_of(&mut market.token_b, caller)
             };
             let amount = abandoned.min(abandoned_balance);
             let new_abandoned = abandoned - amount;
             {
                 let r = if is_a {
-                    market.token_a.burn_from(caller, amount)
+                    self.market_token_burn_from(&mut market.token_a, caller, amount)
                 } else {
-                    market.token_b.burn_from(caller, amount)
+                    self.market_token_burn_from(&mut market.token_b, caller, amount)
                 };
                 r.map_err(|e|PredictorError::UseAbandonedTokenError(e))?;
             };
@@ -415,34 +466,34 @@ mod predictor {
                 return Err(PredictorError::BurnByOutcomeNoOutcome);
             }
             let to_burn = if market.outcome_a == 0 {
-                let r = market.token_b.burn_from(caller, amount);
+                let r = self.market_token_burn_from(&mut market.token_b, caller, amount);
                 r.map_err(|e|PredictorError::BurnByOutcomeBurnError(e))?;
                 amount
             } else if market.outcome_b == 0 {
-                let r = market.token_a.burn_from(caller, amount);
+                let r = self.market_token_burn_from(&mut market.token_a, caller, amount);
                 r.map_err(|e|PredictorError::BurnByOutcomeBurnError(e))?;
                 amount
             } else if market.outcome_a > market.outcome_b {
                 let amount_b = ratio(amount, market.outcome_b, market.outcome_a);
 
-                let r_b = market.token_b.burn_from(caller, amount_b);
+                let r_b = self.market_token_burn_from(&mut market.token_b, caller, amount_b);
                 r_b.map_err(|e|PredictorError::BurnByOutcomeBurnError(e))?;
 
                 let amount_a = ratio(amount_b, market.outcome_a, market.outcome_b);
 
-                let r_a = market.token_a.burn_from(caller, amount_a);
+                let r_a = self.market_token_burn_from(&mut market.token_a, caller, amount_a);
                 r_a.map_err(|e|PredictorError::BurnByOutcomeBurnError(e))?;
 
                 amount_a + amount_b
             } else {
                 let amount_a = ratio(amount, market.outcome_a, market.outcome_b);
 
-                let r_a = market.token_a.burn_from(caller, amount_a);
+                let r_a = self.market_token_burn_from(&mut market.token_a, caller, amount_a);
                 r_a.map_err(|e|PredictorError::BurnByOutcomeBurnError(e))?;
 
                 let amount_b = ratio(amount_a, market.outcome_b, market.outcome_a);
 
-                let r_b = market.token_b.burn_from(caller, amount_b);
+                let r_b = self.market_token_burn_from(&mut market.token_b, caller, amount_b);
                 r_b.map_err(|e|PredictorError::BurnByOutcomeBurnError(e))?;
 
                 amount_a + amount_b
@@ -471,3 +522,6 @@ mod predictor {
         }
     }
 }
+
+#[cfg(test)]
+mod tests;
