@@ -1,6 +1,6 @@
 {
   "source": {
-    "hash": "0xa2e58df2773299d672d4c5e23f51defcb0c32f893c284789c09238cadc7a5ec1",
+    "hash": "0x73c2594b631b0e5a58564097fd0c3b6e94045a202fb9dafa83dd8ad74ff4cd15",
     "language": "ink! 4.3.0",
     "compiler": "rustc 1.69.0",
     "build_info": {
@@ -75,13 +75,13 @@
         "displayName": [
           "BlockNumber"
         ],
-        "type": 24
+        "type": 28
       },
       "chainExtension": {
         "displayName": [
           "ChainExtension"
         ],
-        "type": 25
+        "type": 29
       },
       "hash": {
         "displayName": [
@@ -163,9 +163,35 @@
             "ink",
             "MessageResult"
           ],
-          "type": 15
+          "type": 16
         },
         "selector": "0x00a94438"
+      },
+      {
+        "args": [
+          {
+            "label": "router",
+            "type": {
+              "displayName": [
+                "AccountId"
+              ],
+              "type": 0
+            }
+          }
+        ],
+        "default": false,
+        "docs": [],
+        "label": "set_router",
+        "mutates": true,
+        "payable": false,
+        "returnType": {
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ],
+          "type": 20
+        },
+        "selector": "0x5a6d6019"
       },
       {
         "args": [
@@ -225,7 +251,7 @@
             "ink",
             "MessageResult"
           ],
-          "type": 18
+          "type": 25
         },
         "selector": "0x8d9513cb"
       },
@@ -260,7 +286,7 @@
             "ink",
             "MessageResult"
           ],
-          "type": 18
+          "type": 20
         },
         "selector": "0xcfdd9aa2"
       },
@@ -295,7 +321,7 @@
             "ink",
             "MessageResult"
           ],
-          "type": 18
+          "type": 20
         },
         "selector": "0xb1efc17b"
       },
@@ -325,7 +351,7 @@
               "displayName": [
                 "bool"
               ],
-              "type": 23
+              "type": 27
             }
           }
         ],
@@ -339,7 +365,7 @@
             "ink",
             "MessageResult"
           ],
-          "type": 18
+          "type": 20
         },
         "selector": "0x0094aed4"
       },
@@ -360,7 +386,7 @@
               "displayName": [
                 "bool"
               ],
-              "type": 23
+              "type": 27
             }
           }
         ],
@@ -374,7 +400,7 @@
             "ink",
             "MessageResult"
           ],
-          "type": 18
+          "type": 20
         },
         "selector": "0xb70199c5"
       },
@@ -418,7 +444,7 @@
             "ink",
             "MessageResult"
           ],
-          "type": 18
+          "type": 20
         },
         "selector": "0x42bb1778"
       },
@@ -453,7 +479,7 @@
             "ink",
             "MessageResult"
           ],
-          "type": 18
+          "type": 20
         },
         "selector": "0x54ee392f"
       }
@@ -947,6 +973,37 @@
           "composite": {
             "fields": [
               {
+                "name": "market",
+                "type": 13,
+                "typeName": "Market"
+              },
+              {
+                "name": "balance_a",
+                "type": 6,
+                "typeName": "u128"
+              },
+              {
+                "name": "balance_b",
+                "type": 6,
+                "typeName": "u128"
+              }
+            ]
+          }
+        },
+        "path": [
+          "predictor",
+          "predictor",
+          "MarketResponse"
+        ]
+      }
+    },
+    {
+      "id": 13,
+      "type": {
+        "def": {
+          "composite": {
+            "fields": [
+              {
                 "name": "underlying_token",
                 "type": 0,
                 "typeName": "AccountId"
@@ -958,12 +1015,12 @@
               },
               {
                 "name": "token_a",
-                "type": 13,
+                "type": 14,
                 "typeName": "ConditionalPSP22Ref"
               },
               {
                 "name": "token_b",
-                "type": 13,
+                "type": 14,
                 "typeName": "ConditionalPSP22Ref"
               },
               {
@@ -1022,14 +1079,14 @@
       }
     },
     {
-      "id": 13,
+      "id": 14,
       "type": {
         "def": {
           "composite": {
             "fields": [
               {
                 "name": "inner",
-                "type": 14,
+                "type": 15,
                 "typeName": "<ConditionalPSP22 as::ink::codegen::ContractCallBuilder>::Type"
               }
             ]
@@ -1043,7 +1100,7 @@
       }
     },
     {
-      "id": 14,
+      "id": 15,
       "type": {
         "def": {
           "composite": {
@@ -1064,7 +1121,7 @@
       }
     },
     {
-      "id": 15,
+      "id": 16,
       "type": {
         "def": {
           "variant": {
@@ -1072,7 +1129,7 @@
               {
                 "fields": [
                   {
-                    "type": 16
+                    "type": 17
                   }
                 ],
                 "index": 0,
@@ -1093,7 +1150,7 @@
         "params": [
           {
             "name": "T",
-            "type": 16
+            "type": 17
           },
           {
             "name": "E",
@@ -1106,7 +1163,7 @@
       }
     },
     {
-      "id": 16,
+      "id": 17,
       "type": {
         "def": {
           "variant": {
@@ -1118,7 +1175,7 @@
               {
                 "fields": [
                   {
-                    "type": 17
+                    "type": 18
                   }
                 ],
                 "index": 1,
@@ -1130,7 +1187,7 @@
         "params": [
           {
             "name": "T",
-            "type": 17
+            "type": 18
           }
         ],
         "path": [
@@ -1139,7 +1196,38 @@
       }
     },
     {
-      "id": 17,
+      "id": 18,
+      "type": {
+        "def": {
+          "composite": {
+            "fields": [
+              {
+                "name": "user",
+                "type": 19,
+                "typeName": "UserMarketData"
+              },
+              {
+                "name": "balance_a",
+                "type": 6,
+                "typeName": "u128"
+              },
+              {
+                "name": "balance_b",
+                "type": 6,
+                "typeName": "u128"
+              }
+            ]
+          }
+        },
+        "path": [
+          "predictor",
+          "predictor",
+          "UserResponse"
+        ]
+      }
+    },
+    {
+      "id": 19,
       "type": {
         "def": {
           "composite": {
@@ -1165,7 +1253,7 @@
       }
     },
     {
-      "id": 18,
+      "id": 20,
       "type": {
         "def": {
           "variant": {
@@ -1173,7 +1261,7 @@
               {
                 "fields": [
                   {
-                    "type": 19
+                    "type": 21
                   }
                 ],
                 "index": 0,
@@ -1194,7 +1282,7 @@
         "params": [
           {
             "name": "T",
-            "type": 19
+            "type": 21
           },
           {
             "name": "E",
@@ -1207,7 +1295,7 @@
       }
     },
     {
-      "id": 19,
+      "id": 21,
       "type": {
         "def": {
           "variant": {
@@ -1224,7 +1312,7 @@
               {
                 "fields": [
                   {
-                    "type": 20
+                    "type": 22
                   }
                 ],
                 "index": 1,
@@ -1240,7 +1328,7 @@
           },
           {
             "name": "E",
-            "type": 20
+            "type": 22
           }
         ],
         "path": [
@@ -1249,7 +1337,7 @@
       }
     },
     {
-      "id": 20,
+      "id": 22,
       "type": {
         "def": {
           "variant": {
@@ -1273,7 +1361,7 @@
               {
                 "fields": [
                   {
-                    "type": 21,
+                    "type": 23,
                     "typeName": "PSP22Error"
                   }
                 ],
@@ -1283,7 +1371,7 @@
               {
                 "fields": [
                   {
-                    "type": 21,
+                    "type": 23,
                     "typeName": "PSP22Error"
                   }
                 ],
@@ -1293,7 +1381,7 @@
               {
                 "fields": [
                   {
-                    "type": 21,
+                    "type": 23,
                     "typeName": "PSP22Error"
                   }
                 ],
@@ -1311,7 +1399,7 @@
               {
                 "fields": [
                   {
-                    "type": 21,
+                    "type": 23,
                     "typeName": "PSP22Error"
                   }
                 ],
@@ -1321,7 +1409,7 @@
               {
                 "fields": [
                   {
-                    "type": 21,
+                    "type": 23,
                     "typeName": "PSP22Error"
                   }
                 ],
@@ -1331,7 +1419,7 @@
               {
                 "fields": [
                   {
-                    "type": 21,
+                    "type": 23,
                     "typeName": "PSP22Error"
                   }
                 ],
@@ -1349,7 +1437,7 @@
               {
                 "fields": [
                   {
-                    "type": 21,
+                    "type": 23,
                     "typeName": "PSP22Error"
                   }
                 ],
@@ -1363,7 +1451,7 @@
               {
                 "fields": [
                   {
-                    "type": 21,
+                    "type": 23,
                     "typeName": "PSP22Error"
                   }
                 ],
@@ -1377,7 +1465,7 @@
               {
                 "fields": [
                   {
-                    "type": 21,
+                    "type": 23,
                     "typeName": "PSP22Error"
                   }
                 ],
@@ -1391,7 +1479,7 @@
               {
                 "fields": [
                   {
-                    "type": 21,
+                    "type": 23,
                     "typeName": "PSP22Error"
                   }
                 ],
@@ -1421,7 +1509,7 @@
               {
                 "fields": [
                   {
-                    "type": 21,
+                    "type": 23,
                     "typeName": "PSP22Error"
                   }
                 ],
@@ -1439,7 +1527,7 @@
       }
     },
     {
-      "id": 21,
+      "id": 23,
       "type": {
         "def": {
           "variant": {
@@ -1447,7 +1535,7 @@
               {
                 "fields": [
                   {
-                    "type": 22,
+                    "type": 24,
                     "typeName": "String"
                   }
                 ],
@@ -1473,7 +1561,7 @@
               {
                 "fields": [
                   {
-                    "type": 22,
+                    "type": 24,
                     "typeName": "String"
                   }
                 ],
@@ -1491,7 +1579,7 @@
       }
     },
     {
-      "id": 22,
+      "id": 24,
       "type": {
         "def": {
           "primitive": "str"
@@ -1499,7 +1587,91 @@
       }
     },
     {
-      "id": 23,
+      "id": 25,
+      "type": {
+        "def": {
+          "variant": {
+            "variants": [
+              {
+                "fields": [
+                  {
+                    "type": 26
+                  }
+                ],
+                "index": 0,
+                "name": "Ok"
+              },
+              {
+                "fields": [
+                  {
+                    "type": 9
+                  }
+                ],
+                "index": 1,
+                "name": "Err"
+              }
+            ]
+          }
+        },
+        "params": [
+          {
+            "name": "T",
+            "type": 26
+          },
+          {
+            "name": "E",
+            "type": 9
+          }
+        ],
+        "path": [
+          "Result"
+        ]
+      }
+    },
+    {
+      "id": 26,
+      "type": {
+        "def": {
+          "variant": {
+            "variants": [
+              {
+                "fields": [
+                  {
+                    "type": 5
+                  }
+                ],
+                "index": 0,
+                "name": "Ok"
+              },
+              {
+                "fields": [
+                  {
+                    "type": 22
+                  }
+                ],
+                "index": 1,
+                "name": "Err"
+              }
+            ]
+          }
+        },
+        "params": [
+          {
+            "name": "T",
+            "type": 5
+          },
+          {
+            "name": "E",
+            "type": 22
+          }
+        ],
+        "path": [
+          "Result"
+        ]
+      }
+    },
+    {
+      "id": 27,
       "type": {
         "def": {
           "primitive": "bool"
@@ -1507,7 +1679,7 @@
       }
     },
     {
-      "id": 24,
+      "id": 28,
       "type": {
         "def": {
           "primitive": "u32"
@@ -1515,7 +1687,7 @@
       }
     },
     {
-      "id": 25,
+      "id": 29,
       "type": {
         "def": {
           "variant": {}
