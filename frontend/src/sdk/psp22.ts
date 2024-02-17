@@ -29,6 +29,18 @@ export class PSP22Client {
       [address],
     );
   }
+
+  async increaseAllowance(sender: string, signer: Signer, spender: string, amount: BN) {
+    return contractTx(
+      this.api,
+      sender,
+      signer,
+      this.contract,
+      "PSP22::increase_allowance",
+      undefined,
+      [spender, amount]
+    );
+  }
 }
 
 export class USDClient extends PSP22Client {

@@ -5,8 +5,10 @@ import {
   web3FromAddress,
 } from "@polkadot/extension-dapp";
 import { ApiPromise, WsProvider } from "@polkadot/api";
+import { sha256AsU8a } from "@polkadot/util-crypto";
+import { Hash } from "@polkadot/types/interfaces";
 import { BN } from "@polkadot/util";
-import { USDClient } from "~/sdk";
+import { USDClient, PredictorClient, RouterClient } from "~/sdk";
 import { getFromLocalStorage } from "~/utils";
 import { emitter } from "~/main";
 import { contractAddresses } from "~/config";
@@ -50,13 +52,15 @@ class AccountStore {
 
       if (accounts.length > 0) {
         this.accounts = accounts;
-        this.activeAccount = accounts[0].address;
+        this.activeAccount = getFromLocalStorage(
+          "account",
+          accounts[0].address,
+        );
         if (accounts.length > 1 && !getFromLocalStorage("account", ""))
           // There was no account chosen before, let user choose one
           emitter.emit("select-account");
 
-        console.log(this.accounts);
-        localStorage.setItem("account", this.activeAccount); // In case of refreshing the page, the user will be automatically reconnected
+        localStorage.setItem("account", this.activeAccount!); // In case of refreshing the page, the user will be automatically reconnected
         this.udpateBalance();
       }
     } catch (e) {
@@ -96,6 +100,105 @@ class AccountStore {
     const res = await sdk.balanceOf(this.activeAccount);
 
     this.balance = (res.output?.toPrimitive() as any).ok / 1e6;
+  }
+
+  async addMarket() {
+    if (!this.api || !this.activeAccount) return;
+
+    const addressInjector = await web3FromAddress(this.activeAccount);
+
+    const data = {
+      title: "BTC Price",
+      description:
+        "Will the value of Bitcoin be above $50,000.00 on 18th February 2024?",
+    };
+
+    const sdk = new PredictorClient(
+      this.api,
+      contractAddresses.PREDICTOR_ADDRESS,
+    );
+    const res = await sdk.add_market(
+      this.activeAccount,
+      addressInjector.signer,
+      contractAddresses.USD_ADDRESS,
+      sha256AsU8a(JSON.stringify(data)) as Hash,
+      Date.now() + 1000 * 60 * 60,
+      1000 * 60 * 60,
+      0,
+    );
+
+    console.log(res);
+  }
+
+  async getMarkets() {
+    if (!this.api || !this.activeAccount) return [];
+    const sdk = new PredictorClient(
+      this.api,
+      contractAddresses.PREDICTOR_ADDRESS,
+    );
+
+    const markets = [];
+    for (let id = 0; ; id++) {
+      const res = await sdk.get_market("", id);
+      const market = (res.output?.toHuman() as any).Ok;
+      if (!market) break;
+      markets.push(market);
+    }
+    return markets;
+  }
+
+  async getMarket(id: number) {
+    if (!this.api || !this.activeAccount) return null;
+    const sdk = new PredictorClient(
+      this.api,
+      contractAddresses.PREDICTOR_ADDRESS,
+    );
+    const res = await sdk.get_market("", id);
+    return (res.output?.toHuman() as any).Ok;
+  }
+
+  async addLiquidity(marketId: number, amount: number) {
+    if (!this.api || !this.activeAccount) return;
+
+    const amountRaw = new BN(amount * 1e6);
+    const market = await this.getMarket(marketId);
+    const addressInjector = await web3FromAddress(this.activeAccount);
+    console.log(market);
+
+    const usd = new USDClient(this.api, contractAddresses.USD_ADDRESS);
+    await usd.increaseAllowance(
+      this.activeAccount,
+      addressInjector.signer,
+      contractAddresses.PREDICTOR_ADDRESS,
+      amountRaw,
+    );
+    console.log("after inc");
+
+    const predictor = new PredictorClient(
+      this.api,
+      contractAddresses.PREDICTOR_ADDRESS,
+    );
+
+    await predictor.mint(
+      this.activeAccount,
+      addressInjector.signer,
+      marketId,
+      amountRaw,
+    );
+    console.log("after mint");
+
+    const router = new RouterClient(this.api, contractAddresses.ROUTER_ADDRESS);
+
+    const res = await router.add_liquidity(
+      this.activeAccount,
+      addressInjector.signer,
+      market.market.tokenA.inner.accountId,
+      market.market.tokenB.inner.accountId,
+      amountRaw,
+      amountRaw,
+    );
+
+    console.log(res);
   }
 
   disconnect() {

@@ -10,7 +10,7 @@ import {
   } from './interact'
 
 
-class RouterClient {
+export class RouterClient {
     api: ApiPromise;
     contract: ContractPromise;
 

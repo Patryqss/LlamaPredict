@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import logo from "~/assets/logo.png";
+import { ADMIN_ADDRESS } from "~/config";
 import { formatAssetAmount } from "~/utils";
 
-const tabs = [
+const tabs = ref([
   {
     label: "Home",
     url: "/",
@@ -11,7 +12,28 @@ const tabs = [
     label: "Faucet",
     url: "/faucet",
   },
-];
+]);
+
+onBeforeMount(() => {
+  toggleAdminPanel();
+});
+
+watch(
+  () => accountStore.activeAccount,
+  () => {
+    toggleAdminPanel();
+  },
+);
+
+function toggleAdminPanel() {
+  if (accountStore.activeAccount === ADMIN_ADDRESS) {
+    if (!tabs.value.find((x) => x.label === "Admin")) {
+      tabs.value.push({ label: "Admin", url: "/admin" });
+    }
+  } else {
+    tabs.value = tabs.value.filter((x) => x.label !== "Admin");
+  }
+}
 </script>
 
 <template>

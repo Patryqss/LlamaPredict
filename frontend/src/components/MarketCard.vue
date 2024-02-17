@@ -13,11 +13,11 @@ defineProps({
     required: true,
   },
   shortPct: {
-    type: Number,
+    type: Number || String,
     required: true,
   },
   longPct: {
-    type: Number,
+    type: Number || String,
     required: true,
   },
   expireDate: {

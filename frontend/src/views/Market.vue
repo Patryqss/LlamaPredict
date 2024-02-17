@@ -1,24 +1,18 @@
 <script setup lang="ts">
+import { ADMIN_ADDRESS } from "~/config";
 import { emitter } from "~/main";
+import jsonMarkets from "~/markets/markets.json";
 import {
   abbreviate,
   formatPctValue,
   formatUSDAmount,
+  parseMarket,
+  getMarketHash,
   validateInput,
 } from "~/utils";
+import { Market } from "~/types";
 
 type MarketTxn = "PREDICT" | "ADD_LIQ";
-
-const market = {
-  id: 2,
-  title: "BTC closing price",
-  description:
-    "Will the value of Bitcoin be above $50,000.00 on 18 February 2024?",
-  minValue: 20_000,
-  maxValue: 60_000,
-  expireDate: new Date("18-02-2024"),
-  source: "5E7UzafXNhFLhuRNEekUd9xM7Sc1bffMfnGEyGGtsY3uW4cF",
-};
 
 const state = reactive({
   myPrediction: null as boolean | null,
@@ -26,7 +20,7 @@ const state = reactive({
   predictError: "",
   amountError: "",
   type: "PREDICT" as MarketTxn,
-  isLoading: false, // TODO: fetch market data and change this to false
+  isLoading: true,
   maxWin: 0,
   slippage: 0,
   fee: 0,
@@ -39,6 +33,29 @@ const position = reactive({
   currentValue: 0,
 });
 
+const route = useRoute();
+const market = ref(null as Market | null);
+
+onBeforeMount(async () => {
+  const rawMarket = await accountStore.getMarket(Number(route.params.id));
+  if (!rawMarket) {
+    // No market with this id on the blockchain
+    state.isLoading = false;
+    return;
+  }
+  const matchingJSON = jsonMarkets.find(
+    (m) => getMarketHash(m) === rawMarket.market.hash_,
+  );
+  if (!matchingJSON) {
+    // No matching market in our DB
+    state.isLoading = false;
+    return;
+  }
+
+  market.value = parseMarket(matchingJSON, Number(route.params.id), rawMarket);
+  state.isLoading = false;
+});
+
 function onTypeChange() {
   state.type = state.type === "ADD_LIQ" ? "PREDICT" : "ADD_LIQ";
   state.amount = "";
@@ -46,7 +63,7 @@ function onTypeChange() {
   state.predictError = "";
   state.amountError = "";
 }
-function onPredict(value: boolean) {
+function onPredictChoice(value: boolean) {
   state.predictError = "";
   state.myPrediction = value;
 }
@@ -57,26 +74,37 @@ function onAmountChange(value: string) {
 
   if (!state.amountError) calculateStats();
 }
-
 function calculateStats() {
   // TODO
 }
-
 function onClose() {
   // TODO
 }
-
 function onSubmit() {
-  if (
-    (state.type === "PREDICT" && state.myPrediction === null) ||
-    !state.amount
-  ) {
-    if (state.type === "PREDICT" && state.myPrediction === null)
+  if (state.type === "ADD_LIQ") onAddLiq();
+  else onPredict();
+}
+async function onAddLiq() {
+  if (!state.amount) {
+    if (!state.amount) state.amountError = "This value is required";
+    return;
+  }
+
+  await accountStore.addLiquidity(
+    Number(route.params.id),
+    Number(state.amount),
+  );
+
+  // emitter.emit("txn-success", "r812rc08723r8c2b083rb702873b");
+  state.amount = "";
+}
+function onPredict() {
+  if (state.myPrediction === null || !state.amount) {
+    if (state.myPrediction === null)
       state.predictError = "A choice is required";
     if (!state.amount) state.amountError = "This value is required";
     return;
   }
-  // TODO: perform actual txn
 
   emitter.emit("txn-success", "r812rc08723r8c2b083rb702873b");
   state.myPrediction = null;
@@ -85,23 +113,26 @@ function onSubmit() {
 </script>
 
 <template>
-  <Card title="Market Guess" :subtitle="market.description">
+  <div v-if="state.isLoading" class="mt-40 flex w-full justify-center">
+    <p class="loading loading-bars loading-lg" />
+  </div>
+  <Card v-else-if="!market" title="">
+    <p class="mb-10 text-center text-xl font-bold">Market not found!</p>
+  </Card>
+  <Card v-else title="Market Guess" :subtitle="market.description">
     <div class="flex flex-col gap-x-10 md:flex-row">
       <div :style="{ flex: '3 3 0%' }">
         <div>
-          <MarketChart
-            :min-value="market.minValue"
-            :max-value="market.maxValue"
-          />
+          <MarketChart />
         </div>
         <div class="mb-5 text-sm">
           <span>Resolution Source:</span>
           <a
             class="ml-1 underline"
-            :href="`https://alephzero.subscan.io/account/${market.source}`"
+            :href="`https://alephzero.subscan.io/account/${ADMIN_ADDRESS}`"
             target="_blank"
             rel="noopener noreferrer"
-            >{{ abbreviate(market.source, 10) }}</a
+            >{{ abbreviate(ADMIN_ADDRESS, 10) }}</a
           >
         </div>
         <div class="bg-primary/20 rounded-lg px-5 py-2">
@@ -183,7 +214,7 @@ function onSubmit() {
                 state.myPrediction === false &&
                 'outline-accent outline outline-4 outline-offset-2'
               "
-              @click="() => onPredict(false)"
+              @click="() => onPredictChoice(false)"
             >
               No
             </button>
@@ -193,7 +224,7 @@ function onSubmit() {
                 state.myPrediction === true &&
                 'outline-accent outline outline-4 outline-offset-2'
               "
-              @click="() => onPredict(true)"
+              @click="() => onPredictChoice(true)"
             >
               Yes
             </button>

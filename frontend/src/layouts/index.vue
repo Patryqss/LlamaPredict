@@ -8,7 +8,10 @@ import Navbar from "~/components/Navbar.vue";
       <div class="mx-auto max-w-7xl pb-20">
         <Navbar />
         <div class="mt-5 px-5 sm:px-10">
-          <RouterView />
+          <RouterView v-if="accountStore.api" />
+          <div v-else class="mt-40 flex w-full justify-center">
+            <p class="loading loading-bars loading-lg" />
+          </div>
         </div>
       </div>
     </div>

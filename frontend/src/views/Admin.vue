@@ -10,6 +10,9 @@ const state = reactive({
 
 function addMarket() {
   console.log(state);
+  accountStore.addMarket();
+
+  // accountStore.getMarkets();
   // TODO
 }
 </script>
