@@ -120,6 +120,21 @@ mod predictor {
         ) -> u128 {
             token.balance_of(user)
         }
+        #[cfg(test)]
+        fn underlying_transfer_from(&self, underlying_token: AccountId, caller: AccountId, amount: u128) -> Result<(), PSP22Error>{
+            Ok(())
+        }
+        #[cfg(not(test))]
+        fn underlying_transfer_from(
+            &self, 
+            underlying_token: AccountId, 
+            caller: AccountId, 
+            amount: u128
+        ) -> Result<(), PSP22Error> {
+            let account_id = self.env().account_id();
+            let mut underlying_token_ref: contract_ref!(PSP22) = underlying_token.into();
+            underlying_token_ref.transfer_from(caller, account_id, amount, vec![])
+        }
 
         #[ink(constructor)]
         pub fn new(
@@ -196,23 +211,19 @@ mod predictor {
         #[ink(message)]
         pub fn mint(&mut self, market_id: u64, amount: u128) -> Result<(), PredictorError>  {
             let caller = self.env().caller();
-            let account_id = self.env().account_id();
             let mut market = {
                 let r = self.markets.get(&market_id);
                 r.ok_or(PredictorError::MintForNotExistingMarket)
             }?;
-            let mut underlying_token_ref: contract_ref!(PSP22) = market.underlying_token.into();
             let amount = {
                 let r = amount.checked_shl(1);
                 r.ok_or(PredictorError::MintOverflow)?
             };
-            // Transfer from underlying token must take place before we get market by id
-            // Otherwise, inside transfer_from, contract could be called once again.
-            // By the end of function we would have different market state than we should.
-            // As underlying_token is passed as parameter, it is super important
-            // To validate it as soon as possible
+            
+            // TODO: underlying token should be passed as argument
+            // We cannot get market before transfer as it would introduce reentrancy risk
             {
-                let r = underlying_token_ref.transfer_from(caller, account_id, amount, vec![]);
+                let r = self.underlying_transfer_from(market.underlying_token, caller, amount);
                 r.map_err(|e|PredictorError::MintTransferFromError(e))?;
             }
 
@@ -242,8 +253,6 @@ mod predictor {
                     self.user_market_data.insert((caller, market_id), &user_market_data);
                 }
             };
-            
-            
 
             // Token A and B are trusted
             {
