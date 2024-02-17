@@ -6,7 +6,9 @@ import { IKeyringPair } from '@polkadot/types/types';
 import { BN } from '@polkadot/util';
 import {
     contractTx,
-  } from '@scio-labs/use-inkathon'
+    contractQuery,
+  } from './interact'
+
 
 class RouterClient {
     api: ApiPromise;
@@ -17,20 +19,59 @@ class RouterClient {
         this.contract = new ContractPromise(api, abi_router, router_address);
     }
 
+    calc_min_rcv(amount: BN) {
+        return amount.mul(new BN(95)).div(new BN(100));
+    }
+
+    async get_amounts_out(
+        sender: string,
+        amount_in: BN,
+        path: string[],
+    ) {
+        return contractQuery(
+            this.api,
+            sender,
+            this.contract,
+            "Router::get_amounts_out",
+            undefined,
+            [amount_in, path]
+        )
+    }
+
     async swap_exact_tokens_for_tokens(
-        sender: IKeyringPair,
-        from_asset: string,
-        to_asset: string,
-        amount: BN,
-        min_expected: BN
+        sender: string,
+        signer: Signer,
+        amount_in: BN,
+        amount_out_min: BN,
+        path: string[],
     ) {
         return contractTx(
             this.api,
             sender,
+            signer,
             this.contract,
-            "swap_exact_tokens_for_tokens",
+            "Router::swap_exact_tokens_for_tokens",
             undefined,
-            [amount, min_expected, [from_asset, to_asset], sender.address, Date.now() + 1e6]
+            [amount_in, amount_out_min, path, sender, Date.now() + 1e6]
+        )
+    }
+
+    async add_liquidity(
+        sender: string,
+        signer: Signer,
+        asset_a: string,
+        asset_b: string,
+        amount_a: BN,
+        amount_b: BN,
+    ) {
+        return contractTx(
+            this.api,
+            sender,
+            signer,
+            this.contract,
+            "Router::add_liquidity",
+            undefined,
+            [asset_a, asset_b, amount_a, amount_b, this.calc_min_rcv(amount_a), this.calc_min_rcv(amount_b), sender, Date.now() + 1e6]
         )
     }
 }

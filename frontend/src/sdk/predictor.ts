@@ -1,9 +1,8 @@
 import { ContractPromise } from '@polkadot/api-contract';
 import { ApiPromise } from '@polkadot/api';
-import { Hash } from '@polkadot/types/interfaces';
+import { Hash, AccountId } from '@polkadot/types/interfaces';
 import * as abi_predicotor from './abi/predictor.json';
 import { Signer } from '@polkadot/api/types';
-import { IKeyringPair } from '@polkadot/types/types';
 import { BN } from '@polkadot/util';
 import {
     contractTx,

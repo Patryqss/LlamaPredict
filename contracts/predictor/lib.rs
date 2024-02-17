@@ -169,7 +169,7 @@ mod predictor {
             resolved_at: Timestamp,
             resolution_time: u64,
             collateral_rate: u16,
-        ) -> Result<(), PredictorError>{
+        ) -> Result<u64, PredictorError>{
             let caller = self.env().caller();
             let admin = self.admin;
             if caller != admin {
@@ -205,7 +205,7 @@ mod predictor {
             self.markets.insert(market_id, &market);
             self.count = new_count;
 
-            Ok(())
+            Ok(market_id)
         }
 
         #[ink(message)]
