@@ -18,6 +18,11 @@ export const basicRoutes = [
         component: () => import("~/views/Market.vue"),
       },
       {
+        path: "/faucet",
+        name: "Faucet",
+        component: () => import("~/views/Faucet.vue"),
+      },
+      {
         path: "/admin",
         name: "Admin",
         component: () => import("~/views/Admin.vue"),

@@ -6,9 +6,11 @@ export function validateInput(
 ): string {
   if (Number.isNaN(Number(value))) return "Invalid amount";
 
-  if (value && Number(value < minValue)) return "Amount too small";
+  if (value && Number(value < minValue))
+    return `Amount too small. Min = ${minValue}`;
 
-  if (value && Number(value) > maxValue) return "Amount too big";
+  if (value && Number(value) > maxValue)
+    return `Amount too big. Max = ${maxValue}`;
 
   if (
     value &&

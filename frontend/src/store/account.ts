@@ -5,8 +5,11 @@ import {
   web3FromAddress,
 } from "@polkadot/extension-dapp";
 import { ApiPromise, WsProvider } from "@polkadot/api";
+import { BN } from "@polkadot/util";
+import { USDClient } from "~/sdk"
 import { getFromLocalStorage } from "~/utils";
 import { emitter } from "~/main";
+import { contractAddresses } from "~/config";
 
 type InjectedExtension = Awaited<ReturnType<typeof web3Enable>>[number];
 type InjectedAccountWithMeta = Awaited<ReturnType<typeof web3Accounts>>[number];
@@ -16,6 +19,7 @@ class AccountStore {
   extensions: InjectedExtension[] = [];
   accounts: InjectedAccountWithMeta[] = [];
   activeAccount: string | null = null;
+  balance = 0;
   loading = false;
 
   async init() {
@@ -26,6 +30,7 @@ class AccountStore {
       provider: new WsProvider("wss://ws.test.azero.dev"),
     });
     this.api = apiResponse;
+    this.udpateBalance()
   }
 
   async injectSigner() {
@@ -64,15 +69,27 @@ class AccountStore {
     localStorage.setItem("account", this.activeAccount);
   }
 
-  async submitPrediction() {
-    if (!this.api) {
+  async mintUSD(amount: string) {
+    if (!this.api || !this.activeAccount) {
       throw Error("Transaction could not be signed");
     }
 
-    const addressInjector = await web3FromAddress(this.activeAccount!);
-    // addressInjector.signer
+    const amountRaw = new BN(Number(amount) * 1e6);
+    const addressInjector = await web3FromAddress(this.activeAccount);
 
-    // Do stuff with SDK here
+    const sdk = new USDClient(this.api, contractAddresses.USD_ADDRESS);
+    const res = await sdk.mint(this.activeAccount, addressInjector.signer, amountRaw);
+
+    return res.result?.txHash.toString();
+  }
+
+  async udpateBalance() {
+    if (!this.api || !this.activeAccount) return;
+
+    const sdk = new USDClient(this.api, contractAddresses.USD_ADDRESS);
+    const res = await sdk.balanceOf(this.activeAccount);
+
+    this.balance = (res.output?.toPrimitive() as any).ok / 1e6
   }
 
   disconnect() {

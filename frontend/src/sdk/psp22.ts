@@ -25,7 +25,7 @@ export class PSP22Client {
             this.api,
             address,
             this.contract,
-            "balanceOf",
+            "PSP22::balance_of",
             undefined,
             [address]
         )
