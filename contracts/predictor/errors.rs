@@ -27,4 +27,11 @@ pub enum PredictorError {
     UseAbandonedTokenError(PSP22Error),
     UseAbandonedOverflow,
     UseAbandonedTransferError(PSP22Error),
+
+    SetOutcomeForNotExistingMarket,
+    SetOutcomeTwice,
+
+    BurnByOutcomeForNotExistingMarket,
+    BurnByOutcomeTooEarly,
+    BurnByOutcomeNoOutcome,
 }

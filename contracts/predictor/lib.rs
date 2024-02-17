@@ -36,6 +36,8 @@ mod predictor {
         total_tokens: u128,
         abandoned_a: u128,
         abandoned_b: u128,
+        outcome_a: u128,
+        outcome_b: u128,
     }
 
     #[ink(storage)]
@@ -109,6 +111,8 @@ mod predictor {
                 total_tokens: 0,
                 abandoned_a: 0,
                 abandoned_b: 0,
+                outcome_a: 0,
+                outcome_b: 0,
             };
 
             self.markets.insert(market_id, &market);
@@ -324,5 +328,46 @@ mod predictor {
             Ok(())   
         }
 
+        #[ink(message)]
+        pub fn set_outcome(&mut self, market_id: u64, outcome_a: u128, outcome_b: u128) -> Result<(), PredictorError> {
+            let caller = self.env().caller();
+            let admin = self.admin;
+            if caller != admin {
+                return Err(PredictorError::CallerIsNotAdmin);
+            }
+            let markets = &mut self.markets;
+            let mut market = {
+                let r = markets.get(&market_id);
+                r.ok_or(PredictorError::SetOutcomeForNotExistingMarket)
+            }?;
+            if market.outcome_a != 0 || market.outcome_b != 0 {
+                return Err(PredictorError::SetOutcomeTwice);
+            }
+
+            market.outcome_a = outcome_a;
+            market.outcome_b = outcome_b;
+            markets.insert(market_id, &market);
+
+            Ok(())
+        }
+
+        #[ink(message)]
+        pub fn burn_by_outcome(&mut self, market_id: u64) -> Result<(), PredictorError> {
+            let caller = self.env().caller();
+            let markets = &mut self.markets;
+            let mut market = {
+                let r = markets.get(&market_id);
+                r.ok_or(PredictorError::BurnByOutcomeForNotExistingMarket)
+            }?;
+            let now = self.env().block_timestamp();
+            if now < market.resolved_at {
+                return Err(PredictorError::BurnByOutcomeTooEarly);
+            }
+            if market.outcome_a == 0 && market.outcome_b == 0 {
+                return Err(PredictorError::BurnByOutcomeNoOutcome);
+            }
+
+            Ok(())
+        }
     }
 }
