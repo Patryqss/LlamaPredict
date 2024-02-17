@@ -18,6 +18,7 @@ declare module 'vue' {
     RouterView: typeof import('vue-router')['RouterView']
     SelectAccountModal: typeof import('./../src/components/modals/SelectAccountModal.vue')['default']
     ThemeChange: typeof import('./../src/components/ThemeChange/index.vue')['default']
+    TxnSuccessModal: typeof import('./../src/components/modals/TxnSuccessModal.vue')['default']
     WalletButton: typeof import('./../src/components/WalletButton.vue')['default']
   }
 }

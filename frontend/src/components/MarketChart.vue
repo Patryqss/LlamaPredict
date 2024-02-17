@@ -31,12 +31,13 @@ const state = reactive({
 onBeforeMount(() => {
   state.xAxisData = [
     new Date("02-16-2024 02:13").toString(),
+    new Date("02-16-2024 04:58").toString(),
     new Date("02-16-2024 08:58").toString(),
     new Date("02-16-2024 12:01").toString(),
     new Date("02-16-2024 13:23").toString(),
     new Date("02-16-2024 14:23").toString(),
   ];
-  state.yAxisData = [40_000, 43_345, 41_998, 38_124, 45_222];
+  state.yAxisData = [40_000, 35_352, 43_345, 41_998, 38_124, 45_222];
 });
 
 const hasData = computed(

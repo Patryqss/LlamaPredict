@@ -15,6 +15,11 @@ const props = defineProps({
   },
 });
 
+watch(
+  () => props.value,
+  () => (inputValue.value = props.value),
+);
+
 const emit = defineEmits(["input"]);
 const inputValue = ref(props.value);
 
