@@ -321,6 +321,24 @@ pub mod pair {
 
             let fee_on = self.mint_fee(reserves.0, reserves.1)?;
             let total_supply = self.psp22.total_supply();
+            // let k0 = U128::from(reserves.0).full_mul(U128::from(reserves.1)).integer_sqrt();
+            // let k1 = U128::from(amount_0_transferred + reserves.0)
+            //     .full_mul(U128::from(amount_1_transferred + reserves.1)).integer_sqrt();
+            // let amount_0_perfect = (k1 * U256::from(balance_0) / k0 - balance_0).low_u128();
+            // let amount_1_perfect = (k1 * U256::from(balance_1) / k0 - balance_1).low_u128();
+
+            // let delta_0 = if amount_0_perfect > amount_0_transferred {
+            //     amount_0_perfect - amount_0_transferred
+            // } else {
+            //     amount_0_transferred - amount_0_perfect
+            // };
+            // let delta_1 = if amount_1_perfect > amount_1_transferred {
+            //     amount_1_perfect - amount_1_transferred
+            // } else {
+            //     amount_1_transferred - amount_1_perfect
+            // };
+            // let fee_0 = delta_0 * TRADING_FEE_ADJ_AMOUNTS / (TRADING_FEE_ADJ_RESERVES * 2);
+            // let fee_1 = delta_1 * TRADING_FEE_ADJ_AMOUNTS / (TRADING_FEE_ADJ_RESERVES * 2);
 
             let liquidity = if total_supply == 0 {
                 let liq = casted_mul(amount_0_transferred, amount_1_transferred);

@@ -11,6 +11,7 @@ mod predictor {
     use psp22::PSP22;
     use ink::prelude::vec;
     use crate::errors::PredictorError;
+    #[cfg(feature = "std")]
     use ink::storage::traits::StorageLayout;
 
     fn scale(a: u128, scaler: u16) -> u128 {
@@ -48,12 +49,20 @@ mod predictor {
         outcome_b: u128,
     }
 
+    #[derive(Debug, PartialEq, Eq, scale::Encode, scale::Decode)]
+    #[cfg_attr(feature = "std", derive(scale_info::TypeInfo), derive(StorageLayout))]
+    pub struct UserMarketData {
+        deposited: u128,
+        claimed: u128,
+    }
+
     #[ink(storage)]
     pub struct PredictorContract {
         admin: AccountId,
         token_hash: Hash,
         router: AccountId,
         markets: Mapping<u64, Market>,
+        user_market_data: Mapping<(AccountId, u64), UserMarketData>,
         count: u64,
     }
 
@@ -69,6 +78,7 @@ mod predictor {
                 token_hash,
                 router,
                 markets: Default::default(),
+                user_market_data: Default::default(),
                 count: 0,
             }
         }
@@ -129,10 +139,14 @@ mod predictor {
         }
 
         #[ink(message)]
-        pub fn mint(&mut self, market_id: u64, underlying_token: AccountId, amount: u128) -> Result<(), PredictorError>  {
+        pub fn mint(&mut self, market_id: u64, amount: u128) -> Result<(), PredictorError>  {
             let caller = self.env().caller();
             let account_id = self.env().account_id();
-            let mut underlying_token_ref: contract_ref!(PSP22) = underlying_token.into();
+            let mut market = {
+                let r = self.markets.get(&market_id);
+                r.ok_or(PredictorError::MintForNotExistingMarket)
+            }?;
+            let mut underlying_token_ref: contract_ref!(PSP22) = market.underlying_token.into();
             let amount = {
                 let r = amount.checked_shl(1);
                 r.ok_or(PredictorError::MintOverflow)?
@@ -147,14 +161,6 @@ mod predictor {
                 r.map_err(|e|PredictorError::MintTransferFromError(e))?;
             }
 
-            let mut market = {
-                let r = self.markets.get(&market_id);
-                r.ok_or(PredictorError::MintForNotExistingMarket)
-            }?;
-            if market.underlying_token != underlying_token {
-                return Err(PredictorError::MintInvalidUnderlyingToken);
-            }
-
             let new_total_tokens = {
                 let r = market.total_tokens.checked_add(amount);
                 r.ok_or(PredictorError::MintOverflow)?
@@ -166,6 +172,23 @@ mod predictor {
             market.total_minted = new_total_minted;
             market.total_tokens = new_total_tokens;
             self.markets.insert(market_id, &market);
+
+            // Update amounts deposited by user
+            match self.user_market_data.get((caller, market_id)) {
+                Some(mut user_market_data) => {
+                    user_market_data.deposited += amount;
+                    self.user_market_data.insert((caller, market_id), &user_market_data);
+                },
+                None => {
+                    let user_market_data: UserMarketData = UserMarketData {
+                        deposited: amount,
+                        claimed: 0,
+                    };
+                    self.user_market_data.insert((caller, market_id), &user_market_data);
+                }
+            };
+            
+            
 
             // Token A and B are trusted
             {
@@ -220,6 +243,8 @@ mod predictor {
             market.total_minted = new_total_minted;
             market.total_tokens = new_total_tokens;
             markets.insert(market_id, &market);
+
+            // TODO: Add user data claimed
 
             // As transfer is last operation, reentracy does not introduce any risk
             {
@@ -279,6 +304,9 @@ mod predictor {
             }
             self.markets.insert(market_id, &market);
 
+
+            // TODO: Add user data claimed
+
             // As transfer is last operation, reentracy does not introduce any risk
             {
                 let r = underlying_token.transfer(caller, to_withdraw, vec![]);
@@ -334,6 +362,9 @@ mod predictor {
                 market.abandoned_b = new_abandoned;
             }
             self.markets.insert(market_id, &market);
+
+
+            // TODO: Add user data claimed
 
             // As transfer is last operation, reentracy does not introduce any risk
             {
@@ -421,6 +452,8 @@ mod predictor {
             market.total_minted = new_total_minted;
             market.total_tokens = new_total_tokens;
             self.markets.insert(market_id, &market);
+
+            // TODO: Add user data claimed
 
             let mut underlying_token: contract_ref!(PSP22) = market.underlying_token.into();
             {
