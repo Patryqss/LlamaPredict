@@ -1,6 +1,6 @@
 {
   "source": {
-    "hash": "0x73c2594b631b0e5a58564097fd0c3b6e94045a202fb9dafa83dd8ad74ff4cd15",
+    "hash": "0x7704b96f29158ff259f54bccdc12f8b797eab6230d251c28998331a8c3a4356d",
     "language": "ink! 4.3.0",
     "compiler": "rustc 1.69.0",
     "build_info": {
@@ -1359,14 +1359,8 @@
                 "name": "MintOverflow"
               },
               {
-                "fields": [
-                  {
-                    "type": 23,
-                    "typeName": "PSP22Error"
-                  }
-                ],
                 "index": 4,
-                "name": "MintTransferFromError"
+                "name": "MintUnderflow"
               },
               {
                 "fields": [
@@ -1376,7 +1370,7 @@
                   }
                 ],
                 "index": 5,
-                "name": "MintAError"
+                "name": "MintTransferFromError"
               },
               {
                 "fields": [
@@ -1386,14 +1380,24 @@
                   }
                 ],
                 "index": 6,
+                "name": "MintAError"
+              },
+              {
+                "fields": [
+                  {
+                    "type": 23,
+                    "typeName": "PSP22Error"
+                  }
+                ],
+                "index": 7,
                 "name": "MintBError"
               },
               {
-                "index": 7,
+                "index": 8,
                 "name": "MintInvalidUnderlyingToken"
               },
               {
-                "index": 8,
+                "index": 9,
                 "name": "BurnForNotExistingMarket"
               },
               {
@@ -1403,7 +1407,7 @@
                     "typeName": "PSP22Error"
                   }
                 ],
-                "index": 9,
+                "index": 10,
                 "name": "BurnAError"
               },
               {
@@ -1413,7 +1417,7 @@
                     "typeName": "PSP22Error"
                   }
                 ],
-                "index": 10,
+                "index": 11,
                 "name": "BurnBError"
               },
               {
@@ -1423,15 +1427,15 @@
                     "typeName": "PSP22Error"
                   }
                 ],
-                "index": 11,
+                "index": 12,
                 "name": "BurnTransferError"
               },
               {
-                "index": 12,
+                "index": 13,
                 "name": "BurnOverflow"
               },
               {
-                "index": 13,
+                "index": 14,
                 "name": "GiveUpForNotExistingMarket"
               },
               {
@@ -1441,11 +1445,11 @@
                     "typeName": "PSP22Error"
                   }
                 ],
-                "index": 14,
+                "index": 15,
                 "name": "GiveUpTokenError"
               },
               {
-                "index": 15,
+                "index": 16,
                 "name": "GiveUpOverflow"
               },
               {
@@ -1455,11 +1459,11 @@
                     "typeName": "PSP22Error"
                   }
                 ],
-                "index": 16,
+                "index": 17,
                 "name": "GiveUpTransferError"
               },
               {
-                "index": 17,
+                "index": 18,
                 "name": "UseAbandonedForNotExistingMarket"
               },
               {
@@ -1469,11 +1473,11 @@
                     "typeName": "PSP22Error"
                   }
                 ],
-                "index": 18,
+                "index": 19,
                 "name": "UseAbandonedTokenError"
               },
               {
-                "index": 19,
+                "index": 20,
                 "name": "UseAbandonedOverflow"
               },
               {
@@ -1483,27 +1487,27 @@
                     "typeName": "PSP22Error"
                   }
                 ],
-                "index": 20,
+                "index": 21,
                 "name": "UseAbandonedTransferError"
               },
               {
-                "index": 21,
+                "index": 22,
                 "name": "SetOutcomeForNotExistingMarket"
               },
               {
-                "index": 22,
+                "index": 23,
                 "name": "SetOutcomeTwice"
               },
               {
-                "index": 23,
+                "index": 24,
                 "name": "BurnByOutcomeForNotExistingMarket"
               },
               {
-                "index": 24,
+                "index": 25,
                 "name": "BurnByOutcomeTooEarly"
               },
               {
-                "index": 25,
+                "index": 26,
                 "name": "BurnByOutcomeNoOutcome"
               },
               {
@@ -1513,8 +1517,12 @@
                     "typeName": "PSP22Error"
                   }
                 ],
-                "index": 26,
+                "index": 27,
                 "name": "BurnByOutcomeBurnError"
+              },
+              {
+                "index": 28,
+                "name": "Debug"
               }
             ]
           }
