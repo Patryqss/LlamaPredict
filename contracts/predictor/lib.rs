@@ -5,7 +5,6 @@ pub mod errors;
 #[ink::contract]
 mod predictor {
     use conditional_psp22::ConditionalPSP22Ref;
-    use errors::PredictorError;
     use ink::contract_ref;
     use ink::storage::Mapping;
     use primitive_types::{U128, U256};
@@ -23,10 +22,6 @@ mod predictor {
         let denominator = U128::from(a).full_mul(U128::from(b));
         let result = denominator / U256::from(c);
         result.low_u128()
-    }
-
-    fn avg(a: u128, b: u128) -> u128 {
-        (a & b) + ((a ^ b) >> 1)
     }
 
     #[derive(Debug, PartialEq, Eq, scale::Encode, scale::Decode)]
@@ -273,6 +268,60 @@ mod predictor {
             }
 
             Ok(())
+        }
+
+        #[ink(message)]
+        pub fn use_abandoned(&mut self, market_id: u64, is_a: bool) -> Result<(), PredictorError> {
+            let caller = self.env().caller();
+            let mut underlying_token: contract_ref!(PSP22) = self.underlying_token.into();
+            let markets = &mut self.markets;
+            let mut market = {
+                let r = markets.get(&market_id);
+                r.ok_or(PredictorError::UseAbandonedForNotExistingMarket)
+            }?;
+
+            let abandoned = if is_a {
+                market.abandoned_a
+            } else {
+                market.abandoned_b
+            };
+            let abandoned_balance = if is_a {
+                market.token_a.balance_of(caller)
+            } else {
+                market.token_b.balance_of(caller)
+            };
+            let amount = abandoned.min(abandoned_balance);
+            let new_abandoned = abandoned - amount;
+            {
+                let r = if is_a {
+                    market.token_a.burn_from(caller, amount)
+                } else {
+                    market.token_b.burn_from(caller, amount)
+                };
+                r.map_err(|e|PredictorError::UseAbandonedTokenError(e))?;
+            };
+            let to_withdraw = if market.total_minted == 0 {
+                0
+            } else {
+                ratio(amount, market.total_tokens, market.total_minted)
+            };
+            let new_total_minted = market.total_minted - amount;
+            let new_total_tokens = market.total_tokens - to_withdraw;
+
+            market.total_minted = new_total_minted;
+            market.total_tokens = new_total_tokens;
+            if is_a {
+                market.abandoned_a = new_abandoned;
+            } else {
+                market.abandoned_b = new_abandoned;
+            }
+            markets.insert(market_id, &market);
+
+            {
+                let r = underlying_token.transfer(caller, amount, vec![]);
+                r.map_err(|e|PredictorError::UseAbandonedTransferError(e))?;
+            }
+            Ok(())   
         }
 
     }

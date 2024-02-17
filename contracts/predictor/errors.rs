@@ -22,4 +22,9 @@ pub enum PredictorError {
     GiveUpTokenError(PSP22Error),
     GiveUpOverflow,
     GiveUpTransferError(PSP22Error),
+
+    UseAbandonedForNotExistingMarket,
+    UseAbandonedTokenError(PSP22Error),
+    UseAbandonedOverflow,
+    UseAbandonedTransferError(PSP22Error),
 }
