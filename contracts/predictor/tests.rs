@@ -41,12 +41,12 @@ pub fn run() {
         r.expect_err("user cannot create market");
     }
     {
-        unsafe { UNDERLYING_BALANCES.as_mut().unwrap().insert((underlying_token, user), 200); }
+        unsafe { UNDERLYING_BALANCES.as_mut().unwrap().insert((underlying_token, user), 100); }
         let r = predictor.mint(market_id, 100);
         r.expect("mint failed");
     }
     {
-        let r = predictor.burn(market_id, 50);
+        let r = predictor.burn(market_id, 25);
         r.expect("burn failed");
     }
     set_caller(admin);
@@ -58,9 +58,9 @@ pub fn run() {
     }
     set_caller(user);
     {
-        let r = predictor.burn_by_outcome(market_id, 50);
+        let r = predictor.burn_by_outcome(market_id, 25);
         r.expect("burn by outcome failed");
         let b_left = unsafe { MARKET_BALANCES.as_ref().unwrap().get(&(token_b, user)).unwrap() };
-        assert_eq!(*b_left, 40);
+        assert_eq!(*b_left, 20);
     }
 }

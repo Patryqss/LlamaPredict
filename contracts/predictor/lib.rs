@@ -318,48 +318,6 @@ mod predictor {
             Ok(market_id)
         }
 
-        fn increase_user_deposited(
-            &mut self,
-            caller: AccountId,
-            market_id: u64,
-            amount: u128,
-        ) {
-            match self.user_market_data.get((caller, market_id)) {
-                Some(mut user_market_data) => {
-                    user_market_data.deposited = user_market_data.deposited.saturating_add(amount);
-                    self.user_market_data.insert((caller, market_id), &user_market_data);
-                },
-                None => {
-                    let user_market_data: UserMarketData = UserMarketData {
-                        deposited: amount,
-                        claimed: 0,
-                    };
-                    self.user_market_data.insert((caller, market_id), &user_market_data);
-                }
-            };
-        }
-
-        fn increase_user_claimed(
-            &mut self,
-            caller: AccountId,
-            market_id: u64,
-            amount: u128,
-        ) {
-            match self.user_market_data.get((caller, market_id)) {
-                Some(mut user_market_data) => {
-                    user_market_data.claimed = user_market_data.claimed.saturating_add(amount);
-                    self.user_market_data.insert((caller, market_id), &user_market_data);
-                },
-                None => {
-                    let user_market_data: UserMarketData = UserMarketData {
-                        deposited: 0,
-                        claimed: amount,
-                    };
-                    self.user_market_data.insert((caller, market_id), &user_market_data);
-                }
-            };
-        }
-
         #[ink(message)]
         pub fn mint(&mut self, market_id: u64, amount: u128) -> Result<(), PredictorError>  {
             let caller = self.env().caller();
@@ -379,10 +337,9 @@ mod predictor {
                 r.ok_or(PredictorError::MintOverflow)?
             };
             let collateral = scale(amount, market.collateral_rate);
-            let minted = amount.checked_sub(collateral).ok_or(PredictorError::MintUnderflow)?;
-            let new_total_minted = market.total_minted.checked_add(minted)
-                .ok_or(PredictorError::MintOverflow)?;
-
+            let minted = amount - collateral;
+            let new_total_minted = market.total_minted + minted;
+            let minted_per_token = minted >> 1;
 
             let user_market_key = (caller, market_id);
             let mut user_market_data = self.user_market_data.get(user_market_key).unwrap_or_default();
@@ -397,11 +354,11 @@ mod predictor {
 
             // Token A and B are trusted
             {
-                let r = self.market_token_mint_to(&mut market.token_a, caller, minted);
+                let r = self.market_token_mint_to(&mut market.token_a, caller, minted_per_token);
                 r.map_err(|e|PredictorError::MintAError(e))?;
             }
             {
-                let r = self.market_token_mint_to(&mut market.token_b, caller, minted);
+                let r = self.market_token_mint_to(&mut market.token_b, caller, minted_per_token);
                 r.map_err(|e|PredictorError::MintBError(e))?;
             }
 
@@ -416,11 +373,6 @@ mod predictor {
                 r.ok_or(PredictorError::BurnForNotExistingMarket)
             }?;
 
-            let new_total_minted = {
-                let r = market.total_minted.checked_sub(amount << 1);
-                r.ok_or(PredictorError::BurnOverflow)?
-            };
-
             // Token A and B are trusted
             {
                 let r = self.market_token_burn_from(&mut market.token_a, caller, amount);
@@ -431,10 +383,17 @@ mod predictor {
                 r.map_err(|e|PredictorError::BurnBError(e))?;
             }
 
+            let burned = amount << 1;
+            let new_total_minted = {
+                let r = market.total_minted.checked_sub(burned);
+                r.ok_or(PredictorError::BurnOverflow)?
+            };
+
+
             let to_withdraw = if market.total_minted == 0 {
                 0
             } else {
-                ratio(amount, market.total_tokens, market.total_minted)
+                ratio(burned, market.total_tokens, market.total_minted)
             };
             let new_total_tokens = market.total_tokens - to_withdraw;
             let user_market_key = (caller, market_id);
