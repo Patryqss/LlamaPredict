@@ -24,7 +24,7 @@ sp-arithmetic = { version = "18.0.0", default-features = false }
 amm-helpers = { path = "../helpers", default-features = false }
 
 [lib]
-name = "traits"
+name = "amm_traits"
 path = "lib.rs"
 crate-type = ["rlib"]
 

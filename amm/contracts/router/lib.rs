@@ -14,7 +14,7 @@ pub mod router {
         prelude::{string::String, vec, vec::Vec},
     };
     use psp22::{PSP22Error, PSP22};
-    use traits::{Factory, MathError, Pair, Router, RouterError};
+    use amm_traits::{Factory, MathError, Pair, Router, RouterError};
     use wrapped_azero::WrappedAZERO;
 
     #[ink(storage)]

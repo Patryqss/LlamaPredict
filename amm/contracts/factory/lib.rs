@@ -5,7 +5,7 @@ pub mod factory {
     use amm_helpers::ensure;
     use ink::{codegen::EmitEvent, env::hash::Blake2x256, storage::Mapping, ToAccountId};
     use pair_contract::pair::PairContractRef;
-    use traits::{Factory, FactoryError};
+    use amm_traits::{Factory, FactoryError};
 
     #[ink(event)]
     pub struct PairCreated {

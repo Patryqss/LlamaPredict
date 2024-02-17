@@ -42,7 +42,7 @@ pub mod pair {
 
     use primitive_types::U256;
     use psp22::{PSP22Data, PSP22Error, PSP22Event, PSP22Metadata, PSP22};
-    use traits::{Factory, MathError, Pair, PairError, SwapCallee};
+    use amm_traits::{Factory, MathError, Pair, PairError, SwapCallee};
 
     #[ink(event)]
     pub struct Mint {
