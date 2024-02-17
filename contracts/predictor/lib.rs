@@ -89,10 +89,12 @@ mod predictor {
 
     #[cfg(test)]
     pub static mut UNDERLYING_BALANCES: Option<std::collections::HashMap<(AccountId, AccountId), u128>> = None;
+    #[cfg(test)]
+    pub static mut MARKET_BALANCES: Option<std::collections::HashMap<(u64, AccountId), u128>> = None;
 
     impl PredictorContract {
         #[cfg(test)]
-        fn instantiate_token(&self, router: AccountId, token_hash: Hash, salt: u64) -> u64 {
+        fn instantiate_token(&self, _router: AccountId, _token_hash: Hash, salt: u64) -> u64 {
             salt
         }
         #[cfg(not(test))]
@@ -105,6 +107,13 @@ mod predictor {
         }
         #[cfg(test)]
         fn market_token_mint_to(&self, token: &u64, caller: AccountId, amount: u128) -> Result<(), PSP22Error>{
+            unsafe {
+                let balances = MARKET_BALANCES.as_mut().unwrap();
+                let key = (*token, caller);
+                let balance = balances.get(&key).unwrap_or(&0);
+                let new_balance = balance.checked_add(amount).ok_or(PSP22Error::InsufficientBalance)?;
+                balances.insert(key, new_balance);
+            }
             Ok(())
         }
         #[cfg(not(test))]
@@ -118,6 +127,13 @@ mod predictor {
         }
         #[cfg(test)]
         fn market_token_burn_from(&self, token: &u64, caller: AccountId, amount: u128) -> Result<(), PSP22Error>{
+            unsafe {
+                let balances = MARKET_BALANCES.as_mut().unwrap();
+                let key = (*token, caller);
+                let balance = balances.get(&key).unwrap_or(&0);
+                let new_balance = balance.checked_sub(amount).ok_or(PSP22Error::InsufficientBalance)?;
+                balances.insert(key, new_balance);
+            }
             Ok(())
         }
         #[cfg(not(test))]
@@ -162,6 +178,20 @@ mod predictor {
             let account_id = self.env().account_id();
             let mut underlying_token_ref: contract_ref!(PSP22) = underlying_token.into();
             underlying_token_ref.transfer_from(caller, account_id, amount, vec![])
+        }
+        #[cfg(test)]
+        fn underlying_transfer(&self, underlying_token: AccountId, caller: AccountId, amount: u128) -> Result<(), PSP22Error>{
+            Ok(())
+        }
+        #[cfg(not(test))]
+        fn underlying_transfer(
+            &self, 
+            underlying_token: AccountId, 
+            caller: AccountId, 
+            amount: u128
+        ) -> Result<(), PSP22Error> {
+            let mut underlying_token_ref: contract_ref!(PSP22) = underlying_token.into();
+            underlying_token_ref.transfer(caller, amount, vec![])
         }
 
         #[ink(constructor)]
@@ -385,7 +415,7 @@ mod predictor {
                 r.map_err(|e|PredictorError::BurnBError(e))?;
             }
 
-            let mut underlying_token: contract_ref!(PSP22) = market.underlying_token.into();
+            
 
             let to_withdraw = if market.total_minted == 0 {
                 0
@@ -402,7 +432,7 @@ mod predictor {
 
             // As transfer is last operation, reentracy does not introduce any risk
             {
-                let r = underlying_token.transfer(caller, to_withdraw, vec![]);
+                let r = self.underlying_transfer(market.underlying_token, caller, amount);
                 r.map_err(|e|PredictorError::BurnTransferError(e))?;
             }
 
@@ -463,7 +493,7 @@ mod predictor {
 
             // As transfer is last operation, reentracy does not introduce any risk
             {
-                let r = underlying_token.transfer(caller, to_withdraw, vec![]);
+                let r = self.underlying_transfer(market.underlying_token, caller, to_withdraw);
                 r.map_err(|e|PredictorError::GiveUpTransferError(e))?;
             }
 
@@ -478,7 +508,6 @@ mod predictor {
                 let r = self.markets.get(&market_id);
                 r.ok_or(PredictorError::UseAbandonedForNotExistingMarket)
             }?;
-            let mut underlying_token: contract_ref!(PSP22) = market.underlying_token.into();
 
             let abandoned = if is_a {
                 market.abandoned_a
@@ -522,7 +551,7 @@ mod predictor {
 
             // As transfer is last operation, reentracy does not introduce any risk
             {
-                let r = underlying_token.transfer(caller, amount, vec![]);
+                let r = self.underlying_transfer(market.underlying_token, caller, amount);
                 r.map_err(|e|PredictorError::UseAbandonedTransferError(e))?;
             }
             Ok(())   
@@ -613,9 +642,8 @@ mod predictor {
 
             self.increase_user_claimed(caller, market_id, to_withdraw);
 
-            let mut underlying_token: contract_ref!(PSP22) = market.underlying_token.into();
             {
-                let r = underlying_token.transfer(caller, to_withdraw, vec![]);
+                let r = self.underlying_transfer(market.underlying_token, caller, to_withdraw);
                 r.map_err(|e|PredictorError::BurnByOutcomeBurnError(e))?;
             }
             Ok(())
