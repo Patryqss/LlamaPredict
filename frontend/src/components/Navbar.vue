@@ -9,7 +9,7 @@ defineOptions({
 
 <template>
   <div
-    class="sticky top-0 z-30 flex h-16 w-full justify-center text-base-content opacity-90 backdrop-blur transition-all duration-100"
+    class="text-base-content sticky top-0 z-30 flex h-16 w-full justify-center opacity-90 backdrop-blur transition-all duration-100"
   >
     <nav class="navbar w-full">
       <div class="flex flex-1 md:gap-1 lg:gap-2">
@@ -20,15 +20,19 @@ defineOptions({
           class="btn-ghost btn px-2"
         >
           <div
-            class="inline-flex items-center text-lg text-primary transition-all duration-200 md:text-3xl"
+            class="text-primary inline-flex items-center text-lg transition-all duration-200 md:text-3xl"
           >
-            <img alt="logo" :src="logo" class="w-10">
-            <span class="text-accent">L<span class="lowercase">lama</span></span>
-            <span class="text-base-content">B<span class="lowercase">et</span></span>
+            <img alt="logo" :src="logo" class="w-10" />
+            <span class="text-accent"
+              >L<span class="lowercase">lama</span></span
+            >
+            <span class="text-base-content"
+              >B<span class="lowercase">et</span></span
+            >
           </div>
         </RouterLink>
       </div>
-      <div class="flex navbar-end gap-4">
+      <div class="navbar-end flex gap-4">
         <WalletButton />
         <ThemeChange />
       </div>

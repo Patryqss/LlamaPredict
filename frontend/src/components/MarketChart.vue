@@ -1,9 +1,7 @@
 <script lang="ts" setup>
 import ApexChart from "vue3-apexcharts";
-import { format } from 'date-fns';
-import { formatUSDAmount } from '~/utils';
-
-const dateFormat = 'MMM dd, HH:mm';
+import { format } from "date-fns";
+import { formatUSDAmount } from "~/utils";
 
 const props = defineProps({
   minValue: {
@@ -16,13 +14,15 @@ const props = defineProps({
   },
 });
 
+const dateFormat = "MMM dd, HH:mm";
+
 const state = reactive({
   isLoading: false, // TODO: start with true, fetch real values and then change this to false
   activeData: {
     lastPoint: -1,
-    date: '-',
+    date: "-",
     value: 0,
-    display: '-',
+    display: "-",
   },
   xAxisData: [] as string[],
   yAxisData: [] as number[],
@@ -30,15 +30,13 @@ const state = reactive({
 
 onBeforeMount(() => {
   state.xAxisData = [
-    new Date('02-16-2024 02:13').toString(),
-    new Date('02-16-2024 08:58').toString(),
-    new Date('02-16-2024 12:01').toString(),
-    new Date('02-16-2024 13:23').toString(),
-    new Date('02-16-2024 14:23').toString(),
+    new Date("02-16-2024 02:13").toString(),
+    new Date("02-16-2024 08:58").toString(),
+    new Date("02-16-2024 12:01").toString(),
+    new Date("02-16-2024 13:23").toString(),
+    new Date("02-16-2024 14:23").toString(),
   ];
-  state.yAxisData = [
-    40_000, 43_345, 41_998, 38_124, 45_222
-  ];
+  state.yAxisData = [40_000, 43_345, 41_998, 38_124, 45_222];
 });
 
 const hasData = computed(
@@ -46,37 +44,36 @@ const hasData = computed(
 );
 const chartOptions = computed(() => ({
   chart: {
-    type: 'area',
+    type: "area",
     zoom: { enabled: false },
     toolbar: { show: false },
   },
   xaxis: {
-    type: 'datetime',
+    type: "datetime",
     axisBorder: { show: false },
     axisTicks: { show: false },
-    labels: { style: { colors: '#FFF' }, datetimeUTC: false },
+    labels: { style: { colors: "#FFF" }, datetimeUTC: false },
     tooltip: { enabled: false },
     categories: state.xAxisData,
   },
   yaxis: {
     show: true,
     labels: {
-      style: { colors: '#FFF' },
+      style: { colors: "#FFF" },
       formatter: (v: number) => formatUSDAmount(v),
     },
     min: props.minValue,
     max: props.maxValue,
   },
   tooltip: {
-    cssClass: 'chart-tooltip',
+    cssClass: "chart-tooltip",
     x: {
       formatter: (_: any, data: any) => {
-        if (typeof data === 'object') {
+        if (typeof data === "object")
           return format(
             new Date(state.xAxisData[data.dataPointIndex]),
             dateFormat,
           );
-        }
       },
     },
   },
@@ -85,17 +82,17 @@ const chartOptions = computed(() => ({
   },
   stroke: {
     width: 1,
-    curve: 'smooth',
+    curve: "smooth",
   },
   markers: { hover: { size: 2 } },
   fill: {
     gradient: {
-      type: 'vertical',
+      type: "vertical",
       opacityFrom: 0.6,
       opacityTo: 0,
     },
   },
-  colors: ['#FFF'],
+  colors: ["#FFF"],
   grid: {
     show: false,
   },
@@ -120,9 +117,9 @@ function setActiveDataToLastPoint() {
   if (!hasData.value) {
     state.activeData = {
       lastPoint: -1,
-      date: '-',
+      date: "-",
       value: 0,
-      display: '-',
+      display: "-",
     };
     return;
   }
@@ -134,7 +131,7 @@ function setActiveDataToLastPoint() {
     ),
     value: state.yAxisData[state.yAxisData.length - 1],
     lastPoint: -1,
-    display: '',
+    display: "",
   };
   formatDisplayedData();
 }
@@ -152,7 +149,7 @@ function updateHoveredData(
       date: format(new Date(state.xAxisData[dataPointIndex]), dateFormat),
       value: state.yAxisData[dataPointIndex],
       lastPoint: dataPointIndex,
-      display: '',
+      display: "",
     };
     formatDisplayedData();
   }
@@ -169,31 +166,30 @@ function formatDisplayedData() {
         <p class="text-xl sm:text-3xl">
           <span>{{ state.activeData.display }}</span>
         </p>
-        <p
-          class="flex space-x-1 text-xs sm:text-sm"
-        >
+        <p class="flex space-x-1 text-xs sm:text-sm">
           <span class="tracking-wider">Prediction history</span>
-          <span
-            class="uppercase tracking-wider opacity-50"
-          >
+          <span class="uppercase tracking-wider opacity-50">
             {{ state.activeData.date }}
           </span>
         </p>
       </div>
     </div>
     <div class="w-full" :class="state.isLoading && 'flex justify-center'">
-      <div v-if="state.isLoading" class="loading loading-bars loading-lg mx-auto my-8" />
-      <ApexChart
-      v-else-if="hasData"
-      type="area"
-      height="400px"
-      :options="chartOptions"
-      :series="chartData"
-      @click="updateHoveredData"
-      @mouse-move="updateHoveredData"
-      @mouseleave="setActiveDataToLastPoint"
+      <div
+        v-if="state.isLoading"
+        class="loading loading-bars loading-lg mx-auto my-8"
       />
-      <p v-else class="my-8 mx-auto text-center text-gray-lighter">
+      <ApexChart
+        v-else-if="hasData"
+        type="area"
+        height="400px"
+        :options="chartOptions"
+        :series="chartData"
+        @click="updateHoveredData"
+        @mouse-move="updateHoveredData"
+        @mouseleave="setActiveDataToLastPoint"
+      />
+      <p v-else class="text-gray-lighter my-8 mx-auto text-center">
         No data found
       </p>
     </div>

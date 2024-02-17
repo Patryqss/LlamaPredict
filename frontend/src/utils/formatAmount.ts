@@ -9,10 +9,10 @@ export function formatAssetAmount(
 ) {
   const amount = Number(value);
   if (
-    (amount <= 0 && !options.maxDigits)
-    || Number.isNaN(amount)
-    || (options.maxDigits && Number(Number(value).toFixed(options.maxDigits)))
-      === 0
+    (amount <= 0 && !options.maxDigits) ||
+    Number.isNaN(amount) ||
+    (options.maxDigits && Number(Number(value).toFixed(options.maxDigits))) ===
+      0
   )
     return "0.00";
   else if (Math.abs(amount) >= 0.01 && !options.minDigits)
@@ -22,19 +22,16 @@ export function formatAssetAmount(
     });
   else {
     let maxDigits;
-    if (options.maxDigits)
-      maxDigits = options.maxDigits;
-    else if (options.minDigits)
-      maxDigits = options.minDigits;
+    if (options.maxDigits) maxDigits = options.maxDigits;
+    else if (options.minDigits) maxDigits = options.minDigits;
     else {
       const whole = Math.floor(amount);
-      const fraction
-        = amount >= 1 ? "" : (amount - whole).toString().substring(2);
-      if (!fraction)
-        maxDigits = 2;
+      const fraction =
+        amount >= 1 ? "" : (amount - whole).toString().substring(2);
+      if (!fraction) maxDigits = 2;
       else {
-        const firstSignificant
-          = fraction.split("").findIndex(v => v !== "0") + 1;
+        const firstSignificant =
+          fraction.split("").findIndex((v) => v !== "0") + 1;
         maxDigits = 2 * Math.round(firstSignificant / 2); // round to the nearest even number
       }
     }
@@ -58,8 +55,8 @@ export function formatUSDAmount(value: string | number | null) {
 
   if (value >= 1)
     return (
-      "$"
-      + value.toLocaleString("en-US", {
+      "$" +
+      value.toLocaleString("en-US", {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2,
       })
@@ -79,15 +76,13 @@ export function formatUSDAmount(value: string | number | null) {
       .substring(0, 8)}`;
   else result = `${(whole + Number(fraction)).toLocaleString("en-US")}.00`;
 
-  if (Number(result) === 0)
-    return "$0.00";
+  if (Number(result) === 0) return "$0.00";
   return "$" + result;
 }
 
 function cutTrailingZeros(amount: string) {
   const cutAmount = amount.replace(/\.?0+$/, "");
-  if (cutAmount.includes("."))
-    return cutAmount;
+  if (cutAmount.includes(".")) return cutAmount;
   return `${cutAmount}.00`;
 }
 

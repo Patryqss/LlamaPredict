@@ -2,7 +2,7 @@
 import { modalsID } from "~/config";
 import { abbreviate } from "~/utils";
 
-const accounts = accountStore.accounts.map(a => a.address);
+const accounts = accountStore.accounts.map((a) => a.address);
 const chosenAccount = ref(accounts[0]);
 
 function onAccountSelect(account: string) {
@@ -27,9 +27,16 @@ function onConfirm() {
   >
     <div>
       <div v-for="account in accounts" :key="account">
-        <label class="label cursor-pointer" @click="() => onAccountSelect(account)">
+        <label
+          class="label cursor-pointer"
+          @click="() => onAccountSelect(account)"
+        >
           <span class="label-text">{{ abbreviate(account, 10) }}</span>
-          <input type="radio" class="radio checked:bg-accent" :checked="chosenAccount === account">
+          <input
+            type="radio"
+            class="radio checked:bg-accent"
+            :checked="chosenAccount === account"
+          />
         </label>
       </div>
     </div>

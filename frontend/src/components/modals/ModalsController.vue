@@ -20,8 +20,7 @@ function openAccountsModal() {
 async function openModal(id: string) {
   await nextTick(); // wait for modal that is going to be rendered
   const modal = document.getElementById(id);
-  if (modal)
-    (modal as any).showModal();
+  if (modal) (modal as any).showModal();
   else console.error("Modal could not be opened");
 }
 function closeModals() {

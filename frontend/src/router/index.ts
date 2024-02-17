@@ -42,8 +42,7 @@ export const router = createRouter({
 
 // Injection Progress
 router.beforeEach(() => {
-  if (!NProgress.isStarted())
-    NProgress.start();
+  if (!NProgress.isStarted()) NProgress.start();
 });
 
 router.afterEach(() => {

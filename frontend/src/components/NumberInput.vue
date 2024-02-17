@@ -21,9 +21,9 @@ const inputValue = ref(props.value);
 function onKeyPress(e: KeyboardEvent) {
   const allowedKeys = /[0-9]|\.|,/;
   if (
-    !allowedKeys.test(e.key)
-    || ((e.key === "." || e.key === ",")
-      && inputValue.value!.toString().includes("."))
+    !allowedKeys.test(e.key) ||
+    ((e.key === "." || e.key === ",") &&
+      inputValue.value!.toString().includes("."))
   )
     e.preventDefault();
 }
@@ -34,16 +34,15 @@ function onInput() {
     .replace(",", ".")
     .replaceAll(",", "")
     .replaceAll(" ", "")
-    .replace(/\..*/, c => "." + c.replace(/\./g, () => ""));
+    .replace(/\..*/, (c) => "." + c.replace(/\./g, () => ""));
   // replace first comma with dot and then reomve all other commas and whitespaces and in the end remove all dots except the first one
   // it's ugly but also the only way to make it work on mobiles since preventDefault() cannot be triggered there like on desktop
-  if (Number(toEmit) || Number(toEmit) === 0)
-    emit("input", toEmit);
+  if (Number(toEmit) || Number(toEmit) === 0) emit("input", toEmit);
 }
 </script>
 
 <template>
-  <div class="relative form-control w-full">
+  <div class="form-control relative w-full">
     <label class="label">
       <span class="label-text text-neutral-content">{{ label }}</span>
     </label>
@@ -51,7 +50,7 @@ function onInput() {
       <input
         v-model="inputValue"
         type="text"
-        class="input input-bordered pr-20 rounded-lg w-full input-primary bg-opacity-20 text-neutral-content"
+        class="input input-bordered input-primary text-neutral-content w-full rounded-lg bg-opacity-20 pr-20"
         :class="error ? 'input-error' : 'input-primary'"
         pattern="/[0-9]|\.|,/"
         inputmode="decimal"
@@ -60,7 +59,7 @@ function onInput() {
         autocomplete="off"
         @keypress="onKeyPress"
         @input="onInput"
-      >
+      />
     </div>
     <label v-if="error" class="label">
       <span class="label-text-alt text-error">{{ error }}</span>

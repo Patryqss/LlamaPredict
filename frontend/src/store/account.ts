@@ -16,8 +16,7 @@ class AccountStore {
 
   async init() {
     const wasConnected = !!getFromLocalStorage("account", "");
-    if (wasConnected)
-      this.connectToSigner();
+    if (wasConnected) this.connectToSigner();
 
     const apiResponse = await ApiPromise.create({
       provider: new WsProvider("wss://ws.test.azero.dev"),
@@ -34,12 +33,11 @@ class AccountStore {
     this.loading = true;
     try {
       await this.injectSigner();
-      const accounts = await web3Accounts(
-        {
-          extensions: ["aleph-zero-signer"],
-          genesisHash: "0x05d5279c52c484cc80396535a316add7d47b1c5b9e0398dd1f584149341460c5",
-        },
-      );
+      const accounts = await web3Accounts({
+        extensions: ["aleph-zero-signer"],
+        genesisHash:
+          "0x05d5279c52c484cc80396535a316add7d47b1c5b9e0398dd1f584149341460c5",
+      });
 
       if (accounts.length > 0) {
         this.accounts = accounts;

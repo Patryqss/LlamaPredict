@@ -46,7 +46,7 @@ function onDisconnect() {
     }}</label>
     <ul
       tabindex="0"
-      class="dropdown-content z-[1] menu mt-1 p-2 shadow bg-accent text-accent-content rounded-box w-52"
+      class="dropdown-content menu bg-accent text-accent-content rounded-box z-[1] mt-1 w-52 p-2 shadow"
     >
       <li>
         <div class="flex" @click="onAddressCopy">
@@ -61,7 +61,7 @@ function onDisconnect() {
           <span>Change Account</span>
         </div>
       </li>
-      <hr class="my-1">
+      <hr class="my-1" />
       <li>
         <div class="flex" @click="onDisconnect">
           <LogoutIcon class="w-4 shrink-0" />

@@ -4,10 +4,10 @@ import Navbar from "~/components/Navbar.vue";
 
 <template>
   <div class="antialiased">
-    <div class="min-h-screen bg-gradient-to-bl from-primary to-base-100">
+    <div class="from-primary to-base-100 min-h-screen bg-gradient-to-bl">
       <div class="mx-auto max-w-7xl pb-20">
         <Navbar />
-        <div class="mt-5 sm:px-10 px-5">
+        <div class="mt-5 px-5 sm:px-10">
           <RouterView />
         </div>
       </div>
@@ -15,6 +15,4 @@ import Navbar from "~/components/Navbar.vue";
   </div>
 </template>
 
-<style scoped>
-
-</style>
+<style scoped></style>
