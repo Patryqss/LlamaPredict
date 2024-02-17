@@ -55,7 +55,7 @@ function onInput() {
       <input
         v-model="inputValue"
         type="text"
-        class="input input-bordered input-primary text-neutral-content w-full rounded-lg bg-opacity-20 pr-20"
+        class="input input-bordered input-primary text-neutral-content w-full rounded-lg bg-opacity-20 pl-6"
         :class="error ? 'input-error' : 'input-primary'"
         pattern="/[0-9]|\.|,/"
         inputmode="decimal"
@@ -65,6 +65,12 @@ function onInput() {
         @keypress="onKeyPress"
         @input="onInput"
       />
+      <p
+        class="pointer-events-none absolute left-2 flex items-center text-lg sm:text-2xl"
+        :style="{ top: '50%', transform: 'translateY(-50%)' }"
+      >
+        <span class="text-neutral-content ml-1 text-base">$</span>
+      </p>
     </div>
     <label v-if="error" class="label">
       <span class="label-text-alt text-error">{{ error }}</span>

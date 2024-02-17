@@ -1,5 +1,9 @@
 import { reactive } from "vue";
-import { web3Accounts, web3Enable } from "@polkadot/extension-dapp";
+import {
+  web3Accounts,
+  web3Enable,
+  web3FromAddress,
+} from "@polkadot/extension-dapp";
 import { ApiPromise, WsProvider } from "@polkadot/api";
 import { getFromLocalStorage } from "~/utils";
 import { emitter } from "~/main";
@@ -58,6 +62,17 @@ class AccountStore {
   changeActiveAccount(address: string) {
     this.activeAccount = address;
     localStorage.setItem("account", this.activeAccount);
+  }
+
+  async submitPrediction() {
+    if (!this.api) {
+      throw Error("Transaction could not be signed");
+    }
+
+    const addressInjector = await web3FromAddress(this.activeAccount!);
+    // addressInjector.signer
+
+    // Do stuff with SDK here
   }
 
   disconnect() {

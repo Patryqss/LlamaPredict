@@ -1,18 +1,7 @@
 <script lang="ts" setup>
 import ApexChart from "vue3-apexcharts";
 import { format } from "date-fns";
-import { formatUSDAmount } from "~/utils";
-
-const props = defineProps({
-  minValue: {
-    type: Number,
-    required: true,
-  },
-  maxValue: {
-    type: Number,
-    required: true,
-  },
-});
+import { formatPctValue } from "~/utils";
 
 const dateFormat = "MMM dd, HH:mm";
 
@@ -37,7 +26,7 @@ onBeforeMount(() => {
     new Date("02-16-2024 13:23").toString(),
     new Date("02-16-2024 14:23").toString(),
   ];
-  state.yAxisData = [40_000, 35_352, 43_345, 41_998, 38_124, 45_222];
+  state.yAxisData = [50, 34, 62, 70, 48, 30];
 });
 
 const hasData = computed(
@@ -61,10 +50,10 @@ const chartOptions = computed(() => ({
     show: true,
     labels: {
       style: { colors: "#FFF" },
-      formatter: (v: number) => formatUSDAmount(v),
+      formatter: (v: number) => formatPctValue(v),
     },
-    min: props.minValue,
-    max: props.maxValue,
+    min: 0,
+    max: 100,
   },
   tooltip: {
     cssClass: "chart-tooltip",
@@ -156,7 +145,7 @@ function updateHoveredData(
   }
 }
 function formatDisplayedData() {
-  state.activeData.display = formatUSDAmount(state.activeData.value);
+  state.activeData.display = formatPctValue(state.activeData.value);
 }
 </script>
 
@@ -168,7 +157,7 @@ function formatDisplayedData() {
           <span>{{ state.activeData.display }}</span>
         </p>
         <p class="flex space-x-1 text-xs sm:text-sm">
-          <span class="tracking-wider">Prediction history</span>
+          <span class="tracking-wider">Market Confidence</span>
           <span class="uppercase tracking-wider opacity-50">
             {{ state.activeData.date }}
           </span>
@@ -188,7 +177,7 @@ function formatDisplayedData() {
         :series="chartData"
         @click="updateHoveredData"
         @mouse-move="updateHoveredData"
-        @mouseleave="setActiveDataToLastPoint"
+        @mouse-leave="setActiveDataToLastPoint"
       />
       <p v-else class="text-gray-lighter my-8 mx-auto text-center">
         No data found

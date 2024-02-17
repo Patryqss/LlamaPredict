@@ -10,7 +10,8 @@ import {
 const market = {
   id: 2,
   title: "BTC closing price",
-  description: "What will be the value of Bitcoin on 18 February 2024?",
+  description:
+    "Will the value of Bitcoin be above $50,000.00 on 18 February 2024?",
   minValue: 20_000,
   maxValue: 60_000,
   expireDate: new Date("18-02-2024"),
@@ -18,8 +19,7 @@ const market = {
 };
 
 const state = reactive({
-  myPrediction: "",
-  myPredictionSlider: "0",
+  myPrediction: null as boolean | null,
   betSize: "",
   predictError: "",
   betError: "",
@@ -30,29 +30,15 @@ const state = reactive({
 });
 
 const position = reactive({
-  target: 0,
+  prediction: null,
   size: 0,
   PnL: 0,
   currentValue: 0,
 });
 
-watch(
-  () => state.myPredictionSlider,
-  () => onPreditcionChange(state.myPredictionSlider),
-);
-
-function onPreditcionChange(value: string) {
+function onPredict(value: boolean) {
   state.predictError = "";
   state.myPrediction = value;
-  state.myPredictionSlider = value;
-  state.predictError = validateInput(
-    value,
-    market.minValue,
-    market.maxValue,
-    2,
-  );
-
-  if (!state.predictError) calculateStats();
 }
 function onBetChange(value: string) {
   state.betError = "";
@@ -76,10 +62,17 @@ function onClose() {
 }
 
 function onSubmit() {
-  if (state.predictError || state.betError) return;
-  console.log(state.myPrediction);
+  if (state.myPrediction === null || !state.betSize) {
+    if (state.myPrediction === null)
+      state.predictError = "A choice is required";
+    if (!state.betSize) state.betError = "This value is required";
+    return;
+  }
   // TODO: perform actual txn
+
   emitter.emit("txn-success", "r812rc08723r8c2b083rb702873b");
+  state.myPrediction = null;
+  state.betSize = "";
 }
 </script>
 
@@ -109,9 +102,15 @@ function onSubmit() {
             class="grid grid-cols-2 justify-between sm:grid-cols-5 sm:items-end"
           >
             <div>
-              <p class="stat-title">Target</p>
+              <p class="stat-title">Prediction</p>
               <p class="stat-value text-2xl">
-                {{ formatUSDAmount(position.target) }}
+                {{
+                  position.prediction === null
+                    ? "-"
+                    : position.prediction
+                      ? "YES"
+                      : "NO"
+                }}
               </p>
             </div>
             <div>
@@ -142,20 +141,33 @@ function onSubmit() {
         </div>
       </div>
       <div class="mt-10 flex-1 md:mt-0">
-        <NumberInput
-          :value="state.myPrediction"
-          label="My prediction"
-          :error="state.predictError"
-          @input="onPreditcionChange"
-        />
-        <input
-          v-model="state.myPredictionSlider"
-          type="range"
-          step="0.01"
-          :min="market.minValue"
-          :max="market.maxValue"
-          class="range range-accent mt-3"
-        />
+        <p class="label-text mb-2 ml-2">Prediction</p>
+        <div class="flex gap-x-5">
+          <button
+            class="btn btn-primary flex-1"
+            :class="
+              state.myPrediction === false &&
+              'outline-accent outline outline-4 outline-offset-2'
+            "
+            @click="() => onPredict(false)"
+          >
+            No
+          </button>
+          <button
+            class="btn btn-primary flex-1"
+            :class="
+              state.myPrediction === true &&
+              'outline-accent outline outline-4 outline-offset-2'
+            "
+            @click="() => onPredict(true)"
+          >
+            Yes
+          </button>
+        </div>
+        <div v-if="state.predictError" class="label">
+          <p class="text-error label-text-alt">{{ state.predictError }}</p>
+        </div>
+
         <NumberInput
           class="my-5"
           :value="state.betSize"
