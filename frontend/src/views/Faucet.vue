@@ -23,7 +23,7 @@ async function onMint() {
 
   try {
     const txnHash = await accountStore.mintUSD(state.amount);
-    emitter.emit('txn-success', txnHash!);
+    emitter.emit("txn-success", txnHash!);
     state.amount = "";
     accountStore.udpateBalance();
   } catch (e) {

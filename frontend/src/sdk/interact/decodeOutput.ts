@@ -1,40 +1,44 @@
-import { ContractPromise } from '@polkadot/api-contract'
-import { ContractExecResult } from '@polkadot/types/interfaces'
-import { AnyJson, TypeDef } from '@polkadot/types/types'
-import { stringCamelCase } from '@polkadot/util'
+import { ContractPromise } from "@polkadot/api-contract";
+import { ContractExecResult } from "@polkadot/types/interfaces";
+import { AnyJson, TypeDef } from "@polkadot/types/types";
+import { stringCamelCase } from "@polkadot/util";
 
 export const getAbiMessage = (contract: ContractPromise, method: string) => {
-    const abiMessage = contract.abi.messages.find(
-      (m) => stringCamelCase(m.method) === stringCamelCase(method),
-    )
-    if (!abiMessage) {
-      throw new Error(`"${method}" not found in Contract`)
-    }
-    return abiMessage
+  const abiMessage = contract.abi.messages.find(
+    (m) => stringCamelCase(m.method) === stringCamelCase(method),
+  );
+  if (!abiMessage) {
+    throw new Error(`"${method}" not found in Contract`);
   }
+  return abiMessage;
+};
 
 /**s
  * Helper types & functions
  * SOURCE: https://github.com/paritytech/contracts-ui (GPL-3.0-only)
  */
 type ContractResultErr = {
-  Err: AnyJson
-}
+  Err: AnyJson;
+};
 
 interface ContractResultOk {
-  Ok: AnyJson
+  Ok: AnyJson;
 }
 
-function isErr(o: ContractResultErr | ContractResultOk | AnyJson): o is ContractResultErr {
-  return typeof o === 'object' && o !== null && 'Err' in o
+function isErr(
+  o: ContractResultErr | ContractResultOk | AnyJson,
+): o is ContractResultErr {
+  return typeof o === "object" && o !== null && "Err" in o;
 }
 
-function isOk(o: ContractResultErr | ContractResultOk | AnyJson): o is ContractResultOk {
-  return typeof o === 'object' && o !== null && 'Ok' in o
+function isOk(
+  o: ContractResultErr | ContractResultOk | AnyJson,
+): o is ContractResultOk {
+  return typeof o === "object" && o !== null && "Ok" in o;
 }
 
 function getReturnTypeName(type: TypeDef | null | undefined) {
-  return type?.lookupName || type?.type || ''
+  return type?.lookupName || type?.type || "";
 }
 
 /**
@@ -43,65 +47,65 @@ function getReturnTypeName(type: TypeDef | null | undefined) {
  * SOURCE: https://github.com/paritytech/contracts-ui (GPL-3.0-only)
  */
 export function decodeOutput(
-  { result }: Pick<ContractExecResult, 'result' | 'debugMessage'>,
+  { result }: Pick<ContractExecResult, "result" | "debugMessage">,
   contract: ContractPromise,
   method: string,
 ): {
-  output: any
-  decodedOutput: string
-  isError: boolean
+  output: any;
+  decodedOutput: string;
+  isError: boolean;
 } {
-  let output
-  let decodedOutput = ''
-  let isError = true
+  let output;
+  let decodedOutput = "";
+  let isError = true;
 
   if (result.isOk) {
-    const flags = result.asOk.flags.toHuman()
-    isError = flags.includes('Revert')
-    const abiMessage = getAbiMessage(contract, method)
-    const returnType = abiMessage.returnType
-    const returnTypeName = getReturnTypeName(returnType)
-    const registry = contract.abi.registry
+    const flags = result.asOk.flags.toHuman();
+    isError = flags.includes("Revert");
+    const abiMessage = getAbiMessage(contract, method);
+    const returnType = abiMessage.returnType;
+    const returnTypeName = getReturnTypeName(returnType);
+    const registry = contract.abi.registry;
     const r = returnType
       ? registry.createTypeUnsafe(returnTypeName, [result.asOk.data]).toHuman()
-      : '()'
-    output = isOk(r) ? r.Ok : isErr(r) ? r.Err : r
+      : "()";
+    output = isOk(r) ? r.Ok : isErr(r) ? r.Err : r;
 
     const errorText = isErr(output)
-      ? typeof output.Err === 'object'
+      ? typeof output.Err === "object"
         ? JSON.stringify(output.Err, null, 2)
-        : output.Err?.toString() ?? 'Error'
-      : output !== 'Ok'
-        ? output?.toString() || 'Error'
-        : 'Error'
+        : output.Err?.toString() ?? "Error"
+      : output !== "Ok"
+        ? output?.toString() || "Error"
+        : "Error";
 
     const okText = isOk(r)
-      ? typeof output === 'object'
-        ? JSON.stringify(output, null, '\t')
-        : output?.toString() ?? '()'
-      : JSON.stringify(output, null, '\t') ?? '()'
+      ? typeof output === "object"
+        ? JSON.stringify(output, null, "\t")
+        : output?.toString() ?? "()"
+      : JSON.stringify(output, null, "\t") ?? "()";
 
-    decodedOutput = isError ? errorText : okText
+    decodedOutput = isError ? errorText : okText;
   } else if (result.isErr) {
-    output = result.toHuman()
+    output = result.toHuman();
 
-    let errorText
+    let errorText;
     if (
       isErr(output) &&
-      typeof output.Err === 'object' &&
+      typeof output.Err === "object" &&
       Object.keys(output.Err || {}).length &&
-      typeof Object.values(output.Err || {})[0] === 'string'
+      typeof Object.values(output.Err || {})[0] === "string"
     ) {
-      const [errorKey, errorValue] = Object.entries(output.Err || {})[0]
-      errorText = `${errorKey}${errorValue}`
+      const [errorKey, errorValue] = Object.entries(output.Err || {})[0];
+      errorText = `${errorKey}${errorValue}`;
     }
 
-    decodedOutput = errorText || 'Error'
+    decodedOutput = errorText || "Error";
   }
 
   return {
     output,
     decodedOutput,
     isError,
-  }
+  };
 }

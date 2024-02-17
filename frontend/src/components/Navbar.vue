@@ -2,13 +2,16 @@
 import logo from "~/assets/logo.png";
 import { formatAssetAmount } from "~/utils";
 
-const tabs = [{
-  label: 'Home',
-  url: '/'
-}, {
-  label: 'Faucet',
-  url: '/faucet'
-}]
+const tabs = [
+  {
+    label: "Home",
+    url: "/",
+  },
+  {
+    label: "Faucet",
+    url: "/faucet",
+  },
+];
 </script>
 
 <template>
@@ -67,7 +70,11 @@ const tabs = [{
         <ul
           class="menu menu-horizontal text-primary-content px-1 text-base font-medium"
         >
-          <li v-for="tab in tabs" :key="tab.label" class="bg-primary/20 text-primary-content mx-1 rounded-md">
+          <li
+            v-for="tab in tabs"
+            :key="tab.label"
+            class="bg-primary/20 text-primary-content mx-1 rounded-md"
+          >
             <RouterLink :to="tab.url">{{ tab.label }}</RouterLink>
           </li>
         </ul>
@@ -75,7 +82,9 @@ const tabs = [{
 
       <div class="navbar-end flex gap-4">
         <div v-if="accountStore.activeAccount" class="text-neutral font-500">
-          <p v-if="accountStore.api">${{ formatAssetAmount(accountStore.balance) }}</p>
+          <p v-if="accountStore.api">
+            ${{ formatAssetAmount(accountStore.balance) }}
+          </p>
           <p v-else class="loading loading-bars loading md"></p>
         </div>
         <WalletButton />

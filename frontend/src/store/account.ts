@@ -6,7 +6,7 @@ import {
 } from "@polkadot/extension-dapp";
 import { ApiPromise, WsProvider } from "@polkadot/api";
 import { BN } from "@polkadot/util";
-import { USDClient } from "~/sdk"
+import { USDClient } from "~/sdk";
 import { getFromLocalStorage } from "~/utils";
 import { emitter } from "~/main";
 import { contractAddresses } from "~/config";
@@ -30,7 +30,7 @@ class AccountStore {
       provider: new WsProvider("wss://ws.test.azero.dev"),
     });
     this.api = apiResponse;
-    this.udpateBalance()
+    this.udpateBalance();
   }
 
   async injectSigner() {
@@ -78,7 +78,11 @@ class AccountStore {
     const addressInjector = await web3FromAddress(this.activeAccount);
 
     const sdk = new USDClient(this.api, contractAddresses.USD_ADDRESS);
-    const res = await sdk.mint(this.activeAccount, addressInjector.signer, amountRaw);
+    const res = await sdk.mint(
+      this.activeAccount,
+      addressInjector.signer,
+      amountRaw,
+    );
 
     return res.result?.txHash.toString();
   }
@@ -89,7 +93,7 @@ class AccountStore {
     const sdk = new USDClient(this.api, contractAddresses.USD_ADDRESS);
     const res = await sdk.balanceOf(this.activeAccount);
 
-    this.balance = (res.output?.toPrimitive() as any).ok / 1e6
+    this.balance = (res.output?.toPrimitive() as any).ok / 1e6;
   }
 
   disconnect() {
