@@ -25,10 +25,10 @@ mod predictor {
         result.low_u128()
     }
 
-    fn ratio_mod(a: u128, b: u128, c: u128) -> (u128, u128) {
+    fn perfect_ratio(a: u128, b: u128, c: u128) -> (u128, u128) {
         let denominator = U128::from(a).full_mul(U128::from(b));
         let (result, rem) = denominator.div_mod(U256::from(c));
-        (result.low_u128(), rem.low_u128())
+        (result.low_u128(), rem.low_u128() / b)
     }
 
     #[derive(Debug, PartialEq, Eq, scale::Encode, scale::Decode)]
@@ -420,21 +420,21 @@ mod predictor {
                 r.map_err(|e|PredictorError::BurnByOutcomeBurnError(e))?;
                 amount
             } else if market.outcome_a > market.outcome_b {
-                let (amount_b, amount_a_scaled) = ratio_mod(amount, market.outcome_b, market.outcome_a);
+                let (amount_b, amount_a) = perfect_ratio(amount, market.outcome_b, market.outcome_a);
+
                 let r_b = market.token_b.burn_from(caller, amount_b);
                 r_b.map_err(|e|PredictorError::BurnByOutcomeBurnError(e))?;
 
-                let amount_a = amount_a_scaled / market.outcome_b;
                 let r_a = market.token_a.burn_from(caller, amount_a);
                 r_a.map_err(|e|PredictorError::BurnByOutcomeBurnError(e))?;
 
                 amount_a + amount_b
             } else {
-                let (amount_a, amount_b_scaled) = ratio_mod(amount, market.outcome_a, market.outcome_b);
+                let (amount_a, amount_b) = perfect_ratio(amount, market.outcome_a, market.outcome_b);
+
                 let r_a = market.token_a.burn_from(caller, amount_a);
                 r_a.map_err(|e|PredictorError::BurnByOutcomeBurnError(e))?;
 
-                let amount_b = amount_b_scaled / market.outcome_a;
                 let r_b = market.token_b.burn_from(caller, amount_b);
                 r_b.map_err(|e|PredictorError::BurnByOutcomeBurnError(e))?;
 
@@ -460,7 +460,6 @@ mod predictor {
                 let r = underlying_token.transfer(caller, to_withdraw, vec![]);
                 r.map_err(|e|PredictorError::BurnByOutcomeBurnError(e))?;
             }
-
             Ok(())
         }
     }
