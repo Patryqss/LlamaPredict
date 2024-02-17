@@ -11,6 +11,7 @@ pub enum PredictorError {
     MintTransferFromError(PSP22Error),
     MintAError(PSP22Error),
     MintBError(PSP22Error),
+    MintInvalidUnderlyingToken,
     
     BurnForNotExistingMarket,
     BurnAError(PSP22Error),
@@ -34,4 +35,5 @@ pub enum PredictorError {
     BurnByOutcomeForNotExistingMarket,
     BurnByOutcomeTooEarly,
     BurnByOutcomeNoOutcome,
+    BurnByOutcomeBurnError(PSP22Error),
 }

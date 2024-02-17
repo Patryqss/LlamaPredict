@@ -24,12 +24,20 @@ mod predictor {
         result.low_u128()
     }
 
+    fn ratio_mod(a: u128, b: u128, c: u128) -> (u128, u128) {
+        let denominator = U128::from(a).full_mul(U128::from(b));
+        let (result, rem) = denominator.div_mod(U256::from(c));
+        (result.low_u128(), rem.low_u128())
+    }
+
     #[derive(Debug, PartialEq, Eq, scale::Encode, scale::Decode)]
     #[cfg_attr(feature = "std", derive(scale_info::TypeInfo), derive(StorageLayout))]
     pub struct Market {
+        underlying_token: AccountId,
         hash: Hash,
         token_a: ConditionalPSP22Ref,
         token_b: ConditionalPSP22Ref,
+        collateral_rate: u16,
         expired_at: Timestamp,
         resolved_at: Timestamp,
         total_minted: u128,
@@ -45,10 +53,8 @@ mod predictor {
         admin: AccountId,
         token_hash: Hash,
         router: AccountId,
-        underlying_token: AccountId,
         markets: Mapping<u64, Market>,
         count: u64,
-        collateral_rate: u16,
     }
 
     impl PredictorContract {
@@ -56,26 +62,25 @@ mod predictor {
         pub fn new(
             token_hash: Hash,
             router: AccountId,
-            underlying_token: AccountId,
         ) -> Self {
             let admin = Self::env().caller();
             Self { 
                 admin,
                 token_hash,
                 router,
-                underlying_token,
                 markets: Default::default(),
                 count: 0,
-                collateral_rate: 0,
             }
         }
 
 
         #[ink(message)]
         pub fn add_market(&mut self, 
+            underlying_token: AccountId,
             hash: Hash,
-            expired_at: Timestamp,
+            resolved_at: Timestamp,
             resolution_time: u64,
+            collateral_rate: u16,
         ) -> Result<(), PredictorError>{
             let caller = self.env().caller();
             let admin = self.admin;
@@ -99,12 +104,14 @@ mod predictor {
                 .endowment(0)
                 .salt_bytes(token_b_salt.to_be_bytes())
                 .instantiate();
-            let resolved_at = expired_at.saturating_sub(resolution_time);
+            let expired_at = resolved_at.saturating_add(resolution_time);
 
             let market = Market {
+                underlying_token,
                 hash,
                 token_a,
                 token_b,
+                collateral_rate,
                 expired_at,
                 resolved_at,
                 total_minted: 0,
@@ -122,34 +129,37 @@ mod predictor {
         }
 
         #[ink(message)]
-        pub fn mint(&mut self, market_id: u64, amount: u128) -> Result<(), PredictorError>  {
-            let underlying_token = self.underlying_token;
+        pub fn mint(&mut self, market_id: u64, underlying_token: AccountId, amount: u128) -> Result<(), PredictorError>  {
             let caller = self.env().caller();
             let account_id = self.env().account_id();
-            let mut underlying_token: contract_ref!(PSP22) = underlying_token.into();
+            let mut underlying_token_ref: contract_ref!(PSP22) = underlying_token.into();
             let amount = {
                 let r = amount.checked_shl(1);
                 r.ok_or(PredictorError::MintOverflow)?
             };
+            // Transfer from underlying token must take place before we get market by id
+            // Otherwise, inside transfer_from, contract could be called once again.
+            // By the end of function we would have different market state than we should.
+            // As underlying_token is passed as parameter, it is super important
+            // To validate it as soon as possible
             {
-                let r = underlying_token.transfer_from(caller, account_id, amount, vec![]);
+                let r = underlying_token_ref.transfer_from(caller, account_id, amount, vec![]);
                 r.map_err(|e|PredictorError::MintTransferFromError(e))?;
             }
 
-            let markets = &self.markets;
             let mut market = {
-                let r = markets.get(&market_id);
+                let r = self.markets.get(&market_id);
                 r.ok_or(PredictorError::MintForNotExistingMarket)
             }?;
-
-
-            let collateral_rate = self.collateral_rate;
+            if market.underlying_token != underlying_token {
+                return Err(PredictorError::MintInvalidUnderlyingToken);
+            }
 
             let new_total_tokens = {
                 let r = market.total_tokens.checked_add(amount);
                 r.ok_or(PredictorError::MintOverflow)?
             };
-            let collateral = scale(amount, collateral_rate);
+            let collateral = scale(amount, market.collateral_rate);
             let minted = (amount - collateral) >> 1;
             let new_total_minted = market.total_minted + (minted << 1);
 
@@ -157,6 +167,7 @@ mod predictor {
             market.total_tokens = new_total_tokens;
             self.markets.insert(market_id, &market);
 
+            // Token A and B are trusted
             {
                 let r = market.token_a.mint_to(caller, minted);
                 r.map_err(|e|PredictorError::MintAError(e))?;
@@ -187,6 +198,7 @@ mod predictor {
                 r.ok_or(PredictorError::BurnOverflow)?
             };
 
+            // Token A and B are trusted
             {
                 let r = market.token_a.burn_from(caller, amount);
                 r.map_err(|e|PredictorError::BurnAError(e))?;
@@ -196,7 +208,7 @@ mod predictor {
                 r.map_err(|e|PredictorError::BurnBError(e))?;
             }
 
-            let mut underlying_token: contract_ref!(PSP22) = self.underlying_token.into();
+            let mut underlying_token: contract_ref!(PSP22) = market.underlying_token.into();
 
             let to_withdraw = if market.total_minted == 0 {
                 0
@@ -209,6 +221,7 @@ mod predictor {
             market.total_tokens = new_total_tokens;
             markets.insert(market_id, &market);
 
+            // As transfer is last operation, reentracy does not introduce any risk
             {
                 let r = underlying_token.transfer(caller, to_withdraw, vec![]);
                 r.map_err(|e|PredictorError::BurnTransferError(e))?;
@@ -220,12 +233,12 @@ mod predictor {
         #[ink(message)]
         pub fn give_up(&mut self, market_id: u64, amount: u128, is_a: bool) -> Result<(), PredictorError> {
             let caller = self.env().caller();
-            let mut underlying_token: contract_ref!(PSP22) = self.underlying_token.into();
-            let markets = &mut self.markets;
+            
             let mut market = {
-                let r = markets.get(&market_id);
+                let r = self.markets.get(&market_id);
                 r.ok_or(PredictorError::GiveUpForNotExistingMarket)
             }?;
+            let mut underlying_token: contract_ref!(PSP22) = market.underlying_token.into();
 
             let new_total_minted = {
                 let r = market.total_minted.checked_sub(amount);
@@ -264,8 +277,9 @@ mod predictor {
             } else {
                 market.abandoned_b = new_abandoned;
             }
-            markets.insert(market_id, &market);
+            self.markets.insert(market_id, &market);
 
+            // As transfer is last operation, reentracy does not introduce any risk
             {
                 let r = underlying_token.transfer(caller, to_withdraw, vec![]);
                 r.map_err(|e|PredictorError::GiveUpTransferError(e))?;
@@ -277,12 +291,12 @@ mod predictor {
         #[ink(message)]
         pub fn use_abandoned(&mut self, market_id: u64, is_a: bool) -> Result<(), PredictorError> {
             let caller = self.env().caller();
-            let mut underlying_token: contract_ref!(PSP22) = self.underlying_token.into();
-            let markets = &mut self.markets;
+            
             let mut market = {
-                let r = markets.get(&market_id);
+                let r = self.markets.get(&market_id);
                 r.ok_or(PredictorError::UseAbandonedForNotExistingMarket)
             }?;
+            let mut underlying_token: contract_ref!(PSP22) = market.underlying_token.into();
 
             let abandoned = if is_a {
                 market.abandoned_a
@@ -319,8 +333,9 @@ mod predictor {
             } else {
                 market.abandoned_b = new_abandoned;
             }
-            markets.insert(market_id, &market);
+            self.markets.insert(market_id, &market);
 
+            // As transfer is last operation, reentracy does not introduce any risk
             {
                 let r = underlying_token.transfer(caller, amount, vec![]);
                 r.map_err(|e|PredictorError::UseAbandonedTransferError(e))?;
@@ -335,9 +350,8 @@ mod predictor {
             if caller != admin {
                 return Err(PredictorError::CallerIsNotAdmin);
             }
-            let markets = &mut self.markets;
             let mut market = {
-                let r = markets.get(&market_id);
+                let r = self.markets.get(&market_id);
                 r.ok_or(PredictorError::SetOutcomeForNotExistingMarket)
             }?;
             if market.outcome_a != 0 || market.outcome_b != 0 {
@@ -346,25 +360,72 @@ mod predictor {
 
             market.outcome_a = outcome_a;
             market.outcome_b = outcome_b;
-            markets.insert(market_id, &market);
+            self.markets.insert(market_id, &market);
 
             Ok(())
         }
 
         #[ink(message)]
-        pub fn burn_by_outcome(&mut self, market_id: u64) -> Result<(), PredictorError> {
+        pub fn burn_by_outcome(&mut self, market_id: u64, amount: u128) -> Result<(), PredictorError> {
             let caller = self.env().caller();
-            let markets = &mut self.markets;
             let mut market = {
-                let r = markets.get(&market_id);
+                let r = self.markets.get(&market_id);
                 r.ok_or(PredictorError::BurnByOutcomeForNotExistingMarket)
             }?;
             let now = self.env().block_timestamp();
-            if now < market.resolved_at {
+            // Admin can set outcome anytime, so we cannot allow to burn by outcome before market exipration
+            if now < market.expired_at {
                 return Err(PredictorError::BurnByOutcomeTooEarly);
             }
             if market.outcome_a == 0 && market.outcome_b == 0 {
                 return Err(PredictorError::BurnByOutcomeNoOutcome);
+            }
+            let to_burn = if market.outcome_a == 0 {
+                let r = market.token_b.burn_from(caller, amount);
+                r.map_err(|e|PredictorError::BurnByOutcomeBurnError(e))?;
+                amount
+            } else if market.outcome_b == 0 {
+                let r = market.token_a.burn_from(caller, amount);
+                r.map_err(|e|PredictorError::BurnByOutcomeBurnError(e))?;
+                amount
+            } else if market.outcome_a > market.outcome_b {
+                let (amount_b, amount_a_scaled) = ratio_mod(amount, market.outcome_b, market.outcome_a);
+                let r_b = market.token_b.burn_from(caller, amount_b);
+                r_b.map_err(|e|PredictorError::BurnByOutcomeBurnError(e))?;
+
+                let amount_a = amount_a_scaled / market.outcome_b;
+                let r_a = market.token_a.burn_from(caller, amount_a);
+                r_a.map_err(|e|PredictorError::BurnByOutcomeBurnError(e))?;
+
+                amount_a + amount_b
+            } else {
+                let (amount_a, amount_b_scaled) = ratio_mod(amount, market.outcome_a, market.outcome_b);
+                let r_a = market.token_a.burn_from(caller, amount_a);
+                r_a.map_err(|e|PredictorError::BurnByOutcomeBurnError(e))?;
+
+                let amount_b = amount_b_scaled / market.outcome_a;
+                let r_b = market.token_b.burn_from(caller, amount_b);
+                r_b.map_err(|e|PredictorError::BurnByOutcomeBurnError(e))?;
+
+                amount_a + amount_b
+            };
+
+            let new_total_minted = market.total_minted - to_burn;
+            let to_withdraw = if market.total_minted == 0 {
+                0
+            } else {
+                ratio(to_burn, market.total_tokens, market.total_minted)
+            };
+            let new_total_tokens = market.total_tokens - to_withdraw;
+
+            market.total_minted = new_total_minted;
+            market.total_tokens = new_total_tokens;
+            self.markets.insert(market_id, &market);
+
+            let mut underlying_token: contract_ref!(PSP22) = market.underlying_token.into();
+            {
+                let r = underlying_token.transfer(caller, to_withdraw, vec![]);
+                r.map_err(|e|PredictorError::BurnByOutcomeBurnError(e))?;
             }
 
             Ok(())
