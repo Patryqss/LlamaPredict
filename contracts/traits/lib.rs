@@ -2,7 +2,6 @@
 
 pub mod errors;
 
-use errors::PredictorError;
 use ink::primitives::AccountId;
 use psp22::PSP22Error;
 
@@ -18,16 +17,3 @@ pub trait ManagerTrait {
     fn enable(&mut self, token: AccountId, address: AccountId) -> ManagerResult<()>;
 }
 
-#[ink::trait_definition]
-pub trait PSP22Extras {
-    #[ink(message)]
-    fn mint_to(&mut self, to: AccountId, value: u128) -> Result<(), PSP22Error>;
-    #[ink(message)]
-    fn burn_from(&mut self, from: AccountId, value: u128) -> Result<(), PSP22Error>;
-}
-
-#[ink::trait_definition]
-pub trait Predictor {
-    #[ink(message)]
-    fn add_tokens(&self, underlying_token: AccountId, from: AccountId, amount: u128) -> Result<(), PredictorError>;
-}

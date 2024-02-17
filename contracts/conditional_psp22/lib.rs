@@ -7,7 +7,6 @@ pub mod conditional_psp22 {
     use ink::storage_item;
     use ink::prelude::{vec::Vec, string::String};
     use psp22::{PSP22Data, PSP22Error, PSP22Event, PSP22};
-    use traits::PSP22Extras;
 
     #[ink(event)]
     pub struct Transfer {
@@ -73,6 +72,30 @@ pub mod conditional_psp22 {
                 }
             }
         }
+
+        #[ink(message)]
+        pub fn mint_to(&mut self, to: AccountId, value: u128) -> Result<(), PSP22Error> {
+            if self.env().caller() != self.data.manager {
+                return Err(PSP22Error::Custom(String::from("Unauthorized")));
+            }
+
+            let events = self.psp22.mint(to, value)?;
+
+            self.emit_events(events);
+            Ok(())
+        }
+
+        #[ink(message)]
+        pub fn burn_from(&mut self, from: AccountId, value: u128) -> Result<(), PSP22Error> {
+            if self.env().caller() != self.data.manager {
+                return Err(PSP22Error::Custom(String::from("Unauthorized")));
+            }
+
+            let events = self.psp22.burn(from, value)?;
+
+            self.emit_events(events);
+            Ok(())
+        }
     }
 
     impl PSP22 for ConditionalPSP22 {
@@ -132,32 +155,6 @@ pub mod conditional_psp22 {
                 self.emit_events(events);
             }
             let events = self.psp22.transfer_from(caller, from, to, value)?;
-
-            self.emit_events(events);
-            Ok(())
-        }
-    }
-
-    impl PSP22Extras for ConditionalPSP22 {
-        #[ink(message)]
-        fn mint_to(&mut self, to: AccountId, value: u128) -> Result<(), PSP22Error> {
-            if self.env().caller() != self.data.manager {
-                return Err(PSP22Error::Custom(String::from("Unauthorized")));
-            }
-
-            let events = self.psp22.mint(to, value)?;
-
-            self.emit_events(events);
-            Ok(())
-        }
-
-        #[ink(message)]
-        fn burn_from(&mut self, from: AccountId, value: u128) -> Result<(), PSP22Error> {
-            if self.env().caller() != self.data.manager {
-                return Err(PSP22Error::Custom(String::from("Unauthorized")));
-            }
-
-            let events = self.psp22.burn(from, value)?;
 
             self.emit_events(events);
             Ok(())
