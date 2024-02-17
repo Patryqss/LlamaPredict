@@ -77,6 +77,15 @@ mod predictor {
             }
         }
 
+        #[ink(message)]
+        pub fn get_market(&self, market_id: u64) -> Option<Market> {
+            self.markets.get(&market_id)
+        }
+
+        #[ink(message)]
+        pub fn get_user_market_data(&self, account_id: AccountId, market_id: u64) -> Option<UserMarketData> {
+            self.user_market_data.get((account_id, market_id))
+        }
 
         #[ink(message)]
         pub fn add_market(&mut self, 

@@ -1,6 +1,6 @@
 {
   "source": {
-    "hash": "0x8dbe3250281ed67da2e9e400d73eec6e7466b25dea42bdb5c1404e92880a06dc",
+    "hash": "0xa2e58df2773299d672d4c5e23f51defcb0c32f893c284789c09238cadc7a5ec1",
     "language": "ink! 4.3.0",
     "compiler": "rustc 1.69.0",
     "build_info": {
@@ -16,7 +16,9 @@
   "contract": {
     "name": "predictor",
     "version": "0.1.0",
-    "authors": ["[your_name] <[your_email]>"]
+    "authors": [
+      "[your_name] <[your_email]>"
+    ]
   },
   "spec": {
     "constructors": [
@@ -25,14 +27,18 @@
           {
             "label": "token_hash",
             "type": {
-              "displayName": ["Hash"],
+              "displayName": [
+                "Hash"
+              ],
               "type": 3
             }
           },
           {
             "label": "router",
             "type": {
-              "displayName": ["AccountId"],
+              "displayName": [
+                "AccountId"
+              ],
               "type": 0
             }
           }
@@ -42,7 +48,10 @@
         "label": "new",
         "payable": false,
         "returnType": {
-          "displayName": ["ink_primitives", "ConstructorResult"],
+          "displayName": [
+            "ink_primitives",
+            "ConstructorResult"
+          ],
           "type": 7
         },
         "selector": "0x9bae9d5e"
@@ -51,71 +60,157 @@
     "docs": [],
     "environment": {
       "accountId": {
-        "displayName": ["AccountId"],
+        "displayName": [
+          "AccountId"
+        ],
         "type": 0
       },
       "balance": {
-        "displayName": ["Balance"],
+        "displayName": [
+          "Balance"
+        ],
         "type": 6
       },
       "blockNumber": {
-        "displayName": ["BlockNumber"],
-        "type": 16
+        "displayName": [
+          "BlockNumber"
+        ],
+        "type": 24
       },
       "chainExtension": {
-        "displayName": ["ChainExtension"],
-        "type": 17
+        "displayName": [
+          "ChainExtension"
+        ],
+        "type": 25
       },
       "hash": {
-        "displayName": ["Hash"],
+        "displayName": [
+          "Hash"
+        ],
         "type": 3
       },
       "maxEventTopics": 4,
       "timestamp": {
-        "displayName": ["Timestamp"],
+        "displayName": [
+          "Timestamp"
+        ],
         "type": 5
       }
     },
     "events": [],
     "lang_error": {
-      "displayName": ["ink", "LangError"],
+      "displayName": [
+        "ink",
+        "LangError"
+      ],
       "type": 9
     },
     "messages": [
       {
         "args": [
           {
+            "label": "market_id",
+            "type": {
+              "displayName": [
+                "u64"
+              ],
+              "type": 5
+            }
+          }
+        ],
+        "default": false,
+        "docs": [],
+        "label": "get_market",
+        "mutates": false,
+        "payable": false,
+        "returnType": {
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ],
+          "type": 10
+        },
+        "selector": "0x48bdc177"
+      },
+      {
+        "args": [
+          {
+            "label": "account_id",
+            "type": {
+              "displayName": [
+                "AccountId"
+              ],
+              "type": 0
+            }
+          },
+          {
+            "label": "market_id",
+            "type": {
+              "displayName": [
+                "u64"
+              ],
+              "type": 5
+            }
+          }
+        ],
+        "default": false,
+        "docs": [],
+        "label": "get_user_market_data",
+        "mutates": false,
+        "payable": false,
+        "returnType": {
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ],
+          "type": 15
+        },
+        "selector": "0x00a94438"
+      },
+      {
+        "args": [
+          {
             "label": "underlying_token",
             "type": {
-              "displayName": ["AccountId"],
+              "displayName": [
+                "AccountId"
+              ],
               "type": 0
             }
           },
           {
             "label": "hash",
             "type": {
-              "displayName": ["Hash"],
+              "displayName": [
+                "Hash"
+              ],
               "type": 3
             }
           },
           {
             "label": "resolved_at",
             "type": {
-              "displayName": ["Timestamp"],
+              "displayName": [
+                "Timestamp"
+              ],
               "type": 5
             }
           },
           {
             "label": "resolution_time",
             "type": {
-              "displayName": ["u64"],
+              "displayName": [
+                "u64"
+              ],
               "type": 5
             }
           },
           {
             "label": "collateral_rate",
             "type": {
-              "displayName": ["u16"],
+              "displayName": [
+                "u16"
+              ],
               "type": 4
             }
           }
@@ -126,8 +221,11 @@
         "mutates": true,
         "payable": false,
         "returnType": {
-          "displayName": ["ink", "MessageResult"],
-          "type": 10
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ],
+          "type": 18
         },
         "selector": "0x8d9513cb"
       },
@@ -136,21 +234,18 @@
           {
             "label": "market_id",
             "type": {
-              "displayName": ["u64"],
+              "displayName": [
+                "u64"
+              ],
               "type": 5
-            }
-          },
-          {
-            "label": "underlying_token",
-            "type": {
-              "displayName": ["AccountId"],
-              "type": 0
             }
           },
           {
             "label": "amount",
             "type": {
-              "displayName": ["u128"],
+              "displayName": [
+                "u128"
+              ],
               "type": 6
             }
           }
@@ -161,8 +256,11 @@
         "mutates": true,
         "payable": false,
         "returnType": {
-          "displayName": ["ink", "MessageResult"],
-          "type": 10
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ],
+          "type": 18
         },
         "selector": "0xcfdd9aa2"
       },
@@ -171,14 +269,18 @@
           {
             "label": "market_id",
             "type": {
-              "displayName": ["u64"],
+              "displayName": [
+                "u64"
+              ],
               "type": 5
             }
           },
           {
             "label": "amount",
             "type": {
-              "displayName": ["u128"],
+              "displayName": [
+                "u128"
+              ],
               "type": 6
             }
           }
@@ -189,8 +291,11 @@
         "mutates": true,
         "payable": false,
         "returnType": {
-          "displayName": ["ink", "MessageResult"],
-          "type": 10
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ],
+          "type": 18
         },
         "selector": "0xb1efc17b"
       },
@@ -199,22 +304,28 @@
           {
             "label": "market_id",
             "type": {
-              "displayName": ["u64"],
+              "displayName": [
+                "u64"
+              ],
               "type": 5
             }
           },
           {
             "label": "amount",
             "type": {
-              "displayName": ["u128"],
+              "displayName": [
+                "u128"
+              ],
               "type": 6
             }
           },
           {
             "label": "is_a",
             "type": {
-              "displayName": ["bool"],
-              "type": 15
+              "displayName": [
+                "bool"
+              ],
+              "type": 23
             }
           }
         ],
@@ -224,8 +335,11 @@
         "mutates": true,
         "payable": false,
         "returnType": {
-          "displayName": ["ink", "MessageResult"],
-          "type": 10
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ],
+          "type": 18
         },
         "selector": "0x0094aed4"
       },
@@ -234,15 +348,19 @@
           {
             "label": "market_id",
             "type": {
-              "displayName": ["u64"],
+              "displayName": [
+                "u64"
+              ],
               "type": 5
             }
           },
           {
             "label": "is_a",
             "type": {
-              "displayName": ["bool"],
-              "type": 15
+              "displayName": [
+                "bool"
+              ],
+              "type": 23
             }
           }
         ],
@@ -252,8 +370,11 @@
         "mutates": true,
         "payable": false,
         "returnType": {
-          "displayName": ["ink", "MessageResult"],
-          "type": 10
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ],
+          "type": 18
         },
         "selector": "0xb70199c5"
       },
@@ -262,21 +383,27 @@
           {
             "label": "market_id",
             "type": {
-              "displayName": ["u64"],
+              "displayName": [
+                "u64"
+              ],
               "type": 5
             }
           },
           {
             "label": "outcome_a",
             "type": {
-              "displayName": ["u128"],
+              "displayName": [
+                "u128"
+              ],
               "type": 6
             }
           },
           {
             "label": "outcome_b",
             "type": {
-              "displayName": ["u128"],
+              "displayName": [
+                "u128"
+              ],
               "type": 6
             }
           }
@@ -287,8 +414,11 @@
         "mutates": true,
         "payable": false,
         "returnType": {
-          "displayName": ["ink", "MessageResult"],
-          "type": 10
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ],
+          "type": 18
         },
         "selector": "0x42bb1778"
       },
@@ -297,14 +427,18 @@
           {
             "label": "market_id",
             "type": {
-              "displayName": ["u64"],
+              "displayName": [
+                "u64"
+              ],
               "type": 5
             }
           },
           {
             "label": "amount",
             "type": {
-              "displayName": ["u128"],
+              "displayName": [
+                "u128"
+              ],
               "type": 6
             }
           }
@@ -315,8 +449,11 @@
         "mutates": true,
         "payable": false,
         "returnType": {
-          "displayName": ["ink", "MessageResult"],
-          "type": 10
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ],
+          "type": 18
         },
         "selector": "0x54ee392f"
       }
@@ -589,7 +726,11 @@
             ]
           }
         },
-        "path": ["ink_primitives", "types", "AccountId"]
+        "path": [
+          "ink_primitives",
+          "types",
+          "AccountId"
+        ]
       }
     },
     {
@@ -624,7 +765,11 @@
             ]
           }
         },
-        "path": ["ink_primitives", "types", "Hash"]
+        "path": [
+          "ink_primitives",
+          "types",
+          "Hash"
+        ]
       }
     },
     {
@@ -688,7 +833,9 @@
             "type": 9
           }
         ],
-        "path": ["Result"]
+        "path": [
+          "Result"
+        ]
       }
     },
     {
@@ -712,7 +859,10 @@
             ]
           }
         },
-        "path": ["ink_primitives", "LangError"]
+        "path": [
+          "ink_primitives",
+          "LangError"
+        ]
       }
     },
     {
@@ -752,11 +902,312 @@
             "type": 9
           }
         ],
-        "path": ["Result"]
+        "path": [
+          "Result"
+        ]
       }
     },
     {
       "id": 11,
+      "type": {
+        "def": {
+          "variant": {
+            "variants": [
+              {
+                "index": 0,
+                "name": "None"
+              },
+              {
+                "fields": [
+                  {
+                    "type": 12
+                  }
+                ],
+                "index": 1,
+                "name": "Some"
+              }
+            ]
+          }
+        },
+        "params": [
+          {
+            "name": "T",
+            "type": 12
+          }
+        ],
+        "path": [
+          "Option"
+        ]
+      }
+    },
+    {
+      "id": 12,
+      "type": {
+        "def": {
+          "composite": {
+            "fields": [
+              {
+                "name": "underlying_token",
+                "type": 0,
+                "typeName": "AccountId"
+              },
+              {
+                "name": "hash",
+                "type": 3,
+                "typeName": "Hash"
+              },
+              {
+                "name": "token_a",
+                "type": 13,
+                "typeName": "ConditionalPSP22Ref"
+              },
+              {
+                "name": "token_b",
+                "type": 13,
+                "typeName": "ConditionalPSP22Ref"
+              },
+              {
+                "name": "collateral_rate",
+                "type": 4,
+                "typeName": "u16"
+              },
+              {
+                "name": "expired_at",
+                "type": 5,
+                "typeName": "Timestamp"
+              },
+              {
+                "name": "resolved_at",
+                "type": 5,
+                "typeName": "Timestamp"
+              },
+              {
+                "name": "total_minted",
+                "type": 6,
+                "typeName": "u128"
+              },
+              {
+                "name": "total_tokens",
+                "type": 6,
+                "typeName": "u128"
+              },
+              {
+                "name": "abandoned_a",
+                "type": 6,
+                "typeName": "u128"
+              },
+              {
+                "name": "abandoned_b",
+                "type": 6,
+                "typeName": "u128"
+              },
+              {
+                "name": "outcome_a",
+                "type": 6,
+                "typeName": "u128"
+              },
+              {
+                "name": "outcome_b",
+                "type": 6,
+                "typeName": "u128"
+              }
+            ]
+          }
+        },
+        "path": [
+          "predictor",
+          "predictor",
+          "Market"
+        ]
+      }
+    },
+    {
+      "id": 13,
+      "type": {
+        "def": {
+          "composite": {
+            "fields": [
+              {
+                "name": "inner",
+                "type": 14,
+                "typeName": "<ConditionalPSP22 as::ink::codegen::ContractCallBuilder>::Type"
+              }
+            ]
+          }
+        },
+        "path": [
+          "conditional_psp22",
+          "conditional_psp22",
+          "ConditionalPSP22Ref"
+        ]
+      }
+    },
+    {
+      "id": 14,
+      "type": {
+        "def": {
+          "composite": {
+            "fields": [
+              {
+                "name": "account_id",
+                "type": 0,
+                "typeName": "AccountId"
+              }
+            ]
+          }
+        },
+        "path": [
+          "conditional_psp22",
+          "conditional_psp22",
+          "CallBuilder"
+        ]
+      }
+    },
+    {
+      "id": 15,
+      "type": {
+        "def": {
+          "variant": {
+            "variants": [
+              {
+                "fields": [
+                  {
+                    "type": 16
+                  }
+                ],
+                "index": 0,
+                "name": "Ok"
+              },
+              {
+                "fields": [
+                  {
+                    "type": 9
+                  }
+                ],
+                "index": 1,
+                "name": "Err"
+              }
+            ]
+          }
+        },
+        "params": [
+          {
+            "name": "T",
+            "type": 16
+          },
+          {
+            "name": "E",
+            "type": 9
+          }
+        ],
+        "path": [
+          "Result"
+        ]
+      }
+    },
+    {
+      "id": 16,
+      "type": {
+        "def": {
+          "variant": {
+            "variants": [
+              {
+                "index": 0,
+                "name": "None"
+              },
+              {
+                "fields": [
+                  {
+                    "type": 17
+                  }
+                ],
+                "index": 1,
+                "name": "Some"
+              }
+            ]
+          }
+        },
+        "params": [
+          {
+            "name": "T",
+            "type": 17
+          }
+        ],
+        "path": [
+          "Option"
+        ]
+      }
+    },
+    {
+      "id": 17,
+      "type": {
+        "def": {
+          "composite": {
+            "fields": [
+              {
+                "name": "deposited",
+                "type": 6,
+                "typeName": "u128"
+              },
+              {
+                "name": "claimed",
+                "type": 6,
+                "typeName": "u128"
+              }
+            ]
+          }
+        },
+        "path": [
+          "predictor",
+          "predictor",
+          "UserMarketData"
+        ]
+      }
+    },
+    {
+      "id": 18,
+      "type": {
+        "def": {
+          "variant": {
+            "variants": [
+              {
+                "fields": [
+                  {
+                    "type": 19
+                  }
+                ],
+                "index": 0,
+                "name": "Ok"
+              },
+              {
+                "fields": [
+                  {
+                    "type": 9
+                  }
+                ],
+                "index": 1,
+                "name": "Err"
+              }
+            ]
+          }
+        },
+        "params": [
+          {
+            "name": "T",
+            "type": 19
+          },
+          {
+            "name": "E",
+            "type": 9
+          }
+        ],
+        "path": [
+          "Result"
+        ]
+      }
+    },
+    {
+      "id": 19,
       "type": {
         "def": {
           "variant": {
@@ -773,7 +1224,7 @@
               {
                 "fields": [
                   {
-                    "type": 12
+                    "type": 20
                   }
                 ],
                 "index": 1,
@@ -789,14 +1240,16 @@
           },
           {
             "name": "E",
-            "type": 12
+            "type": 20
           }
         ],
-        "path": ["Result"]
+        "path": [
+          "Result"
+        ]
       }
     },
     {
-      "id": 12,
+      "id": 20,
       "type": {
         "def": {
           "variant": {
@@ -820,7 +1273,7 @@
               {
                 "fields": [
                   {
-                    "type": 13,
+                    "type": 21,
                     "typeName": "PSP22Error"
                   }
                 ],
@@ -830,7 +1283,7 @@
               {
                 "fields": [
                   {
-                    "type": 13,
+                    "type": 21,
                     "typeName": "PSP22Error"
                   }
                 ],
@@ -840,7 +1293,7 @@
               {
                 "fields": [
                   {
-                    "type": 13,
+                    "type": 21,
                     "typeName": "PSP22Error"
                   }
                 ],
@@ -858,7 +1311,7 @@
               {
                 "fields": [
                   {
-                    "type": 13,
+                    "type": 21,
                     "typeName": "PSP22Error"
                   }
                 ],
@@ -868,7 +1321,7 @@
               {
                 "fields": [
                   {
-                    "type": 13,
+                    "type": 21,
                     "typeName": "PSP22Error"
                   }
                 ],
@@ -878,7 +1331,7 @@
               {
                 "fields": [
                   {
-                    "type": 13,
+                    "type": 21,
                     "typeName": "PSP22Error"
                   }
                 ],
@@ -896,7 +1349,7 @@
               {
                 "fields": [
                   {
-                    "type": 13,
+                    "type": 21,
                     "typeName": "PSP22Error"
                   }
                 ],
@@ -910,7 +1363,7 @@
               {
                 "fields": [
                   {
-                    "type": 13,
+                    "type": 21,
                     "typeName": "PSP22Error"
                   }
                 ],
@@ -924,7 +1377,7 @@
               {
                 "fields": [
                   {
-                    "type": 13,
+                    "type": 21,
                     "typeName": "PSP22Error"
                   }
                 ],
@@ -938,7 +1391,7 @@
               {
                 "fields": [
                   {
-                    "type": 13,
+                    "type": 21,
                     "typeName": "PSP22Error"
                   }
                 ],
@@ -968,7 +1421,7 @@
               {
                 "fields": [
                   {
-                    "type": 13,
+                    "type": 21,
                     "typeName": "PSP22Error"
                   }
                 ],
@@ -978,11 +1431,15 @@
             ]
           }
         },
-        "path": ["predictor", "errors", "PredictorError"]
+        "path": [
+          "predictor",
+          "errors",
+          "PredictorError"
+        ]
       }
     },
     {
-      "id": 13,
+      "id": 21,
       "type": {
         "def": {
           "variant": {
@@ -990,7 +1447,7 @@
               {
                 "fields": [
                   {
-                    "type": 14,
+                    "type": 22,
                     "typeName": "String"
                   }
                 ],
@@ -1016,7 +1473,7 @@
               {
                 "fields": [
                   {
-                    "type": 14,
+                    "type": 22,
                     "typeName": "String"
                   }
                 ],
@@ -1026,11 +1483,15 @@
             ]
           }
         },
-        "path": ["psp22", "errors", "PSP22Error"]
+        "path": [
+          "psp22",
+          "errors",
+          "PSP22Error"
+        ]
       }
     },
     {
-      "id": 14,
+      "id": 22,
       "type": {
         "def": {
           "primitive": "str"
@@ -1038,7 +1499,7 @@
       }
     },
     {
-      "id": 15,
+      "id": 23,
       "type": {
         "def": {
           "primitive": "bool"
@@ -1046,7 +1507,7 @@
       }
     },
     {
-      "id": 16,
+      "id": 24,
       "type": {
         "def": {
           "primitive": "u32"
@@ -1054,12 +1515,16 @@
       }
     },
     {
-      "id": 17,
+      "id": 25,
       "type": {
         "def": {
           "variant": {}
         },
-        "path": ["ink_env", "types", "NoChainExtension"]
+        "path": [
+          "ink_env",
+          "types",
+          "NoChainExtension"
+        ]
       }
     }
   ],
