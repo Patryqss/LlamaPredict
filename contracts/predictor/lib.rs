@@ -54,7 +54,7 @@ mod predictor {
         outcome_b: u128,
     }
 
-    #[derive(Debug, PartialEq, Eq, scale::Encode, scale::Decode)]
+    #[derive(Default, Debug, PartialEq, Eq, scale::Encode, scale::Decode)]
     #[cfg_attr(feature = "std", derive(scale_info::TypeInfo), derive(StorageLayout))]
     pub struct MarketResponse {
         market: Market,
@@ -180,7 +180,7 @@ mod predictor {
             underlying_token_ref.transfer_from(caller, account_id, amount, vec![])
         }
         #[cfg(test)]
-        fn underlying_transfer(&self, underlying_token: AccountId, caller: AccountId, amount: u128) -> Result<(), PSP22Error>{
+        fn underlying_transfer(&self, _underlying_token: AccountId, _caller: AccountId, _amount: u128) -> Result<(), PSP22Error>{
             Ok(())
         }
         #[cfg(not(test))]
@@ -307,48 +307,6 @@ mod predictor {
             Ok(market_id)
         }
 
-        fn increase_user_deposited(
-            &mut self,
-            caller: AccountId,
-            market_id: u64,
-            amount: u128,
-        ) {
-            match self.user_market_data.get((caller, market_id)) {
-                Some(mut user_market_data) => {
-                    user_market_data.deposited += amount;
-                    self.user_market_data.insert((caller, market_id), &user_market_data);
-                },
-                None => {
-                    let user_market_data: UserMarketData = UserMarketData {
-                        deposited: amount,
-                        claimed: 0,
-                    };
-                    self.user_market_data.insert((caller, market_id), &user_market_data);
-                }
-            };
-        }
-
-        fn increase_user_claimed(
-            &mut self,
-            caller: AccountId,
-            market_id: u64,
-            amount: u128,
-        ) {
-            match self.user_market_data.get((caller, market_id)) {
-                Some(mut user_market_data) => {
-                    user_market_data.claimed += amount;
-                    self.user_market_data.insert((caller, market_id), &user_market_data);
-                },
-                None => {
-                    let user_market_data: UserMarketData = UserMarketData {
-                        deposited: 0,
-                        claimed: amount,
-                    };
-                    self.user_market_data.insert((caller, market_id), &user_market_data);
-                }
-            };
-        }
-
         #[ink(message)]
         pub fn mint(&mut self, market_id: u64, amount: u128) -> Result<(), PredictorError>  {
             let caller = self.env().caller();
@@ -356,7 +314,6 @@ mod predictor {
                 let r = self.markets.get(&market_id);
                 r.ok_or(PredictorError::MintForNotExistingMarket)
             }?;
-            
             // TODO: underlying token should be passed as argument
             // We cannot get market before transfer as it would introduce reentrancy risk
             {
@@ -369,15 +326,20 @@ mod predictor {
                 r.ok_or(PredictorError::MintOverflow)?
             };
             let collateral = scale(amount, market.collateral_rate);
+
             let minted = amount - collateral;
             let new_total_minted = market.total_minted + (minted << 1);
+
+            let user_market_key = (caller, market_id);
+            let mut user_market_data = self.user_market_data.get(user_market_key).unwrap_or_default();
+            let new_user_deposited = user_market_data.deposited.saturating_add(amount);
 
             market.total_minted = new_total_minted;
             market.total_tokens = new_total_tokens;
             self.markets.insert(market_id, &market);
 
-            // Update amounts deposited by user
-            self.increase_user_deposited(caller, market_id, amount);
+            user_market_data.deposited = new_user_deposited;
+            self.user_market_data.insert(user_market_key, &user_market_data);
 
             // Token A and B are trusted
             {
@@ -415,24 +377,26 @@ mod predictor {
                 r.map_err(|e|PredictorError::BurnBError(e))?;
             }
 
-            
-
             let to_withdraw = if market.total_minted == 0 {
                 0
             } else {
                 ratio(amount, market.total_tokens, market.total_minted)
             };
             let new_total_tokens = market.total_tokens - to_withdraw;
+            let user_market_key = (caller, market_id);
+            let mut user_market_data = self.user_market_data.get(user_market_key).unwrap_or_default();
+            let new_user_claimed = user_market_data.claimed.saturating_add(to_withdraw);
 
             market.total_minted = new_total_minted;
             market.total_tokens = new_total_tokens;
             self.markets.insert(market_id, &market);
 
-            // TODO: Add user data claimed
+            user_market_data.claimed = new_user_claimed;
+            self.user_market_data.insert(user_market_key, &user_market_data);
 
             // As transfer is last operation, reentracy does not introduce any risk
             {
-                let r = self.underlying_transfer(market.underlying_token, caller, amount);
+                let r = self.underlying_transfer(market.underlying_token, caller, to_withdraw);
                 r.map_err(|e|PredictorError::BurnTransferError(e))?;
             }
 
@@ -447,7 +411,6 @@ mod predictor {
                 let r = self.markets.get(&market_id);
                 r.ok_or(PredictorError::GiveUpForNotExistingMarket)
             }?;
-            let mut underlying_token: contract_ref!(PSP22) = market.underlying_token.into();
 
             let new_total_minted = {
                 let r = market.total_minted.checked_sub(amount);
@@ -478,6 +441,9 @@ mod predictor {
                 ratio(amount, collateral, market.total_minted)
             };
             let new_total_tokens = market.total_tokens - to_withdraw;
+            let user_market_key = (caller, market_id);
+            let mut user_market_data = self.user_market_data.get(user_market_key).unwrap_or_default();
+            let new_user_claimed = user_market_data.claimed.saturating_add(to_withdraw);
             
             market.total_minted = new_total_minted;
             market.total_tokens = new_total_tokens;
@@ -488,8 +454,8 @@ mod predictor {
             }
             self.markets.insert(market_id, &market);
 
-
-            self.increase_user_claimed(caller, market_id, to_withdraw);
+            user_market_data.claimed = new_user_claimed;
+            self.user_market_data.insert(user_market_key, &user_market_data);
 
             // As transfer is last operation, reentracy does not introduce any risk
             {
@@ -536,6 +502,9 @@ mod predictor {
             };
             let new_total_minted = market.total_minted - amount;
             let new_total_tokens = market.total_tokens - to_withdraw;
+            let user_market_key = (caller, market_id);
+            let mut user_market_data = self.user_market_data.get(user_market_key).unwrap_or_default();
+            let new_user_claimed = user_market_data.claimed.saturating_add(to_withdraw);
 
             market.total_minted = new_total_minted;
             market.total_tokens = new_total_tokens;
@@ -546,12 +515,12 @@ mod predictor {
             }
             self.markets.insert(market_id, &market);
 
-
-            self.increase_user_claimed(caller, market_id, amount);
+            user_market_data.claimed = new_user_claimed;
+            self.user_market_data.insert(user_market_key, &user_market_data);
 
             // As transfer is last operation, reentracy does not introduce any risk
             {
-                let r = self.underlying_transfer(market.underlying_token, caller, amount);
+                let r = self.underlying_transfer(market.underlying_token, caller, to_withdraw);
                 r.map_err(|e|PredictorError::UseAbandonedTransferError(e))?;
             }
             Ok(())   
@@ -635,12 +604,16 @@ mod predictor {
                 ratio(to_burn, market.total_tokens, market.total_minted)
             };
             let new_total_tokens = market.total_tokens - to_withdraw;
+            let user_market_key = (caller, market_id);
+            let mut user_market_data = self.user_market_data.get(user_market_key).unwrap_or_default();
+            let new_user_claimed = user_market_data.claimed.saturating_add(to_withdraw);
 
             market.total_minted = new_total_minted;
             market.total_tokens = new_total_tokens;
             self.markets.insert(market_id, &market);
 
-            self.increase_user_claimed(caller, market_id, to_withdraw);
+            user_market_data.claimed = new_user_claimed;
+            self.user_market_data.insert(user_market_key, &user_market_data);
 
             {
                 let r = self.underlying_transfer(market.underlying_token, caller, to_withdraw);
