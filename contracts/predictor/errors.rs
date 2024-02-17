@@ -17,4 +17,9 @@ pub enum PredictorError {
     BurnBError(PSP22Error),
     BurnTransferError(PSP22Error),
     BurnOverflow,
+    
+    GiveUpForNotExistingMarket,
+    GiveUpTokenError(PSP22Error),
+    GiveUpOverflow,
+    GiveUpTransferError(PSP22Error),
 }

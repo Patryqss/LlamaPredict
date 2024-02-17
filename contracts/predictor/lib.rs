@@ -5,6 +5,7 @@ pub mod errors;
 #[ink::contract]
 mod predictor {
     use conditional_psp22::ConditionalPSP22Ref;
+    use errors::PredictorError;
     use ink::contract_ref;
     use ink::storage::Mapping;
     use primitive_types::{U128, U256};
@@ -24,6 +25,10 @@ mod predictor {
         result.low_u128()
     }
 
+    fn avg(a: u128, b: u128) -> u128 {
+        (a & b) + ((a ^ b) >> 1)
+    }
+
     #[derive(Debug, PartialEq, Eq, scale::Encode, scale::Decode)]
     #[cfg_attr(feature = "std", derive(scale_info::TypeInfo), derive(StorageLayout))]
     pub struct Market {
@@ -34,6 +39,8 @@ mod predictor {
         resolved_at: Timestamp,
         total_minted: u128,
         total_tokens: u128,
+        abandoned_a: u128,
+        abandoned_b: u128,
     }
 
     #[ink(storage)]
@@ -105,6 +112,8 @@ mod predictor {
                 resolved_at,
                 total_minted: 0,
                 total_tokens: 0,
+                abandoned_a: 0,
+                abandoned_b: 0,
             };
 
             self.markets.insert(market_id, &market);
@@ -119,6 +128,10 @@ mod predictor {
             let caller = self.env().caller();
             let account_id = self.env().account_id();
             let mut underlying_token: contract_ref!(PSP22) = underlying_token.into();
+            let amount = {
+                let r = amount.checked_shl(1);
+                r.ok_or(PredictorError::MintOverflow)?
+            };
             {
                 let r = underlying_token.transfer_from(caller, account_id, amount, vec![]);
                 r.map_err(|e|PredictorError::MintTransferFromError(e))?;
@@ -138,8 +151,8 @@ mod predictor {
                 r.ok_or(PredictorError::MintOverflow)?
             };
             let collateral = scale(amount, collateral_rate);
-            let minted = amount - collateral;
-            let new_total_minted = market.total_minted + minted;
+            let minted = (amount - collateral) >> 1;
+            let new_total_minted = market.total_minted + (minted << 1);
 
             market.total_minted = new_total_minted;
             market.total_tokens = new_total_tokens;
@@ -165,6 +178,16 @@ mod predictor {
                 let r = markets.get(&market_id);
                 r.ok_or(PredictorError::BurnForNotExistingMarket)
             }?;
+            let amount2 = {
+                let r = amount.checked_shl(1);
+                r.ok_or(PredictorError::MintOverflow)?
+            };
+
+            let new_total_minted = {
+                let r = market.total_minted.checked_sub(amount2);
+                r.ok_or(PredictorError::BurnOverflow)?
+            };
+
             {
                 let r = market.token_a.burn_from(caller, amount);
                 r.map_err(|e|PredictorError::BurnAError(e))?;
@@ -176,17 +199,12 @@ mod predictor {
 
             let mut underlying_token: contract_ref!(PSP22) = self.underlying_token.into();
 
-            let new_total_minted = {
-                let r = market.total_minted.checked_sub(amount);
-                r.ok_or(PredictorError::BurnOverflow)?
-            };
-
             let to_withdraw = if market.total_minted == 0 {
                 0
             } else {
-                ratio(amount, market.total_tokens, market.total_minted)
+                ratio(amount2, market.total_tokens, market.total_minted)
             };
-            let new_total_tokens = market.total_tokens - amount;
+            let new_total_tokens = market.total_tokens - to_withdraw;
 
             market.total_minted = new_total_minted;
             market.total_tokens = new_total_tokens;
@@ -195,6 +213,63 @@ mod predictor {
             {
                 let r = underlying_token.transfer(caller, to_withdraw, vec![]);
                 r.map_err(|e|PredictorError::BurnTransferError(e))?;
+            }
+
+            Ok(())
+        }
+        
+        #[ink(message)]
+        pub fn give_up(&mut self, market_id: u64, amount: u128, is_a: bool) -> Result<(), PredictorError> {
+            let caller = self.env().caller();
+            let mut underlying_token: contract_ref!(PSP22) = self.underlying_token.into();
+            let markets = &mut self.markets;
+            let mut market = {
+                let r = markets.get(&market_id);
+                r.ok_or(PredictorError::GiveUpForNotExistingMarket)
+            }?;
+
+            let new_total_minted = {
+                let r = market.total_minted.checked_sub(amount);
+                r.ok_or(PredictorError::GiveUpOverflow)?
+            };
+            let new_abandoned = {
+                let r = if is_a {
+                    market.abandoned_a.checked_add(amount)
+                } else {
+                    market.abandoned_b.checked_add(amount)
+                };
+                r.ok_or(PredictorError::GiveUpOverflow)?
+            };
+            {
+                let r = if is_a {
+                    market.token_a.burn_from(caller, amount)
+                } else {
+                    market.token_b.burn_from(caller, amount)
+                };
+                r.map_err(|e|PredictorError::GiveUpTokenError(e))?;
+            };
+
+            let collateral = market.total_tokens - market.total_minted;
+            
+            let to_withdraw = if market.total_minted == 0 {
+                0
+            } else {
+                ratio(amount, collateral, market.total_minted)
+            };
+            let new_total_tokens = market.total_tokens - to_withdraw;
+            
+            market.total_minted = new_total_minted;
+            market.total_tokens = new_total_tokens;
+            if is_a {
+                market.abandoned_a = new_abandoned;
+            } else {
+                market.abandoned_b = new_abandoned;
+            }
+            markets.insert(market_id, &market);
+
+            {
+                let r = underlying_token.transfer(caller, to_withdraw, vec![]);
+                r.map_err(|e|PredictorError::GiveUpTransferError(e))?;
             }
 
             Ok(())
