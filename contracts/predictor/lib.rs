@@ -69,6 +69,14 @@ mod predictor {
         claimed: u128,
     }
 
+    #[derive(Debug, PartialEq, Eq, scale::Encode, scale::Decode)]
+    #[cfg_attr(feature = "std", derive(scale_info::TypeInfo), derive(StorageLayout))]
+    pub struct UserResponse {
+        user: UserMarketData,
+        balance_a: u128,
+        balance_b: u128,
+    }
+
     #[ink(storage)]
     pub struct PredictorContract {
         admin: AccountId,
@@ -181,8 +189,25 @@ mod predictor {
         }
 
         #[ink(message)]
-        pub fn get_user_market_data(&self, account_id: AccountId, market_id: u64) -> Option<UserMarketData> {
-            self.user_market_data.get((account_id, market_id))
+        pub fn get_user_market_data(&self, account_id: AccountId, market_id: u64) -> Option<UserResponse> {
+            let user_market_data = match self.user_market_data.get((account_id, market_id)) {
+                Some(user_market_data) => user_market_data,
+                None => return None,
+            };
+            let market = match self.markets.get(market_id) {
+                Some(market) => market,
+                None => return None,
+            };
+            let token_a: contract_ref!(PSP22) = (*market.token_a.as_ref()).into();
+            let token_b: contract_ref!(PSP22) = (*market.token_b.as_ref()).into();
+            
+            let balance_a = token_a.balance_of(account_id);
+            let balance_b = token_b.balance_of(account_id);
+            Some(UserResponse{
+                user: user_market_data,
+                balance_a,
+                balance_b,
+            })
         }
 
         #[ink(message)]
@@ -242,6 +267,48 @@ mod predictor {
             Ok(market_id)
         }
 
+        fn increase_user_deposited(
+            &mut self,
+            caller: AccountId,
+            market_id: u64,
+            amount: u128,
+        ) {
+            match self.user_market_data.get((caller, market_id)) {
+                Some(mut user_market_data) => {
+                    user_market_data.deposited += amount;
+                    self.user_market_data.insert((caller, market_id), &user_market_data);
+                },
+                None => {
+                    let user_market_data: UserMarketData = UserMarketData {
+                        deposited: amount,
+                        claimed: 0,
+                    };
+                    self.user_market_data.insert((caller, market_id), &user_market_data);
+                }
+            };
+        }
+
+        fn increase_user_claimed(
+            &mut self,
+            caller: AccountId,
+            market_id: u64,
+            amount: u128,
+        ) {
+            match self.user_market_data.get((caller, market_id)) {
+                Some(mut user_market_data) => {
+                    user_market_data.claimed += amount;
+                    self.user_market_data.insert((caller, market_id), &user_market_data);
+                },
+                None => {
+                    let user_market_data: UserMarketData = UserMarketData {
+                        deposited: 0,
+                        claimed: amount,
+                    };
+                    self.user_market_data.insert((caller, market_id), &user_market_data);
+                }
+            };
+        }
+
         #[ink(message)]
         pub fn mint(&mut self, market_id: u64, amount: u128) -> Result<(), PredictorError>  {
             let caller = self.env().caller();
@@ -270,19 +337,7 @@ mod predictor {
             self.markets.insert(market_id, &market);
 
             // Update amounts deposited by user
-            match self.user_market_data.get((caller, market_id)) {
-                Some(mut user_market_data) => {
-                    user_market_data.deposited += amount;
-                    self.user_market_data.insert((caller, market_id), &user_market_data);
-                },
-                None => {
-                    let user_market_data: UserMarketData = UserMarketData {
-                        deposited: amount,
-                        claimed: 0,
-                    };
-                    self.user_market_data.insert((caller, market_id), &user_market_data);
-                }
-            };
+            self.increase_user_deposited(caller, market_id, amount);
 
             // Token A and B are trusted
             {
@@ -394,7 +449,7 @@ mod predictor {
             self.markets.insert(market_id, &market);
 
 
-            // TODO: Add user data claimed
+            self.increase_user_claimed(caller, market_id, to_withdraw);
 
             // As transfer is last operation, reentracy does not introduce any risk
             {
@@ -453,7 +508,7 @@ mod predictor {
             self.markets.insert(market_id, &market);
 
 
-            // TODO: Add user data claimed
+            self.increase_user_claimed(caller, market_id, amount);
 
             // As transfer is last operation, reentracy does not introduce any risk
             {
@@ -546,7 +601,7 @@ mod predictor {
             market.total_tokens = new_total_tokens;
             self.markets.insert(market_id, &market);
 
-            // TODO: Add user data claimed
+            self.increase_user_claimed(caller, market_id, to_withdraw);
 
             let mut underlying_token: contract_ref!(PSP22) = market.underlying_token.into();
             {
