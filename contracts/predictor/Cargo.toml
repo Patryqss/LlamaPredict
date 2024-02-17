@@ -14,6 +14,7 @@ conditional_psp22 = { path = "../conditional_psp22", default-features = false, f
 primitive-types = { version = "0.12.1", default-features = false, features = [
     "codec",
 ] }
+amm-traits = { path = "../../amm/traits", default-features = false }
 
 [dev-dependencies]
 ink_e2e = "4.2.0"

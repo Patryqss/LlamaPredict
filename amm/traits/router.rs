@@ -8,6 +8,13 @@ use psp22::PSP22Error;
 
 #[ink::trait_definition]
 pub trait Router {
+    #[ink(message)]
+    fn get_reserves(
+        &self,
+        token_0: AccountId,
+        token_1: AccountId,
+    ) -> Result<(u128, u128), RouterError>;
+
     /// Returns address of the `Factory` contract for this `Router` instance.
     #[ink(message)]
     fn factory(&self) -> AccountId;

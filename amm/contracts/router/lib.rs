@@ -53,22 +53,6 @@ pub mod router {
         }
 
         #[inline]
-        fn get_reserves(
-            &self,
-            token_0: AccountId,
-            token_1: AccountId,
-        ) -> Result<(u128, u128), RouterError> {
-            ensure!(token_0 != token_1, RouterError::IdenticalAddresses);
-            let pair: contract_ref!(Pair) = self.get_pair(token_0, token_1)?.into();
-            let (reserve_0, reserve_1, _) = pair.get_reserves();
-            if token_0 < token_1 {
-                Ok((reserve_0, reserve_1))
-            } else {
-                Ok((reserve_1, reserve_0))
-            }
-        }
-
-        #[inline]
         fn wrap(&self, value: Balance) -> Result<(), RouterError> {
             self.wnative_ref()
                 .call_mut()
@@ -207,6 +191,22 @@ pub mod router {
     }
 
     impl Router for RouterContract {
+        #[ink(message)]
+        fn get_reserves(
+            &self,
+            token_0: AccountId,
+            token_1: AccountId,
+        ) -> Result<(u128, u128), RouterError> {
+            ensure!(token_0 != token_1, RouterError::IdenticalAddresses);
+            let pair: contract_ref!(Pair) = self.get_pair(token_0, token_1)?.into();
+            let (reserve_0, reserve_1, _) = pair.get_reserves();
+            if token_0 < token_1 {
+                Ok((reserve_0, reserve_1))
+            } else {
+                Ok((reserve_1, reserve_0))
+            }
+        }
+
         #[ink(message)]
         fn factory(&self) -> AccountId {
             self.factory

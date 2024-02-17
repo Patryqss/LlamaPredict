@@ -15,6 +15,8 @@ mod predictor {
     #[cfg(feature = "std")]
     use ink::storage::traits::StorageLayout;
 
+    use amm_traits::Router;
+
     fn scale(a: u128, scaler: u16) -> u128 {
         let result = U128::from(a).full_mul(U128::from(scaler));
         (result >> u16::BITS).low_u128()
@@ -50,6 +52,14 @@ mod predictor {
         abandoned_b: u128,
         outcome_a: u128,
         outcome_b: u128,
+    }
+
+    #[derive(Debug, PartialEq, Eq, scale::Encode, scale::Decode)]
+    #[cfg_attr(feature = "std", derive(scale_info::TypeInfo), derive(StorageLayout))]
+    pub struct MarketResponse {
+        market: Market,
+        balance_a: u128,
+        balance_b: u128,
     }
 
     #[derive(Debug, PartialEq, Eq, scale::Encode, scale::Decode)]
@@ -153,13 +163,37 @@ mod predictor {
         }
 
         #[ink(message)]
-        pub fn get_market(&self, market_id: u64) -> Option<Market> {
-            self.markets.get(&market_id)
+        pub fn get_market(&self, market_id: u64) -> Option<MarketResponse> {
+            let market = match self.markets.get(&market_id) {
+                Some(market) => market,
+                None => return None,
+            };
+            let router: contract_ref!(Router) = self.router.into();
+            let (balance_a, balance_b) = match router.get_reserves(*market.token_a.as_ref(), *market.token_b.as_ref()) {
+                Ok((balance_a, balance_b)) => (balance_a, balance_b),
+                Err(_) => (0, 0),
+            };
+            Some(MarketResponse{
+                market,
+                balance_a,
+                balance_b,
+            })
         }
 
         #[ink(message)]
         pub fn get_user_market_data(&self, account_id: AccountId, market_id: u64) -> Option<UserMarketData> {
             self.user_market_data.get((account_id, market_id))
+        }
+
+        #[ink(message)]
+        pub fn set_router(&mut self, router: AccountId) -> Result<(), PredictorError> {
+            let caller = self.env().caller();
+            let admin = self.admin;
+            if caller != admin {
+                return Err(PredictorError::CallerIsNotAdmin);
+            }
+            self.router = router;
+            Ok(())
         }
 
         #[ink(message)]
@@ -215,10 +249,6 @@ mod predictor {
                 let r = self.markets.get(&market_id);
                 r.ok_or(PredictorError::MintForNotExistingMarket)
             }?;
-            let amount = {
-                let r = amount.checked_shl(1);
-                r.ok_or(PredictorError::MintOverflow)?
-            };
             
             // TODO: underlying token should be passed as argument
             // We cannot get market before transfer as it would introduce reentrancy risk
@@ -232,7 +262,7 @@ mod predictor {
                 r.ok_or(PredictorError::MintOverflow)?
             };
             let collateral = scale(amount, market.collateral_rate);
-            let minted = (amount - collateral) >> 1;
+            let minted = amount - collateral;
             let new_total_minted = market.total_minted + (minted << 1);
 
             market.total_minted = new_total_minted;
@@ -274,13 +304,9 @@ mod predictor {
                 let r = self.markets.get(&market_id);
                 r.ok_or(PredictorError::BurnForNotExistingMarket)
             }?;
-            let amount2 = {
-                let r = amount.checked_shl(1);
-                r.ok_or(PredictorError::MintOverflow)?
-            };
 
             let new_total_minted = {
-                let r = market.total_minted.checked_sub(amount2);
+                let r = market.total_minted.checked_sub(amount << 1);
                 r.ok_or(PredictorError::BurnOverflow)?
             };
 
@@ -299,7 +325,7 @@ mod predictor {
             let to_withdraw = if market.total_minted == 0 {
                 0
             } else {
-                ratio(amount2, market.total_tokens, market.total_minted)
+                ratio(amount, market.total_tokens, market.total_minted)
             };
             let new_total_tokens = market.total_tokens - to_withdraw;
 

@@ -3,7 +3,6 @@
 pub mod errors;
 
 use ink::primitives::AccountId;
-use psp22::PSP22Error;
 
 pub use errors::ManagerError;
 
