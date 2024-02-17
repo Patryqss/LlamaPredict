@@ -54,7 +54,7 @@ mod predictor {
         outcome_b: u128,
     }
 
-    #[derive(Default, Debug, PartialEq, Eq, scale::Encode, scale::Decode)]
+    #[derive(Debug, PartialEq, Eq, scale::Encode, scale::Decode)]
     #[cfg_attr(feature = "std", derive(scale_info::TypeInfo), derive(StorageLayout))]
     pub struct MarketResponse {
         market: Market,
@@ -62,7 +62,7 @@ mod predictor {
         balance_b: u128,
     }
 
-    #[derive(Debug, PartialEq, Eq, scale::Encode, scale::Decode)]
+    #[derive(Default, Debug, PartialEq, Eq, scale::Encode, scale::Decode)]
     #[cfg_attr(feature = "std", derive(scale_info::TypeInfo), derive(StorageLayout))]
     pub struct UserMarketData {
         deposited: u128,
@@ -91,6 +91,15 @@ mod predictor {
     pub static mut UNDERLYING_BALANCES: Option<std::collections::HashMap<(AccountId, AccountId), u128>> = None;
     #[cfg(test)]
     pub static mut MARKET_BALANCES: Option<std::collections::HashMap<(u64, AccountId), u128>> = None;
+
+    #[cfg(test)]
+    fn market_token_id(_token: &u64) -> AccountId {
+        AccountId::from([0x0; 32])
+    }
+    #[cfg(not(test))]
+    fn market_token_id(token: &ConditionalPSP22Ref) -> AccountId {
+        *token.as_ref()
+    }
 
     impl PredictorContract {
         #[cfg(test)]
@@ -217,7 +226,9 @@ mod predictor {
                 None => return None,
             };
             let router: contract_ref!(Router) = self.router.into();
-            let (balance_a, balance_b) = match router.get_reserves(*market.token_a.as_ref(), *market.token_b.as_ref()) {
+            let token_a = market_token_id(&market.token_a);
+            let token_b = market_token_id(&market.token_b);
+            let (balance_a, balance_b) = match router.get_reserves(token_a, token_b) {
                 Ok((balance_a, balance_b)) => (balance_a, balance_b),
                 Err(_) => (0, 0),
             };
@@ -238,8 +249,8 @@ mod predictor {
                 Some(market) => market,
                 None => return None,
             };
-            let token_a: contract_ref!(PSP22) = (*market.token_a.as_ref()).into();
-            let token_b: contract_ref!(PSP22) = (*market.token_b.as_ref()).into();
+            let token_a: contract_ref!(PSP22) = market_token_id(&market.token_a).into();
+            let token_b: contract_ref!(PSP22) = market_token_id(&market.token_b).into();
             
             let balance_a = token_a.balance_of(account_id);
             let balance_b = token_b.balance_of(account_id);
