@@ -318,6 +318,48 @@ mod predictor {
             Ok(market_id)
         }
 
+        fn increase_user_deposited(
+            &mut self,
+            caller: AccountId,
+            market_id: u64,
+            amount: u128,
+        ) {
+            match self.user_market_data.get((caller, market_id)) {
+                Some(mut user_market_data) => {
+                    user_market_data.deposited = user_market_data.deposited.saturating_add(amount);
+                    self.user_market_data.insert((caller, market_id), &user_market_data);
+                },
+                None => {
+                    let user_market_data: UserMarketData = UserMarketData {
+                        deposited: amount,
+                        claimed: 0,
+                    };
+                    self.user_market_data.insert((caller, market_id), &user_market_data);
+                }
+            };
+        }
+
+        fn increase_user_claimed(
+            &mut self,
+            caller: AccountId,
+            market_id: u64,
+            amount: u128,
+        ) {
+            match self.user_market_data.get((caller, market_id)) {
+                Some(mut user_market_data) => {
+                    user_market_data.claimed = user_market_data.claimed.saturating_add(amount);
+                    self.user_market_data.insert((caller, market_id), &user_market_data);
+                },
+                None => {
+                    let user_market_data: UserMarketData = UserMarketData {
+                        deposited: 0,
+                        claimed: amount,
+                    };
+                    self.user_market_data.insert((caller, market_id), &user_market_data);
+                }
+            };
+        }
+
         #[ink(message)]
         pub fn mint(&mut self, market_id: u64, amount: u128) -> Result<(), PredictorError>  {
             let caller = self.env().caller();
@@ -337,9 +379,10 @@ mod predictor {
                 r.ok_or(PredictorError::MintOverflow)?
             };
             let collateral = scale(amount, market.collateral_rate);
+            let minted = amount.checked_sub(collateral).ok_or(PredictorError::MintUnderflow)?;
+            let new_total_minted = market.total_minted.checked_add(minted)
+                .ok_or(PredictorError::MintOverflow)?;
 
-            let minted = amount - collateral;
-            let new_total_minted = market.total_minted + (minted << 1);
 
             let user_market_key = (caller, market_id);
             let mut user_market_data = self.user_market_data.get(user_market_key).unwrap_or_default();

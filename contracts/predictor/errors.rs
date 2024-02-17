@@ -8,6 +8,7 @@ pub enum PredictorError {
 
     MintForNotExistingMarket,
     MintOverflow,
+    MintUnderflow,
     MintTransferFromError(PSP22Error),
     MintAError(PSP22Error),
     MintBError(PSP22Error),
@@ -36,4 +37,6 @@ pub enum PredictorError {
     BurnByOutcomeTooEarly,
     BurnByOutcomeNoOutcome,
     BurnByOutcomeBurnError(PSP22Error),
+
+    Debug
 }
