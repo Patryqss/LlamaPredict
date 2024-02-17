@@ -102,16 +102,14 @@ class AccountStore {
     this.balance = (res.output?.toPrimitive() as any).ok / 1e6;
   }
 
-  async addMarket() {
+  async addMarket(title: string, description: string, expiredAt: string) {
     if (!this.api || !this.activeAccount) return;
 
     const addressInjector = await web3FromAddress(this.activeAccount);
 
-    const data = {
-      title: "BTC Price",
-      description:
-        "Will the value of Bitcoin be above $50,000.00 on 18th February 2024?",
-    };
+    const data = { title, description };
+    console.log("Hey Admin, add this to markets.json:");
+    console.log(JSON.stringify(data));
 
     const sdk = new PredictorClient(
       this.api,
@@ -122,7 +120,7 @@ class AccountStore {
       addressInjector.signer,
       contractAddresses.USD_ADDRESS,
       sha256AsU8a(JSON.stringify(data)) as Hash,
-      Date.now() + 1000 * 60 * 60,
+      Number(new Date(expiredAt)),
       1000 * 60 * 60,
       0,
     );

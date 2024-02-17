@@ -1,19 +1,32 @@
 <script setup lang="ts">
 const state = reactive({
-  title: "",
-  description: "",
-  minValue: "",
-  maxValue: "",
-  expireDate: "",
-  source: "",
+  title: "BTC Price",
+  description:
+    "Will the value of Bitcoin be above $50,000.00 on 18th February 2024?",
+  expireDate: "2024-02-20T03:36",
+  isLoading: false,
+  error: "",
 });
 
-function addMarket() {
-  console.log(state);
-  accountStore.addMarket();
+async function addMarket() {
+  if (!state.title || !state.description || !state.expireDate) {
+    state.error = "All inputs are required";
+    return;
+  }
+  state.error = "";
+  state.isLoading = true;
 
-  // accountStore.getMarkets();
-  // TODO
+  try {
+    await accountStore.addMarket(
+      state.title,
+      state.description,
+      state.expireDate,
+    );
+  } catch (e) {
+    console.error(e);
+  }
+
+  state.isLoading = false;
 }
 </script>
 
@@ -39,24 +52,6 @@ function addMarket() {
         autocomplete="off"
       />
       <label class="label">
-        <span class="label-text text-neutral-content">Min Value</span>
-      </label>
-      <input
-        v-model="state.minValue"
-        type="text"
-        class="input input-bordered input-primary text-neutral-content rounded-lg bg-opacity-20"
-        autocomplete="off"
-      />
-      <label class="label">
-        <span class="label-text text-neutral-content">Max Value</span>
-      </label>
-      <input
-        v-model="state.maxValue"
-        type="text"
-        class="input input-bordered input-primary text-neutral-content rounded-lg bg-opacity-20"
-        autocomplete="off"
-      />
-      <label class="label">
         <span class="label-text text-neutral-content">Expire Date</span>
       </label>
       <input
@@ -66,7 +61,16 @@ function addMarket() {
         autocomplete="off"
       />
 
-      <button class="btn btn-primary mt-5" @click="addMarket">ADD</button>
+      <button class="btn btn-primary mt-5" @click="addMarket">
+        <span
+          v-if="state.isLoading"
+          class="loading loading-spinner loading-md"
+        />
+        ADD
+      </button>
+      <p v-if="state.error" class="text-error mt-1 text-center text-sm">
+        {{ state.error }}
+      </p>
     </div>
   </Card>
 </template>

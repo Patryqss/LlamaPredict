@@ -20,7 +20,8 @@ const state = reactive({
   predictError: "",
   amountError: "",
   type: "PREDICT" as MarketTxn,
-  isLoading: true,
+  loadingMarket: true,
+  loadingTxn: false,
   maxWin: 0,
   slippage: 0,
   fee: 0,
@@ -40,7 +41,7 @@ onBeforeMount(async () => {
   const rawMarket = await accountStore.getMarket(Number(route.params.id));
   if (!rawMarket) {
     // No market with this id on the blockchain
-    state.isLoading = false;
+    state.loadingMarket = false;
     return;
   }
   const matchingJSON = jsonMarkets.find(
@@ -48,12 +49,12 @@ onBeforeMount(async () => {
   );
   if (!matchingJSON) {
     // No matching market in our DB
-    state.isLoading = false;
+    state.loadingMarket = false;
     return;
   }
 
   market.value = parseMarket(matchingJSON, Number(route.params.id), rawMarket);
-  state.isLoading = false;
+  state.loadingMarket = false;
 });
 
 function onTypeChange() {
@@ -80,9 +81,13 @@ function calculateStats() {
 function onClose() {
   // TODO
 }
-function onSubmit() {
-  if (state.type === "ADD_LIQ") onAddLiq();
-  else onPredict();
+async function onSubmit() {
+  state.loadingTxn = true;
+
+  if (state.type === "ADD_LIQ") await onAddLiq();
+  else await onPredict();
+
+  state.loadingTxn = false;
 }
 async function onAddLiq() {
   if (!state.amount) {
@@ -98,7 +103,7 @@ async function onAddLiq() {
   // emitter.emit("txn-success", "r812rc08723r8c2b083rb702873b");
   state.amount = "";
 }
-function onPredict() {
+async function onPredict() {
   if (state.myPrediction === null || !state.amount) {
     if (state.myPrediction === null)
       state.predictError = "A choice is required";
@@ -113,7 +118,7 @@ function onPredict() {
 </script>
 
 <template>
-  <div v-if="state.isLoading" class="mt-40 flex w-full justify-center">
+  <div v-if="state.loadingMarket" class="mt-40 flex w-full justify-center">
     <p class="loading loading-bars loading-lg" />
   </div>
   <Card v-else-if="!market" title="">
@@ -270,7 +275,7 @@ function onPredict() {
           @click="onSubmit"
         >
           <span
-            v-if="state.isLoading"
+            v-if="state.loadingTxn"
             class="loading loading-spinner loading-md"
           />
           Submit
