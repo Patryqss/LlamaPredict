@@ -1,0 +1,1181 @@
+{
+  "source": {
+    "hash": "0x8dbe3250281ed67da2e9e400d73eec6e7466b25dea42bdb5c1404e92880a06dc",
+    "language": "ink! 4.3.0",
+    "compiler": "rustc 1.69.0",
+    "build_info": {
+      "build_mode": "Release",
+      "cargo_contract_version": "3.0.1",
+      "rust_toolchain": "stable-aarch64-apple-darwin",
+      "wasm_opt_settings": {
+        "keep_debug_symbols": false,
+        "optimization_passes": "Z"
+      }
+    }
+  },
+  "contract": {
+    "name": "predictor",
+    "version": "0.1.0",
+    "authors": [
+      "[your_name] <[your_email]>"
+    ]
+  },
+  "spec": {
+    "constructors": [
+      {
+        "args": [
+          {
+            "label": "token_hash",
+            "type": {
+              "displayName": [
+                "Hash"
+              ],
+              "type": 3
+            }
+          },
+          {
+            "label": "router",
+            "type": {
+              "displayName": [
+                "AccountId"
+              ],
+              "type": 0
+            }
+          }
+        ],
+        "default": false,
+        "docs": [],
+        "label": "new",
+        "payable": false,
+        "returnType": {
+          "displayName": [
+            "ink_primitives",
+            "ConstructorResult"
+          ],
+          "type": 7
+        },
+        "selector": "0x9bae9d5e"
+      }
+    ],
+    "docs": [],
+    "environment": {
+      "accountId": {
+        "displayName": [
+          "AccountId"
+        ],
+        "type": 0
+      },
+      "balance": {
+        "displayName": [
+          "Balance"
+        ],
+        "type": 6
+      },
+      "blockNumber": {
+        "displayName": [
+          "BlockNumber"
+        ],
+        "type": 16
+      },
+      "chainExtension": {
+        "displayName": [
+          "ChainExtension"
+        ],
+        "type": 17
+      },
+      "hash": {
+        "displayName": [
+          "Hash"
+        ],
+        "type": 3
+      },
+      "maxEventTopics": 4,
+      "timestamp": {
+        "displayName": [
+          "Timestamp"
+        ],
+        "type": 5
+      }
+    },
+    "events": [],
+    "lang_error": {
+      "displayName": [
+        "ink",
+        "LangError"
+      ],
+      "type": 9
+    },
+    "messages": [
+      {
+        "args": [
+          {
+            "label": "underlying_token",
+            "type": {
+              "displayName": [
+                "AccountId"
+              ],
+              "type": 0
+            }
+          },
+          {
+            "label": "hash",
+            "type": {
+              "displayName": [
+                "Hash"
+              ],
+              "type": 3
+            }
+          },
+          {
+            "label": "resolved_at",
+            "type": {
+              "displayName": [
+                "Timestamp"
+              ],
+              "type": 5
+            }
+          },
+          {
+            "label": "resolution_time",
+            "type": {
+              "displayName": [
+                "u64"
+              ],
+              "type": 5
+            }
+          },
+          {
+            "label": "collateral_rate",
+            "type": {
+              "displayName": [
+                "u16"
+              ],
+              "type": 4
+            }
+          }
+        ],
+        "default": false,
+        "docs": [],
+        "label": "add_market",
+        "mutates": true,
+        "payable": false,
+        "returnType": {
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ],
+          "type": 10
+        },
+        "selector": "0x8d9513cb"
+      },
+      {
+        "args": [
+          {
+            "label": "market_id",
+            "type": {
+              "displayName": [
+                "u64"
+              ],
+              "type": 5
+            }
+          },
+          {
+            "label": "underlying_token",
+            "type": {
+              "displayName": [
+                "AccountId"
+              ],
+              "type": 0
+            }
+          },
+          {
+            "label": "amount",
+            "type": {
+              "displayName": [
+                "u128"
+              ],
+              "type": 6
+            }
+          }
+        ],
+        "default": false,
+        "docs": [],
+        "label": "mint",
+        "mutates": true,
+        "payable": false,
+        "returnType": {
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ],
+          "type": 10
+        },
+        "selector": "0xcfdd9aa2"
+      },
+      {
+        "args": [
+          {
+            "label": "market_id",
+            "type": {
+              "displayName": [
+                "u64"
+              ],
+              "type": 5
+            }
+          },
+          {
+            "label": "amount",
+            "type": {
+              "displayName": [
+                "u128"
+              ],
+              "type": 6
+            }
+          }
+        ],
+        "default": false,
+        "docs": [],
+        "label": "burn",
+        "mutates": true,
+        "payable": false,
+        "returnType": {
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ],
+          "type": 10
+        },
+        "selector": "0xb1efc17b"
+      },
+      {
+        "args": [
+          {
+            "label": "market_id",
+            "type": {
+              "displayName": [
+                "u64"
+              ],
+              "type": 5
+            }
+          },
+          {
+            "label": "amount",
+            "type": {
+              "displayName": [
+                "u128"
+              ],
+              "type": 6
+            }
+          },
+          {
+            "label": "is_a",
+            "type": {
+              "displayName": [
+                "bool"
+              ],
+              "type": 15
+            }
+          }
+        ],
+        "default": false,
+        "docs": [],
+        "label": "give_up",
+        "mutates": true,
+        "payable": false,
+        "returnType": {
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ],
+          "type": 10
+        },
+        "selector": "0x0094aed4"
+      },
+      {
+        "args": [
+          {
+            "label": "market_id",
+            "type": {
+              "displayName": [
+                "u64"
+              ],
+              "type": 5
+            }
+          },
+          {
+            "label": "is_a",
+            "type": {
+              "displayName": [
+                "bool"
+              ],
+              "type": 15
+            }
+          }
+        ],
+        "default": false,
+        "docs": [],
+        "label": "use_abandoned",
+        "mutates": true,
+        "payable": false,
+        "returnType": {
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ],
+          "type": 10
+        },
+        "selector": "0xb70199c5"
+      },
+      {
+        "args": [
+          {
+            "label": "market_id",
+            "type": {
+              "displayName": [
+                "u64"
+              ],
+              "type": 5
+            }
+          },
+          {
+            "label": "outcome_a",
+            "type": {
+              "displayName": [
+                "u128"
+              ],
+              "type": 6
+            }
+          },
+          {
+            "label": "outcome_b",
+            "type": {
+              "displayName": [
+                "u128"
+              ],
+              "type": 6
+            }
+          }
+        ],
+        "default": false,
+        "docs": [],
+        "label": "set_outcome",
+        "mutates": true,
+        "payable": false,
+        "returnType": {
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ],
+          "type": 10
+        },
+        "selector": "0x42bb1778"
+      },
+      {
+        "args": [
+          {
+            "label": "market_id",
+            "type": {
+              "displayName": [
+                "u64"
+              ],
+              "type": 5
+            }
+          },
+          {
+            "label": "amount",
+            "type": {
+              "displayName": [
+                "u128"
+              ],
+              "type": 6
+            }
+          }
+        ],
+        "default": false,
+        "docs": [],
+        "label": "burn_by_outcome",
+        "mutates": true,
+        "payable": false,
+        "returnType": {
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ],
+          "type": 10
+        },
+        "selector": "0x54ee392f"
+      }
+    ]
+  },
+  "storage": {
+    "root": {
+      "layout": {
+        "struct": {
+          "fields": [
+            {
+              "layout": {
+                "leaf": {
+                  "key": "0x00000000",
+                  "ty": 0
+                }
+              },
+              "name": "admin"
+            },
+            {
+              "layout": {
+                "leaf": {
+                  "key": "0x00000000",
+                  "ty": 3
+                }
+              },
+              "name": "token_hash"
+            },
+            {
+              "layout": {
+                "leaf": {
+                  "key": "0x00000000",
+                  "ty": 0
+                }
+              },
+              "name": "router"
+            },
+            {
+              "layout": {
+                "root": {
+                  "layout": {
+                    "struct": {
+                      "fields": [
+                        {
+                          "layout": {
+                            "leaf": {
+                              "key": "0xce6b36f7",
+                              "ty": 0
+                            }
+                          },
+                          "name": "underlying_token"
+                        },
+                        {
+                          "layout": {
+                            "leaf": {
+                              "key": "0xce6b36f7",
+                              "ty": 3
+                            }
+                          },
+                          "name": "hash"
+                        },
+                        {
+                          "layout": {
+                            "struct": {
+                              "fields": [
+                                {
+                                  "layout": {
+                                    "struct": {
+                                      "fields": [
+                                        {
+                                          "layout": {
+                                            "leaf": {
+                                              "key": "0xce6b36f7",
+                                              "ty": 0
+                                            }
+                                          },
+                                          "name": "account_id"
+                                        }
+                                      ],
+                                      "name": "CallBuilder"
+                                    }
+                                  },
+                                  "name": "inner"
+                                }
+                              ],
+                              "name": "ConditionalPSP22Ref"
+                            }
+                          },
+                          "name": "token_a"
+                        },
+                        {
+                          "layout": {
+                            "struct": {
+                              "fields": [
+                                {
+                                  "layout": {
+                                    "struct": {
+                                      "fields": [
+                                        {
+                                          "layout": {
+                                            "leaf": {
+                                              "key": "0xce6b36f7",
+                                              "ty": 0
+                                            }
+                                          },
+                                          "name": "account_id"
+                                        }
+                                      ],
+                                      "name": "CallBuilder"
+                                    }
+                                  },
+                                  "name": "inner"
+                                }
+                              ],
+                              "name": "ConditionalPSP22Ref"
+                            }
+                          },
+                          "name": "token_b"
+                        },
+                        {
+                          "layout": {
+                            "leaf": {
+                              "key": "0xce6b36f7",
+                              "ty": 4
+                            }
+                          },
+                          "name": "collateral_rate"
+                        },
+                        {
+                          "layout": {
+                            "leaf": {
+                              "key": "0xce6b36f7",
+                              "ty": 5
+                            }
+                          },
+                          "name": "expired_at"
+                        },
+                        {
+                          "layout": {
+                            "leaf": {
+                              "key": "0xce6b36f7",
+                              "ty": 5
+                            }
+                          },
+                          "name": "resolved_at"
+                        },
+                        {
+                          "layout": {
+                            "leaf": {
+                              "key": "0xce6b36f7",
+                              "ty": 6
+                            }
+                          },
+                          "name": "total_minted"
+                        },
+                        {
+                          "layout": {
+                            "leaf": {
+                              "key": "0xce6b36f7",
+                              "ty": 6
+                            }
+                          },
+                          "name": "total_tokens"
+                        },
+                        {
+                          "layout": {
+                            "leaf": {
+                              "key": "0xce6b36f7",
+                              "ty": 6
+                            }
+                          },
+                          "name": "abandoned_a"
+                        },
+                        {
+                          "layout": {
+                            "leaf": {
+                              "key": "0xce6b36f7",
+                              "ty": 6
+                            }
+                          },
+                          "name": "abandoned_b"
+                        },
+                        {
+                          "layout": {
+                            "leaf": {
+                              "key": "0xce6b36f7",
+                              "ty": 6
+                            }
+                          },
+                          "name": "outcome_a"
+                        },
+                        {
+                          "layout": {
+                            "leaf": {
+                              "key": "0xce6b36f7",
+                              "ty": 6
+                            }
+                          },
+                          "name": "outcome_b"
+                        }
+                      ],
+                      "name": "Market"
+                    }
+                  },
+                  "root_key": "0xce6b36f7"
+                }
+              },
+              "name": "markets"
+            },
+            {
+              "layout": {
+                "root": {
+                  "layout": {
+                    "struct": {
+                      "fields": [
+                        {
+                          "layout": {
+                            "leaf": {
+                              "key": "0x9458aa82",
+                              "ty": 6
+                            }
+                          },
+                          "name": "deposited"
+                        },
+                        {
+                          "layout": {
+                            "leaf": {
+                              "key": "0x9458aa82",
+                              "ty": 6
+                            }
+                          },
+                          "name": "claimed"
+                        }
+                      ],
+                      "name": "UserMarketData"
+                    }
+                  },
+                  "root_key": "0x9458aa82"
+                }
+              },
+              "name": "user_market_data"
+            },
+            {
+              "layout": {
+                "leaf": {
+                  "key": "0x00000000",
+                  "ty": 5
+                }
+              },
+              "name": "count"
+            }
+          ],
+          "name": "PredictorContract"
+        }
+      },
+      "root_key": "0x00000000"
+    }
+  },
+  "types": [
+    {
+      "id": 0,
+      "type": {
+        "def": {
+          "composite": {
+            "fields": [
+              {
+                "type": 1,
+                "typeName": "[u8; 32]"
+              }
+            ]
+          }
+        },
+        "path": [
+          "ink_primitives",
+          "types",
+          "AccountId"
+        ]
+      }
+    },
+    {
+      "id": 1,
+      "type": {
+        "def": {
+          "array": {
+            "len": 32,
+            "type": 2
+          }
+        }
+      }
+    },
+    {
+      "id": 2,
+      "type": {
+        "def": {
+          "primitive": "u8"
+        }
+      }
+    },
+    {
+      "id": 3,
+      "type": {
+        "def": {
+          "composite": {
+            "fields": [
+              {
+                "type": 1,
+                "typeName": "[u8; 32]"
+              }
+            ]
+          }
+        },
+        "path": [
+          "ink_primitives",
+          "types",
+          "Hash"
+        ]
+      }
+    },
+    {
+      "id": 4,
+      "type": {
+        "def": {
+          "primitive": "u16"
+        }
+      }
+    },
+    {
+      "id": 5,
+      "type": {
+        "def": {
+          "primitive": "u64"
+        }
+      }
+    },
+    {
+      "id": 6,
+      "type": {
+        "def": {
+          "primitive": "u128"
+        }
+      }
+    },
+    {
+      "id": 7,
+      "type": {
+        "def": {
+          "variant": {
+            "variants": [
+              {
+                "fields": [
+                  {
+                    "type": 8
+                  }
+                ],
+                "index": 0,
+                "name": "Ok"
+              },
+              {
+                "fields": [
+                  {
+                    "type": 9
+                  }
+                ],
+                "index": 1,
+                "name": "Err"
+              }
+            ]
+          }
+        },
+        "params": [
+          {
+            "name": "T",
+            "type": 8
+          },
+          {
+            "name": "E",
+            "type": 9
+          }
+        ],
+        "path": [
+          "Result"
+        ]
+      }
+    },
+    {
+      "id": 8,
+      "type": {
+        "def": {
+          "tuple": []
+        }
+      }
+    },
+    {
+      "id": 9,
+      "type": {
+        "def": {
+          "variant": {
+            "variants": [
+              {
+                "index": 1,
+                "name": "CouldNotReadInput"
+              }
+            ]
+          }
+        },
+        "path": [
+          "ink_primitives",
+          "LangError"
+        ]
+      }
+    },
+    {
+      "id": 10,
+      "type": {
+        "def": {
+          "variant": {
+            "variants": [
+              {
+                "fields": [
+                  {
+                    "type": 11
+                  }
+                ],
+                "index": 0,
+                "name": "Ok"
+              },
+              {
+                "fields": [
+                  {
+                    "type": 9
+                  }
+                ],
+                "index": 1,
+                "name": "Err"
+              }
+            ]
+          }
+        },
+        "params": [
+          {
+            "name": "T",
+            "type": 11
+          },
+          {
+            "name": "E",
+            "type": 9
+          }
+        ],
+        "path": [
+          "Result"
+        ]
+      }
+    },
+    {
+      "id": 11,
+      "type": {
+        "def": {
+          "variant": {
+            "variants": [
+              {
+                "fields": [
+                  {
+                    "type": 8
+                  }
+                ],
+                "index": 0,
+                "name": "Ok"
+              },
+              {
+                "fields": [
+                  {
+                    "type": 12
+                  }
+                ],
+                "index": 1,
+                "name": "Err"
+              }
+            ]
+          }
+        },
+        "params": [
+          {
+            "name": "T",
+            "type": 8
+          },
+          {
+            "name": "E",
+            "type": 12
+          }
+        ],
+        "path": [
+          "Result"
+        ]
+      }
+    },
+    {
+      "id": 12,
+      "type": {
+        "def": {
+          "variant": {
+            "variants": [
+              {
+                "index": 0,
+                "name": "CallerIsNotAdmin"
+              },
+              {
+                "index": 1,
+                "name": "CallerIsNotMarket"
+              },
+              {
+                "index": 2,
+                "name": "MintForNotExistingMarket"
+              },
+              {
+                "index": 3,
+                "name": "MintOverflow"
+              },
+              {
+                "fields": [
+                  {
+                    "type": 13,
+                    "typeName": "PSP22Error"
+                  }
+                ],
+                "index": 4,
+                "name": "MintTransferFromError"
+              },
+              {
+                "fields": [
+                  {
+                    "type": 13,
+                    "typeName": "PSP22Error"
+                  }
+                ],
+                "index": 5,
+                "name": "MintAError"
+              },
+              {
+                "fields": [
+                  {
+                    "type": 13,
+                    "typeName": "PSP22Error"
+                  }
+                ],
+                "index": 6,
+                "name": "MintBError"
+              },
+              {
+                "index": 7,
+                "name": "MintInvalidUnderlyingToken"
+              },
+              {
+                "index": 8,
+                "name": "BurnForNotExistingMarket"
+              },
+              {
+                "fields": [
+                  {
+                    "type": 13,
+                    "typeName": "PSP22Error"
+                  }
+                ],
+                "index": 9,
+                "name": "BurnAError"
+              },
+              {
+                "fields": [
+                  {
+                    "type": 13,
+                    "typeName": "PSP22Error"
+                  }
+                ],
+                "index": 10,
+                "name": "BurnBError"
+              },
+              {
+                "fields": [
+                  {
+                    "type": 13,
+                    "typeName": "PSP22Error"
+                  }
+                ],
+                "index": 11,
+                "name": "BurnTransferError"
+              },
+              {
+                "index": 12,
+                "name": "BurnOverflow"
+              },
+              {
+                "index": 13,
+                "name": "GiveUpForNotExistingMarket"
+              },
+              {
+                "fields": [
+                  {
+                    "type": 13,
+                    "typeName": "PSP22Error"
+                  }
+                ],
+                "index": 14,
+                "name": "GiveUpTokenError"
+              },
+              {
+                "index": 15,
+                "name": "GiveUpOverflow"
+              },
+              {
+                "fields": [
+                  {
+                    "type": 13,
+                    "typeName": "PSP22Error"
+                  }
+                ],
+                "index": 16,
+                "name": "GiveUpTransferError"
+              },
+              {
+                "index": 17,
+                "name": "UseAbandonedForNotExistingMarket"
+              },
+              {
+                "fields": [
+                  {
+                    "type": 13,
+                    "typeName": "PSP22Error"
+                  }
+                ],
+                "index": 18,
+                "name": "UseAbandonedTokenError"
+              },
+              {
+                "index": 19,
+                "name": "UseAbandonedOverflow"
+              },
+              {
+                "fields": [
+                  {
+                    "type": 13,
+                    "typeName": "PSP22Error"
+                  }
+                ],
+                "index": 20,
+                "name": "UseAbandonedTransferError"
+              },
+              {
+                "index": 21,
+                "name": "SetOutcomeForNotExistingMarket"
+              },
+              {
+                "index": 22,
+                "name": "SetOutcomeTwice"
+              },
+              {
+                "index": 23,
+                "name": "BurnByOutcomeForNotExistingMarket"
+              },
+              {
+                "index": 24,
+                "name": "BurnByOutcomeTooEarly"
+              },
+              {
+                "index": 25,
+                "name": "BurnByOutcomeNoOutcome"
+              },
+              {
+                "fields": [
+                  {
+                    "type": 13,
+                    "typeName": "PSP22Error"
+                  }
+                ],
+                "index": 26,
+                "name": "BurnByOutcomeBurnError"
+              }
+            ]
+          }
+        },
+        "path": [
+          "predictor",
+          "errors",
+          "PredictorError"
+        ]
+      }
+    },
+    {
+      "id": 13,
+      "type": {
+        "def": {
+          "variant": {
+            "variants": [
+              {
+                "fields": [
+                  {
+                    "type": 14,
+                    "typeName": "String"
+                  }
+                ],
+                "index": 0,
+                "name": "Custom"
+              },
+              {
+                "index": 1,
+                "name": "InsufficientBalance"
+              },
+              {
+                "index": 2,
+                "name": "InsufficientAllowance"
+              },
+              {
+                "index": 3,
+                "name": "ZeroRecipientAddress"
+              },
+              {
+                "index": 4,
+                "name": "ZeroSenderAddress"
+              },
+              {
+                "fields": [
+                  {
+                    "type": 14,
+                    "typeName": "String"
+                  }
+                ],
+                "index": 5,
+                "name": "SafeTransferCheckFailed"
+              }
+            ]
+          }
+        },
+        "path": [
+          "psp22",
+          "errors",
+          "PSP22Error"
+        ]
+      }
+    },
+    {
+      "id": 14,
+      "type": {
+        "def": {
+          "primitive": "str"
+        }
+      }
+    },
+    {
+      "id": 15,
+      "type": {
+        "def": {
+          "primitive": "bool"
+        }
+      }
+    },
+    {
+      "id": 16,
+      "type": {
+        "def": {
+          "primitive": "u32"
+        }
+      }
+    },
+    {
+      "id": 17,
+      "type": {
+        "def": {
+          "variant": {}
+        },
+        "path": [
+          "ink_env",
+          "types",
+          "NoChainExtension"
+        ]
+      }
+    }
+  ],
+  "version": "4"
+}
