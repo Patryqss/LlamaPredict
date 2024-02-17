@@ -17,6 +17,11 @@ export const basicRoutes = [
         name: "Market",
         component: () => import("~/views/Market.vue"),
       },
+      {
+        path: "/admin",
+        name: "Admin",
+        component: () => import("~/views/Admin.vue"),
+      },
     ],
   },
   // Always leave this as last one
