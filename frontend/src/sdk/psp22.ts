@@ -3,12 +3,11 @@ import { ApiPromise } from '@polkadot/api';
 import * as minty_psp from './abi/minty_psp22.json';
 import * as conditional_psp from './abi/conditional_psp22.json';
 import { Signer } from '@polkadot/api/types';
-import { IKeyringPair } from '@polkadot/types/types';
 import { BN } from '@polkadot/util';
 import {
     contractTx,
     contractQuery
-  } from '@scio-labs/use-inkathon'
+  } from './interact/contractTx'
 
 export class PSP22Client {
     api: ApiPromise;
@@ -41,12 +40,14 @@ export class USDClient extends PSP22Client {
     }
 
     async mint(
-        sender: IKeyringPair,
+        sender: string,
+        signer: Signer,
         amount: BN,
     ) {
         return contractTx(
             this.api,
             sender,
+            signer,
             this.contract,
             "mint",
             undefined,
