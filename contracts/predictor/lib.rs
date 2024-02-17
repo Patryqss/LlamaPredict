@@ -87,6 +87,9 @@ mod predictor {
         count: u64,
     }
 
+    #[cfg(test)]
+    pub static mut UNDERLYING_BALANCES: Option<std::collections::HashMap<(AccountId, AccountId), u128>> = None;
+
     impl PredictorContract {
         #[cfg(test)]
         fn instantiate_token(&self, router: AccountId, token_hash: Hash, salt: u64) -> u64 {
@@ -140,6 +143,13 @@ mod predictor {
         }
         #[cfg(test)]
         fn underlying_transfer_from(&self, underlying_token: AccountId, caller: AccountId, amount: u128) -> Result<(), PSP22Error>{
+            unsafe {
+                let balances = UNDERLYING_BALANCES.as_mut().unwrap();
+                let key = (underlying_token, caller);
+                let balance = balances.get(&key).unwrap_or(&0);
+                let new_balance = balance.checked_sub(amount).ok_or(PSP22Error::InsufficientBalance)?;
+                balances.insert(key, new_balance);
+            }
             Ok(())
         }
         #[cfg(not(test))]
