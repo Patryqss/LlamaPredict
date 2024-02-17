@@ -155,7 +155,7 @@ mod predictor {
             token.burn_from(caller, amount)
         }
         #[cfg(test)]
-        fn market_token_balance_of(&self, token: &u64, user: AccountId) -> u128 {
+        fn market_token_balance_of(&self, _token: &u64, _user: AccountId) -> u128 {
             0
         }
         #[cfg(not(test))]
