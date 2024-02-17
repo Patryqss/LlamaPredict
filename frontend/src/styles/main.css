@@ -1,4 +1,5 @@
 @import "variables.css";
+@import 'apexcharts.css';
 
 html.dark {
   background: #22272e;

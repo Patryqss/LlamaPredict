@@ -6,7 +6,7 @@ const markets = [
     description: "What will be the value of AZERO on 18 February 2024?",
     minValue: 0.5,
     maxValue: 5,
-    expireDate: new Date("18-02-2024"),
+    expireDate: new Date("02-18-2024"),
   },
   {
     id: 2,
@@ -14,7 +14,7 @@ const markets = [
     description: "What will be the value of Bitcoin on 18 February 2024?",
     minValue: 20_000,
     maxValue: 60_000,
-    expireDate: new Date("18-02-2024"),
+    expireDate: new Date("02-18-2024"),
   },
   {
     id: 3,
@@ -22,7 +22,7 @@ const markets = [
     description: "What will be the value of Bitcoin on 18 February 2024?",
     minValue: 1_000,
     maxValue: 20_000,
-    expireDate: new Date("22-02-2024"),
+    expireDate: new Date("02-22-2024"),
   },
   {
     id: 4,
@@ -30,7 +30,7 @@ const markets = [
     description: "What will be the value of Bitcoin on 18 February 2024?",
     minValue: 0.001,
     maxValue: 1,
-    expireDate: new Date("23-02-2024"),
+    expireDate: new Date("02-23-2024"),
   },
 ];
 </script>

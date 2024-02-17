@@ -10,6 +10,7 @@ declare module 'vue' {
     BaseModal: typeof import('./../src/components/modals/BaseModal.vue')['default']
     Card: typeof import('./../src/components/Card.vue')['default']
     MarketCard: typeof import('./../src/components/MarketCard.vue')['default']
+    MarketChart: typeof import('./../src/components/MarketChart.vue')['default']
     ModalsController: typeof import('./../src/components/modals/ModalsController.vue')['default']
     Navbar: typeof import('./../src/components/Navbar.vue')['default']
     NumberInput: typeof import('./../src/components/NumberInput.vue')['default']

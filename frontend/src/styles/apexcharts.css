@@ -1,0 +1,18 @@
+/* Those classes override ApexCharts default styles */
+
+.chart-tooltip {
+  @apply text-neutral bg-black;
+}
+
+.apexcharts-tooltip-title {
+  background-color: white !important;
+  border: none !important;
+}
+
+.apexcharts-tooltip-marker {
+  display: none;
+}
+
+.apexcharts-menu-item {
+  text-align: left;
+}

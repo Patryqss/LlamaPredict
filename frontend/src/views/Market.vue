@@ -8,6 +8,7 @@ const market = {
   minValue: 20_000,
   maxValue: 60_000,
   expireDate: new Date("18-02-2024"),
+  source: '5E7UzafXNhFLhuRNEekUd9xM7Sc1bffMfnGEyGGtsY3uW4cF'
 };
 
 const state = reactive({
@@ -67,17 +68,21 @@ function onSubmit() {
 </script>
 
 <template>
-  <Card title="Market Guess: $45,000.00">
-    <div class="flex gap-x-10">
+  <Card title="Market Guess" :subtitle="market.description">
+    <div class="flex flex-col md:flex-row gap-x-10">
       <div :style="{ flex: '3 3 0%' }">
         <div>
-          CHART WILL BE HERE
+          <MarketChart :min-value="market.minValue" :max-value="market.maxValue" />
+        </div>
+        <div class="flex text-sm justify-start mb-5">
+          <span>Resolution Source:</span>
+          <a class="underline" :href="`https://alephzero.subscan.io/account/${market.source}`">{{ market.source }}</a>
         </div>
         <div class="bg-primary/20 px-5 py-2 rounded-lg">
           <p class="text-xl font-bold mb-5">
             Position
           </p>
-          <div class="flex items-center justify-between">
+          <div class="grid grid-cols-2 sm:grid-cols-5 sm:items-end justify-between">
             <div>
               <p class="font-bold">
                 Target
@@ -102,13 +107,13 @@ function onSubmit() {
               </p>
               <p>{{ formatUSDAmount(position.currentValue) }}</p>
             </div>
-            <button class="btn btn-accent" @click="onClose">
+            <button class="btn btn-accent col-span-2 sm:col-span-1 md:mt-0 mt-3" @click="onClose">
               Close
             </button>
           </div>
         </div>
       </div>
-      <div class="flex-1">
+      <div class="flex-1 md:mt-0 mt-10">
         <NumberInput
           :value="state.myPrediction"
           label="My prediction"
