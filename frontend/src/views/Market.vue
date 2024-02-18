@@ -29,7 +29,7 @@ const state = reactive({
 
 const position = reactive({
   prediction: null,
-  size: 0,
+  invested: 0,
   PnL: 0,
   currentValue: 0,
 });
@@ -55,6 +55,8 @@ onBeforeMount(async () => {
 
   market.value = parseMarket(matchingJSON, Number(route.params.id), rawMarket);
   state.loadingMarket = false;
+
+  position.currentValue = await accountStore.getPosition(Number(route.params.id));
 });
 
 function onTypeChange() {
@@ -95,12 +97,17 @@ async function onAddLiq() {
     return;
   }
 
-  await accountStore.addLiquidity(
-    Number(route.params.id),
-    Number(state.amount),
-  );
+  try {
+    const txnHash = await accountStore.addLiquidity(
+      Number(route.params.id),
+      Number(state.amount),
+    );
 
-  // emitter.emit("txn-success", "r812rc08723r8c2b083rb702873b");
+    if (txnHash) emitter.emit("txn-success", txnHash);
+    accountStore.udpateBalance();
+  } catch (e) {
+    console.error(e);
+  }
   state.amount = "";
 }
 async function onPredict() {
@@ -111,7 +118,17 @@ async function onPredict() {
     return;
   }
 
-  emitter.emit("txn-success", "r812rc08723r8c2b083rb702873b");
+  try {
+    const txnHash = await accountStore.predict(
+      Number(route.params.id)
+    );
+
+    if (txnHash) emitter.emit("txn-success", txnHash);
+    accountStore.udpateBalance();
+  } catch (e) {
+    console.error(e);
+  }
+
   state.myPrediction = null;
   state.amount = "";
 }
@@ -158,9 +175,9 @@ async function onPredict() {
               </p>
             </div>
             <div>
-              <p class="stat-title">Size</p>
+              <p class="stat-title">Invested</p>
               <p class="stat-value text-2xl">
-                {{ formatUSDAmount(position.size) }}
+                {{ formatUSDAmount(position.invested) }}
               </p>
             </div>
             <div>
@@ -176,7 +193,8 @@ async function onPredict() {
               </p>
             </div>
             <button
-              class="btn btn-accent col-span-2 mt-3 sm:col-span-1 md:mt-0"
+              class="btn btn-primary col-span-2 mt-3 sm:col-span-1 md:mt-0"
+              :disabled="!accountStore.activeAccount"
               @click="onClose"
             >
               Close
@@ -270,8 +288,8 @@ async function onPredict() {
         </div>
 
         <button
-          class="btn btn-accent mt-5 w-full"
-          :disabled="!!state.amountError || !!state.predictError"
+          class="btn btn-primary mt-5 w-full"
+          :disabled="!!state.amountError || !!state.predictError || !accountStore.activeAccount"
           @click="onSubmit"
         >
           <span

@@ -108,6 +108,7 @@ class AccountStore {
     const addressInjector = await web3FromAddress(this.activeAccount);
 
     const data = { title, description };
+    // Future feature: Save the data on the backend. For now do it manually.
     console.log("Hey Admin, add this to markets.json:");
     console.log(JSON.stringify(data));
 
@@ -129,7 +130,7 @@ class AccountStore {
   }
 
   async getMarkets() {
-    if (!this.api || !this.activeAccount) return [];
+    if (!this.api) return [];
     const sdk = new PredictorClient(
       this.api,
       contractAddresses.PREDICTOR_ADDRESS,
@@ -146,13 +147,23 @@ class AccountStore {
   }
 
   async getMarket(id: number) {
-    if (!this.api || !this.activeAccount) return null;
+    if (!this.api) return null;
     const sdk = new PredictorClient(
       this.api,
       contractAddresses.PREDICTOR_ADDRESS,
     );
     const res = await sdk.get_market("", id);
     return (res.output?.toHuman() as any).Ok;
+  }
+
+  async getPosition(marketId: number) {
+    if (!this.api || !this.activeAccount) return 0;
+
+    const market = await this.getMarket(marketId);
+    const router = new RouterClient(this.api, contractAddresses.ROUTER_ADDRESS);
+
+    const position = await router.get_position_value(this.activeAccount, market.market.tokenA.inner.accountId, market.market.tokenB.inner.accountId)
+    return position;
   }
 
   async addLiquidity(marketId: number, amount: number) {
@@ -197,6 +208,20 @@ class AccountStore {
     );
 
     console.log(res);
+    return res.result?.txHash.toString();
+  }
+
+  async predict(marketId: number) {
+    if (!this.api || !this.activeAccount) return;
+
+    const market = await this.getMarket(marketId);
+    const addressInjector = await web3FromAddress(this.activeAccount);
+
+    const router = new RouterClient(this.api, contractAddresses.ROUTER_ADDRESS);
+
+    // router.
+
+    return 'hash'
   }
 
   disconnect() {

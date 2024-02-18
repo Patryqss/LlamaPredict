@@ -49,14 +49,14 @@ async function onMint() {
 
         <button
           class="btn btn-primary mt-5"
-          :disabled="!!state.error"
+          :disabled="!!state.error || !accountStore.activeAccount"
           @click="onMint"
         >
           <span
             v-if="state.isLoading"
             class="loading loading-spinner loading-md"
           />
-          MINT
+          {{ accountStore.activeAccount ? 'MINT' : 'Connect to be able to Mint' }}
         </button>
       </div>
     </div>

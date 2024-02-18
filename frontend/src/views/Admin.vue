@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import { ADMIN_ADDRESS } from '~/config';
+import { router } from '~/router';
+
 const state = reactive({
   title: "BTC Price",
   description:
@@ -7,6 +10,10 @@ const state = reactive({
   isLoading: false,
   error: "",
 });
+
+onBeforeMount(() => {
+  if (accountStore.activeAccount !== ADMIN_ADDRESS) router.push('/');
+})
 
 async function addMarket() {
   if (!state.title || !state.description || !state.expireDate) {
