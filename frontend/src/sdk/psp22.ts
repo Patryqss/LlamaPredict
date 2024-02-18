@@ -28,7 +28,7 @@ export class PSP22Client {
       undefined,
       [user],
     );
-    return wrapDecodeError(decodeOutput(r, this.contract, "get_pair"));
+    return wrapDecodeError(decodeOutput(r, this.contract, "PSP22::balance_of"));
   }
 
   async totalSupply() {  // TODO: mark type
@@ -40,7 +40,7 @@ export class PSP22Client {
       undefined,
       [],
     );
-    return wrapDecodeError(decodeOutput(r, this.contract, "total_supply"));
+    return wrapDecodeError(decodeOutput(r, this.contract, "PSP22::total_supply"));
   }
 
   async increaseAllowance(sender: string, signer: Signer, spender: string, amount: BN) {

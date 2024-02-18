@@ -99,7 +99,7 @@ export class RouterClient {
             undefined,
             [asset_a, asset_b]
         )
-        return wrapDecodeError(decodeOutput(r, this.contract, "get_pair"));
+        return wrapDecodeError(decodeOutput(r, this.contract, "Router::get_reserves"));
     }
 
     async get_amount_out(
@@ -116,7 +116,7 @@ export class RouterClient {
             undefined,
             [amount_in, this_amount, other_amount]
         )
-        return wrapDecodeError(decodeOutput(r, this.contract, "get_amount_out"));
+        return wrapDecodeError(decodeOutput(r, this.contract, "Router::get_amount_out"));
     }
 
     async swap_exact_tokens_for_tokens(
