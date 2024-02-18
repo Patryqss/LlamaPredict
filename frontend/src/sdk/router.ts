@@ -99,6 +99,35 @@ export class RouterClient {
     };
   }
 
+  calculate_close_position(
+    user_a: number,
+    user_b: number,
+    total_a: number,
+    total_b: number,
+  ) {
+    let sell_outcome: string;
+    if (user_a > user_b) {
+        sell_outcome = "A";
+    } else if (user_a < user_b) {
+        sell_outcome = "B";
+        [total_a, total_b] = [total_b, total_a];
+        [user_a, user_b] = [user_b, user_a]
+    } else {
+        return {sell_outcome: "NONE", to_swap: 0};
+    }
+
+    // now a > b, because of the whack swap we did above
+    let a = user_a - user_b; // ease calculation by assuming b = 0
+    let A = total_a;
+    let B = total_b;
+    let root_delta = Math.sqrt((a - A - B) ** 2 + 4 * a * A);
+    let to_swap = root_delta + a - A - B;
+
+    return {
+        sell_outcome, to_swap
+    };
+  }
+
   async get_pair(
     sender: string,
     asset_a: string,
