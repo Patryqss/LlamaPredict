@@ -109,3 +109,18 @@ export function decodeOutput(
     isError,
   };
 }
+
+export function wrapDecodeError({
+  output,
+  decodedOutput,
+  isError
+}: {
+  output: any;
+  decodedOutput: string;
+  isError: boolean;
+}): any {
+  if (isError) {
+    throw new Error(decodedOutput);
+  }
+  return output;
+}

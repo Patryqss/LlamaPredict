@@ -4,7 +4,7 @@ import * as minty_psp from "./abi/minty_psp22.json";
 import * as conditional_psp from "./abi/conditional_psp22.json";
 import { Signer } from "@polkadot/api/types";
 import { BN } from "@polkadot/util";
-import { contractTx, contractQuery } from "./interact/contractTx";
+import { contractTx, contractQuery, wrapDecodeError, decodeOutput } from "./interact";
 
 export class PSP22Client {
   api: ApiPromise;
@@ -19,15 +19,28 @@ export class PSP22Client {
     this.contract = new ContractPromise(api, source, contract_address);
   }
 
-  async balanceOf(address: string) {
-    return contractQuery(
+  async balanceOf(user: string) { // TODO: mark type
+    let r = await contractQuery(
       this.api,
-      address,
+      user,
       this.contract,
       "PSP22::balance_of",
       undefined,
-      [address],
+      [user],
     );
+    return wrapDecodeError(decodeOutput(r, this.contract, "get_pair"));
+  }
+
+  async totalSupply() {  // TODO: mark type
+    let r = await contractQuery(
+      this.api,
+      "",
+      this.contract,
+      "PSP22::total_supply",
+      undefined,
+      [],
+    );
+    return wrapDecodeError(decodeOutput(r, this.contract, "total_supply"));
   }
 
   async increaseAllowance(sender: string, signer: Signer, spender: string, amount: BN) {

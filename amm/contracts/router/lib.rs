@@ -41,8 +41,8 @@ pub mod router {
 
         /// Returns address of a `Pair` contract instance (if exists) for
         /// `(token_0, token_1)` pair registered in `factory` Factory instance.
-        #[inline]
-        fn get_pair(
+        #[ink(message)]
+        pub fn get_pair(
             &self,
             token_0: AccountId,
             token_1: AccountId,
