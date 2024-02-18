@@ -318,38 +318,6 @@ mod predictor {
             Ok(market_id)
         }
 
-        fn increase_user_deposited(
-            &mut self,
-            caller: AccountId,
-            market_id: u64,
-            amount: u128,
-        ) {
-            let umd = self.user_market_data.get((caller, market_id)).unwrap_or_default();
-            
-            let user_market_data = UserMarketData {
-                deposited: umd.deposited.saturating_add(amount),
-                claimed: umd.claimed,
-            };
-
-            self.user_market_data.insert((caller, market_id), &user_market_data);
-        }
-
-        fn increase_user_claimed(
-            &mut self,
-            caller: AccountId,
-            market_id: u64,
-            amount: u128,
-        ) {
-            let umd = self.user_market_data.get((caller, market_id)).unwrap_or_default();
-            
-            let user_market_data = UserMarketData {
-                deposited: umd.deposited,
-                claimed: umd.claimed.saturating_add(amount),
-            };
-
-            self.user_market_data.insert((caller, market_id), &user_market_data);
-        }
-
         #[ink(message)]
         pub fn mint(&mut self, market_id: u64, amount: u128) -> Result<(), PredictorError>  {
             let caller = self.env().caller();
@@ -372,12 +340,15 @@ mod predictor {
             let minted = amount - collateral;
             let new_total_minted = market.total_minted + minted;
             let minted_per_token = minted >> 1;
+            let user_market_key = (caller, market_id);
+            let mut user_market_data = self.user_market_data.get(user_market_key).unwrap_or_default();
 
             market.total_minted = new_total_minted;
             market.total_tokens = new_total_tokens;
             self.markets.insert(market_id, &market);
 
-            self.increase_user_deposited(caller, market_id, amount);
+            user_market_data.deposited = user_market_data.deposited.saturating_add(amount);
+            self.user_market_data.insert(user_market_key, &user_market_data);
 
             // Token A and B are trusted
             {
