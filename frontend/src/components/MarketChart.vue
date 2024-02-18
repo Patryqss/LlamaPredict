@@ -1,12 +1,12 @@
 <script lang="ts" setup>
 import ApexChart from "vue3-apexcharts";
 import { format } from "date-fns";
-import { formatPctValue } from "~/utils";
+import { formatPctValue, parseMarket } from "~/utils";
 
 const dateFormat = "MMM dd, HH:mm";
 
 const state = reactive({
-  isLoading: false,
+  isLoading: true,
   activeData: {
     lastPoint: -1,
     date: "-",
@@ -17,17 +17,26 @@ const state = reactive({
   yAxisData: [] as number[],
 });
 
-onBeforeMount(() => {
+const route = useRoute();
+
+onBeforeMount(async () => {
   // Mocked data for hackathon purposes. Normally it would be fetched from BE
   state.xAxisData = [
-    new Date("02-16-2024 02:13").toString(),
-    new Date("02-16-2024 04:58").toString(),
-    new Date("02-16-2024 08:58").toString(),
-    new Date("02-16-2024 12:01").toString(),
-    new Date("02-16-2024 13:23").toString(),
-    new Date("02-16-2024 14:23").toString(),
+    new Date("02-18-2024 00:13").toString(),
+    new Date("02-18-2024 02:58").toString(),
+    new Date("02-18-2024 06:58").toString(),
+    new Date("02-18-2024 10:01").toString(),
+    new Date("02-18-2024 11:23").toString(),
+    new Date("02-18-2024 12:23").toString(),
   ];
-  state.yAxisData = [50, 34, 62, 70, 48, 30];
+  state.yAxisData = [50, 34, 62, 70, 48, 52];
+
+  const rawMarket = await accountStore.getMarket(Number(route.params.id));
+  const parsedMarket = parseMarket({}, Number(route.params.id), rawMarket);
+  state.xAxisData.push(new Date().toString());
+  state.yAxisData.push(parsedMarket.shortPct);
+  setActiveDataToLastPoint();
+  state.isLoading = false;
 });
 
 const hasData = computed(
