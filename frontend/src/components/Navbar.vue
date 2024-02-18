@@ -82,7 +82,7 @@ function toggleAdminPanel() {
               >L<span class="lowercase">lama</span></span
             >
             <span class="text-base-content"
-              >B<span class="lowercase">et</span></span
+              >P<span class="lowercase">redict</span></span
             >
           </div>
         </RouterLink>

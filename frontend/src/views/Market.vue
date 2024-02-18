@@ -306,7 +306,7 @@ async function onPredict() {
         <NumberInput
           class="my-5"
           :value="state.amount"
-          :label="state.type === 'PREDICT' ? 'Bet Size' : 'Amount'"
+          :label="state.type === 'PREDICT' ? 'Prediction Size' : 'Amount'"
           :max="accountStore.balance"
           :error="state.amountError"
           @input="onAmountChange"

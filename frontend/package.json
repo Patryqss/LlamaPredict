@@ -1,5 +1,5 @@
 {
-  "name": "llama-bet",
+  "name": "llama-predict",
   "version": "0.0.1",
   "private": true,
   "packageManager": "pnpm@8.9.0",

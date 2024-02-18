@@ -37,7 +37,7 @@ class AccountStore {
   }
 
   async injectSigner() {
-    const injectedExtensions = await web3Enable("Llama Bet");
+    const injectedExtensions = await web3Enable("Llama Predict");
     this.extensions = injectedExtensions;
   }
 

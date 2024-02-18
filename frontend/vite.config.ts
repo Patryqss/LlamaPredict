@@ -69,8 +69,8 @@ export default defineConfig({
       registerType: "autoUpdate",
       includeAssets: ["favicon.ico"],
       manifest: {
-        name: "LlamaBet",
-        short_name: "LlamaBet",
+        name: "LlamaPredict",
+        short_name: "LlamaPredict",
         theme_color: "#ffffff",
         icons: [
           {

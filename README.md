@@ -1,4 +1,4 @@
-# LlamaBet
+# LlamaPredict
 Prediction Market built on AlephZero
 
 # What kind of problem we try to solve?
