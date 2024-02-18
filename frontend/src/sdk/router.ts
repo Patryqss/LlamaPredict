@@ -11,6 +11,7 @@ import {
     wrapDecodeError,
   } from './interact'
 import { PSP22Client } from './psp22';
+import { process_number } from './utils';
 
 export class RouterClient {
     api: ApiPromise;
@@ -46,25 +47,25 @@ export class RouterClient {
         let balance_b = await client_b.balanceOf(user);
         let balance_lp = await client_lp.balanceOf(user);
 
-        balance_a += balance_lp * total_a / total_lp;
-        balance_b += balance_lp * total_b / total_lp;
+        balance_a = balance_a.add(balance_lp.mul(total_a).div(total_lp));
+        balance_b = balance_b.add(balance_lp.mul(total_b).div(total_lp));
 
-        let dolla = 0;
+        let dolla: BN;
         // dolla is minimum of balance_a and balance_b
-        if (balance_a < balance_b) {
-            dolla = balance_a;
+        if (balance_a.cmp(balance_b) == -1) {
+            dolla = balance_a.clone();
         } else {
-            dolla = balance_b;
+            dolla = balance_b.clone();
         }
-        balance_a -= dolla;
-        balance_b -= dolla;
+        balance_a = balance_a.sub(dolla);
+        balance_b = balance_b.sub(dolla);
 
-        if (total_a < total_b) {
-            dolla += balance_a * (1 - total_a / (total_a + total_b));
-            dolla += balance_b * (total_a / (total_a + total_b));
+        if (total_a.cmp(total_b) == -1){
+            dolla = dolla.add(balance_a.muln(1 - total_a.toNumber() / (total_a.toNumber() + total_b.toNumber())));
+            dolla = dolla.add(balance_b.muln(total_a.toNumber() / (total_a.toNumber() + total_b.toNumber())));
         } else {
-            dolla += balance_b * (1 - total_b / (total_a + total_b));
-            dolla += balance_a * (total_b / (total_a + total_b));
+            dolla = dolla.add(balance_b.muln(1 - total_b.toNumber() / (total_a.toNumber() + total_b.toNumber())));
+            dolla = dolla.add(balance_a.muln(total_b.toNumber() / (total_a.toNumber() + total_b.toNumber())));
         }
 
         return dolla;
@@ -90,7 +91,7 @@ export class RouterClient {
         sender: string,
         asset_a: string,
         asset_b: string,
-    ){ // TODO: typed return
+    ): Promise<Array<BN>> {
         let r = await contractQuery(
             this.api,
             sender,
@@ -99,7 +100,8 @@ export class RouterClient {
             undefined,
             [asset_a, asset_b]
         )
-        return wrapDecodeError(decodeOutput(r, this.contract, "Router::get_reserves"));
+        let [a,b] = wrapDecodeError(decodeOutput(r, this.contract, "Router::get_reserves"));
+        return [process_number(a), process_number(b)]
     }
 
     async get_amount_out(
@@ -107,7 +109,7 @@ export class RouterClient {
         amount_in: BN,
         this_amount: BN,
         other_amount: BN,
-    ) { // TODO: typed return
+    ): Promise<BN> { // TODO: typed return
         let r = await contractQuery(
             this.api,
             sender,
@@ -116,7 +118,7 @@ export class RouterClient {
             undefined,
             [amount_in, this_amount, other_amount]
         )
-        return wrapDecodeError(decodeOutput(r, this.contract, "Router::get_amount_out"));
+        return process_number(wrapDecodeError(decodeOutput(r, this.contract, "Router::get_amount_out")));
     }
 
     async swap_exact_tokens_for_tokens(

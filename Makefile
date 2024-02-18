@@ -10,12 +10,3 @@ build-all:
 	 	echo "Building $$d contract" ; \
 	 	cargo contract build --quiet --manifest-path contracts/$$d/Cargo.toml --release ; \
 	done
-
-
-.PHONY: deploy-all
-deploy-all:
-	@for d in $(CONTRACTS); do \
-	 	echo "Deploying $$d" ; \
-	 	./scripts/deploy.sh $$d; \
-	done
-	

@@ -6,6 +6,10 @@ import { Signer } from "@polkadot/api/types";
 import { BN } from "@polkadot/util";
 import { contractTx, contractQuery, wrapDecodeError, decodeOutput } from "./interact";
 
+function process_number(v: string): BN {
+  return new BN(v.replaceAll(",", ""));
+}
+
 export class PSP22Client {
   api: ApiPromise;
   contract: ContractPromise;
@@ -19,7 +23,7 @@ export class PSP22Client {
     this.contract = new ContractPromise(api, source, contract_address);
   }
 
-  async balanceOf(user: string) { // TODO: mark type
+  async balanceOf(user: string): Promise<BN> {
     let r = await contractQuery(
       this.api,
       user,
@@ -28,10 +32,10 @@ export class PSP22Client {
       undefined,
       [user],
     );
-    return wrapDecodeError(decodeOutput(r, this.contract, "PSP22::balance_of"));
+    return process_number(wrapDecodeError(decodeOutput(r, this.contract, "PSP22::balance_of")));
   }
 
-  async totalSupply() {  // TODO: mark type
+  async totalSupply(): Promise<BN> {
     let r = await contractQuery(
       this.api,
       "",
@@ -40,7 +44,7 @@ export class PSP22Client {
       undefined,
       [],
     );
-    return wrapDecodeError(decodeOutput(r, this.contract, "PSP22::total_supply"));
+    return process_number(wrapDecodeError(decodeOutput(r, this.contract, "PSP22::total_supply")));
   }
 
   async increaseAllowance(sender: string, signer: Signer, spender: string, amount: BN) {
