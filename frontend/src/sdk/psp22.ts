@@ -5,10 +5,7 @@ import * as conditional_psp from "./abi/conditional_psp22.json";
 import { Signer } from "@polkadot/api/types";
 import { BN } from "@polkadot/util";
 import { contractTx, contractQuery, wrapDecodeError, decodeOutput } from "./interact";
-
-function process_number(v: string): BN {
-  return new BN(v.replaceAll(",", ""));
-}
+import { process_number } from "./utils";
 
 export class PSP22Client {
   api: ApiPromise;

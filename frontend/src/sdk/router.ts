@@ -2,7 +2,6 @@ import { ContractPromise } from '@polkadot/api-contract';
 import { ApiPromise } from '@polkadot/api';
 import * as abi_router from './abi/router_contract.json';
 import { Signer } from '@polkadot/api/types';
-import { IKeyringPair } from '@polkadot/types/types';
 import { BN } from '@polkadot/util';
 import {
     contractTx,
@@ -12,6 +11,7 @@ import {
   } from './interact'
 import { PSP22Client } from './psp22';
 import { process_number } from './utils';
+import { FactoryClient } from './factory';
 
 export class RouterClient {
     api: ApiPromise;
@@ -36,7 +36,8 @@ export class RouterClient {
         token_a: string,
         token_b: string,
     ) {  // TODO: specify type
-        let token_lp = await this.get_pair(user, token_a, token_b);
+        let factory = await this.get_factory();
+        let token_lp = await factory.get_pair(token_a, token_b);
         let client_a = new PSP22Client(this.api, token_a);
         let client_b = new PSP22Client(this.api, token_b);
         let client_lp = new PSP22Client(this.api, token_lp);
@@ -87,6 +88,19 @@ export class RouterClient {
         return wrapDecodeError(decodeOutput(r, this.contract, "get_pair"));
     }
 
+    async get_factory(): Promise<FactoryClient> {
+        let r = await contractQuery(
+            this.api,
+            "",
+            this.contract,
+            "Router::factory",
+            undefined,
+            []
+        );
+        let addr = wrapDecodeError(decodeOutput(r, this.contract, "Router::factory"));
+        return new FactoryClient(this.api, addr);
+    }
+
     async get_reserves(
         sender: string,
         asset_a: string,
@@ -109,7 +123,7 @@ export class RouterClient {
         amount_in: BN,
         this_amount: BN,
         other_amount: BN,
-    ): Promise<BN> { // TODO: typed return
+    ): Promise<BN> {
         let r = await contractQuery(
             this.api,
             sender,
