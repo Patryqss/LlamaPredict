@@ -1,12 +1,12 @@
 {
   "source": {
-    "hash": "0xa926755b49b42d3786b20615cb3972e1fcf1a5084a0cb40f38fa3727b2043a71",
+    "hash": "0x8448f79d6428e1ab85ce12d60bd968d0bed5fde460464f071fb2d4328596219e",
     "language": "ink! 4.3.0",
-    "compiler": "rustc 1.69.0",
+    "compiler": "rustc 1.71.0",
     "build_info": {
       "build_mode": "Release",
       "cargo_contract_version": "3.0.1",
-      "rust_toolchain": "stable-aarch64-apple-darwin",
+      "rust_toolchain": "stable-x86_64-unknown-linux-gnu",
       "wasm_opt_settings": {
         "keep_debug_symbols": false,
         "optimization_passes": "Z"
@@ -20,6 +20,7 @@
       "Cardinal Cryptography"
     ]
   },
+  "image": null,
   "spec": {
     "constructors": [
       {
@@ -69,32 +70,32 @@
         "displayName": [
           "Balance"
         ],
-        "type": 9
+        "type": 17
       },
       "blockNumber": {
         "displayName": [
           "BlockNumber"
         ],
-        "type": 28
+        "type": 30
       },
       "chainExtension": {
         "displayName": [
           "ChainExtension"
         ],
-        "type": 29
+        "type": 31
       },
       "hash": {
         "displayName": [
           "Hash"
         ],
-        "type": 27
+        "type": 29
       },
       "maxEventTopics": 4,
       "timestamp": {
         "displayName": [
           "Timestamp"
         ],
-        "type": 17
+        "type": 19
       }
     },
     "events": [],
@@ -128,6 +129,44 @@
           }
         ],
         "default": false,
+        "docs": [
+          " Returns address of a `Pair` contract instance (if exists) for",
+          " `(token_0, token_1)` pair registered in `factory` Factory instance."
+        ],
+        "label": "get_pair",
+        "mutates": false,
+        "payable": false,
+        "returnType": {
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ],
+          "type": 6
+        },
+        "selector": "0x337daf4f"
+      },
+      {
+        "args": [
+          {
+            "label": "token_0",
+            "type": {
+              "displayName": [
+                "AccountId"
+              ],
+              "type": 0
+            }
+          },
+          {
+            "label": "token_1",
+            "type": {
+              "displayName": [
+                "AccountId"
+              ],
+              "type": 0
+            }
+          }
+        ],
+        "default": false,
         "docs": [],
         "label": "Router::get_reserves",
         "mutates": false,
@@ -137,7 +176,7 @@
             "ink",
             "MessageResult"
           ],
-          "type": 6
+          "type": 14
         },
         "selector": "0x9fc0218f"
       },
@@ -153,7 +192,7 @@
             "ink",
             "MessageResult"
           ],
-          "type": 16
+          "type": 18
         },
         "selector": "0xac3a4c18"
       },
@@ -169,7 +208,7 @@
             "ink",
             "MessageResult"
           ],
-          "type": 16
+          "type": 18
         },
         "selector": "0x5593eab6"
       },
@@ -199,7 +238,7 @@
               "displayName": [
                 "u128"
               ],
-              "type": 9
+              "type": 17
             }
           },
           {
@@ -208,7 +247,7 @@
               "displayName": [
                 "u128"
               ],
-              "type": 9
+              "type": 17
             }
           },
           {
@@ -217,7 +256,7 @@
               "displayName": [
                 "u128"
               ],
-              "type": 9
+              "type": 17
             }
           },
           {
@@ -226,7 +265,7 @@
               "displayName": [
                 "u128"
               ],
-              "type": 9
+              "type": 17
             }
           },
           {
@@ -244,7 +283,7 @@
               "displayName": [
                 "u64"
               ],
-              "type": 17
+              "type": 19
             }
           }
         ],
@@ -258,7 +297,7 @@
             "ink",
             "MessageResult"
           ],
-          "type": 18
+          "type": 20
         },
         "selector": "0xa5b7d597"
       },
@@ -279,7 +318,7 @@
               "displayName": [
                 "u128"
               ],
-              "type": 9
+              "type": 17
             }
           },
           {
@@ -288,7 +327,7 @@
               "displayName": [
                 "u128"
               ],
-              "type": 9
+              "type": 17
             }
           },
           {
@@ -297,7 +336,7 @@
               "displayName": [
                 "Balance"
               ],
-              "type": 9
+              "type": 17
             }
           },
           {
@@ -315,7 +354,7 @@
               "displayName": [
                 "u64"
               ],
-              "type": 17
+              "type": 19
             }
           }
         ],
@@ -329,7 +368,7 @@
             "ink",
             "MessageResult"
           ],
-          "type": 18
+          "type": 20
         },
         "selector": "0x292d7221"
       },
@@ -359,7 +398,7 @@
               "displayName": [
                 "u128"
               ],
-              "type": 9
+              "type": 17
             }
           },
           {
@@ -368,7 +407,7 @@
               "displayName": [
                 "u128"
               ],
-              "type": 9
+              "type": 17
             }
           },
           {
@@ -377,7 +416,7 @@
               "displayName": [
                 "u128"
               ],
-              "type": 9
+              "type": 17
             }
           },
           {
@@ -395,7 +434,7 @@
               "displayName": [
                 "u64"
               ],
-              "type": 17
+              "type": 19
             }
           }
         ],
@@ -409,7 +448,7 @@
             "ink",
             "MessageResult"
           ],
-          "type": 6
+          "type": 14
         },
         "selector": "0xd3abe5a3"
       },
@@ -430,7 +469,7 @@
               "displayName": [
                 "u128"
               ],
-              "type": 9
+              "type": 17
             }
           },
           {
@@ -439,7 +478,7 @@
               "displayName": [
                 "u128"
               ],
-              "type": 9
+              "type": 17
             }
           },
           {
@@ -448,7 +487,7 @@
               "displayName": [
                 "Balance"
               ],
-              "type": 9
+              "type": 17
             }
           },
           {
@@ -466,7 +505,7 @@
               "displayName": [
                 "u64"
               ],
-              "type": 17
+              "type": 19
             }
           }
         ],
@@ -480,7 +519,7 @@
             "ink",
             "MessageResult"
           ],
-          "type": 6
+          "type": 14
         },
         "selector": "0x3448bb5c"
       },
@@ -492,7 +531,7 @@
               "displayName": [
                 "u128"
               ],
-              "type": 9
+              "type": 17
             }
           },
           {
@@ -501,7 +540,7 @@
               "displayName": [
                 "u128"
               ],
-              "type": 9
+              "type": 17
             }
           },
           {
@@ -510,7 +549,7 @@
               "displayName": [
                 "Vec"
               ],
-              "type": 21
+              "type": 23
             }
           },
           {
@@ -528,7 +567,7 @@
               "displayName": [
                 "u64"
               ],
-              "type": 17
+              "type": 19
             }
           }
         ],
@@ -542,7 +581,7 @@
             "ink",
             "MessageResult"
           ],
-          "type": 22
+          "type": 24
         },
         "selector": "0xaf0a8836"
       },
@@ -554,7 +593,7 @@
               "displayName": [
                 "u128"
               ],
-              "type": 9
+              "type": 17
             }
           },
           {
@@ -563,7 +602,7 @@
               "displayName": [
                 "u128"
               ],
-              "type": 9
+              "type": 17
             }
           },
           {
@@ -572,7 +611,7 @@
               "displayName": [
                 "Vec"
               ],
-              "type": 21
+              "type": 23
             }
           },
           {
@@ -590,7 +629,7 @@
               "displayName": [
                 "u64"
               ],
-              "type": 17
+              "type": 19
             }
           }
         ],
@@ -604,7 +643,7 @@
             "ink",
             "MessageResult"
           ],
-          "type": 22
+          "type": 24
         },
         "selector": "0xd8eafd67"
       },
@@ -616,7 +655,7 @@
               "displayName": [
                 "u128"
               ],
-              "type": 9
+              "type": 17
             }
           },
           {
@@ -625,7 +664,7 @@
               "displayName": [
                 "Vec"
               ],
-              "type": 21
+              "type": 23
             }
           },
           {
@@ -643,7 +682,7 @@
               "displayName": [
                 "u64"
               ],
-              "type": 17
+              "type": 19
             }
           }
         ],
@@ -657,7 +696,7 @@
             "ink",
             "MessageResult"
           ],
-          "type": 22
+          "type": 24
         },
         "selector": "0x0a78e251"
       },
@@ -669,7 +708,7 @@
               "displayName": [
                 "Balance"
               ],
-              "type": 9
+              "type": 17
             }
           },
           {
@@ -678,7 +717,7 @@
               "displayName": [
                 "u128"
               ],
-              "type": 9
+              "type": 17
             }
           },
           {
@@ -687,7 +726,7 @@
               "displayName": [
                 "Vec"
               ],
-              "type": 21
+              "type": 23
             }
           },
           {
@@ -705,7 +744,7 @@
               "displayName": [
                 "u64"
               ],
-              "type": 17
+              "type": 19
             }
           }
         ],
@@ -719,7 +758,7 @@
             "ink",
             "MessageResult"
           ],
-          "type": 22
+          "type": 24
         },
         "selector": "0xb2b28f92"
       },
@@ -731,7 +770,7 @@
               "displayName": [
                 "u128"
               ],
-              "type": 9
+              "type": 17
             }
           },
           {
@@ -740,7 +779,7 @@
               "displayName": [
                 "Balance"
               ],
-              "type": 9
+              "type": 17
             }
           },
           {
@@ -749,7 +788,7 @@
               "displayName": [
                 "Vec"
               ],
-              "type": 21
+              "type": 23
             }
           },
           {
@@ -767,7 +806,7 @@
               "displayName": [
                 "u64"
               ],
-              "type": 17
+              "type": 19
             }
           }
         ],
@@ -781,7 +820,7 @@
             "ink",
             "MessageResult"
           ],
-          "type": 22
+          "type": 24
         },
         "selector": "0xcb577423"
       },
@@ -793,7 +832,7 @@
               "displayName": [
                 "u128"
               ],
-              "type": 9
+              "type": 17
             }
           },
           {
@@ -802,7 +841,7 @@
               "displayName": [
                 "Vec"
               ],
-              "type": 21
+              "type": 23
             }
           },
           {
@@ -820,7 +859,7 @@
               "displayName": [
                 "u64"
               ],
-              "type": 17
+              "type": 19
             }
           }
         ],
@@ -834,7 +873,7 @@
             "ink",
             "MessageResult"
           ],
-          "type": 22
+          "type": 24
         },
         "selector": "0x1299fdf2"
       },
@@ -846,7 +885,7 @@
               "displayName": [
                 "u128"
               ],
-              "type": 9
+              "type": 17
             }
           },
           {
@@ -855,7 +894,7 @@
               "displayName": [
                 "u128"
               ],
-              "type": 9
+              "type": 17
             }
           },
           {
@@ -864,7 +903,7 @@
               "displayName": [
                 "u128"
               ],
-              "type": 9
+              "type": 17
             }
           }
         ],
@@ -882,7 +921,7 @@
             "ink",
             "MessageResult"
           ],
-          "type": 25
+          "type": 27
         },
         "selector": "0x16347b10"
       },
@@ -894,7 +933,7 @@
               "displayName": [
                 "u128"
               ],
-              "type": 9
+              "type": 17
             }
           },
           {
@@ -903,7 +942,7 @@
               "displayName": [
                 "u128"
               ],
-              "type": 9
+              "type": 17
             }
           },
           {
@@ -912,7 +951,7 @@
               "displayName": [
                 "u128"
               ],
-              "type": 9
+              "type": 17
             }
           }
         ],
@@ -930,7 +969,7 @@
             "ink",
             "MessageResult"
           ],
-          "type": 25
+          "type": 27
         },
         "selector": "0x41e315fd"
       },
@@ -942,7 +981,7 @@
               "displayName": [
                 "u128"
               ],
-              "type": 9
+              "type": 17
             }
           },
           {
@@ -951,7 +990,7 @@
               "displayName": [
                 "u128"
               ],
-              "type": 9
+              "type": 17
             }
           },
           {
@@ -960,7 +999,7 @@
               "displayName": [
                 "u128"
               ],
-              "type": 9
+              "type": 17
             }
           }
         ],
@@ -978,7 +1017,7 @@
             "ink",
             "MessageResult"
           ],
-          "type": 25
+          "type": 27
         },
         "selector": "0xea4ac85d"
       },
@@ -990,7 +1029,7 @@
               "displayName": [
                 "u128"
               ],
-              "type": 9
+              "type": 17
             }
           },
           {
@@ -999,7 +1038,7 @@
               "displayName": [
                 "Vec"
               ],
-              "type": 21
+              "type": 23
             }
           }
         ],
@@ -1013,7 +1052,7 @@
             "ink",
             "MessageResult"
           ],
-          "type": 22
+          "type": 24
         },
         "selector": "0x7170b8f6"
       },
@@ -1025,7 +1064,7 @@
               "displayName": [
                 "u128"
               ],
-              "type": 9
+              "type": 17
             }
           },
           {
@@ -1034,7 +1073,7 @@
               "displayName": [
                 "Vec"
               ],
-              "type": 21
+              "type": 23
             }
           }
         ],
@@ -1048,7 +1087,7 @@
             "ink",
             "MessageResult"
           ],
-          "type": 22
+          "type": 24
         },
         "selector": "0x707998fc"
       }
@@ -1244,7 +1283,7 @@
               {
                 "fields": [
                   {
-                    "type": 8
+                    "type": 0
                   }
                 ],
                 "index": 0,
@@ -1253,7 +1292,7 @@
               {
                 "fields": [
                   {
-                    "type": 10
+                    "type": 8
                   }
                 ],
                 "index": 1,
@@ -1265,11 +1304,11 @@
         "params": [
           {
             "name": "T",
-            "type": 8
+            "type": 0
           },
           {
             "name": "E",
-            "type": 10
+            "type": 8
           }
         ],
         "path": [
@@ -1281,31 +1320,12 @@
       "id": 8,
       "type": {
         "def": {
-          "tuple": [
-            9,
-            9
-          ]
-        }
-      }
-    },
-    {
-      "id": 9,
-      "type": {
-        "def": {
-          "primitive": "u128"
-        }
-      }
-    },
-    {
-      "id": 10,
-      "type": {
-        "def": {
           "variant": {
             "variants": [
               {
                 "fields": [
                   {
-                    "type": 11,
+                    "type": 9,
                     "typeName": "PSP22Error"
                   }
                 ],
@@ -1315,7 +1335,7 @@
               {
                 "fields": [
                   {
-                    "type": 13,
+                    "type": 11,
                     "typeName": "FactoryError"
                   }
                 ],
@@ -1325,7 +1345,7 @@
               {
                 "fields": [
                   {
-                    "type": 14,
+                    "type": 12,
                     "typeName": "PairError"
                   }
                 ],
@@ -1345,7 +1365,7 @@
               {
                 "fields": [
                   {
-                    "type": 15,
+                    "type": 13,
                     "typeName": "MathError"
                   }
                 ],
@@ -1355,7 +1375,7 @@
               {
                 "fields": [
                   {
-                    "type": 12,
+                    "type": 10,
                     "typeName": "String"
                   }
                 ],
@@ -1417,7 +1437,7 @@
       }
     },
     {
-      "id": 11,
+      "id": 9,
       "type": {
         "def": {
           "variant": {
@@ -1425,7 +1445,7 @@
               {
                 "fields": [
                   {
-                    "type": 12,
+                    "type": 10,
                     "typeName": "String"
                   }
                 ],
@@ -1451,7 +1471,7 @@
               {
                 "fields": [
                   {
-                    "type": 12,
+                    "type": 10,
                     "typeName": "String"
                   }
                 ],
@@ -1469,7 +1489,7 @@
       }
     },
     {
-      "id": 12,
+      "id": 10,
       "type": {
         "def": {
           "primitive": "str"
@@ -1477,7 +1497,7 @@
       }
     },
     {
-      "id": 13,
+      "id": 11,
       "type": {
         "def": {
           "variant": {
@@ -1485,7 +1505,7 @@
               {
                 "fields": [
                   {
-                    "type": 14,
+                    "type": 12,
                     "typeName": "PairError"
                   }
                 ],
@@ -1519,7 +1539,7 @@
       }
     },
     {
-      "id": 14,
+      "id": 12,
       "type": {
         "def": {
           "variant": {
@@ -1527,7 +1547,7 @@
               {
                 "fields": [
                   {
-                    "type": 11,
+                    "type": 9,
                     "typeName": "PSP22Error"
                   }
                 ],
@@ -1547,7 +1567,7 @@
               {
                 "fields": [
                   {
-                    "type": 15,
+                    "type": 13,
                     "typeName": "MathError"
                   }
                 ],
@@ -1597,7 +1617,7 @@
       }
     },
     {
-      "id": 15,
+      "id": 13,
       "type": {
         "def": {
           "variant": {
@@ -1662,7 +1682,110 @@
       }
     },
     {
+      "id": 14,
+      "type": {
+        "def": {
+          "variant": {
+            "variants": [
+              {
+                "fields": [
+                  {
+                    "type": 15
+                  }
+                ],
+                "index": 0,
+                "name": "Ok"
+              },
+              {
+                "fields": [
+                  {
+                    "type": 5
+                  }
+                ],
+                "index": 1,
+                "name": "Err"
+              }
+            ]
+          }
+        },
+        "params": [
+          {
+            "name": "T",
+            "type": 15
+          },
+          {
+            "name": "E",
+            "type": 5
+          }
+        ],
+        "path": [
+          "Result"
+        ]
+      }
+    },
+    {
+      "id": 15,
+      "type": {
+        "def": {
+          "variant": {
+            "variants": [
+              {
+                "fields": [
+                  {
+                    "type": 16
+                  }
+                ],
+                "index": 0,
+                "name": "Ok"
+              },
+              {
+                "fields": [
+                  {
+                    "type": 8
+                  }
+                ],
+                "index": 1,
+                "name": "Err"
+              }
+            ]
+          }
+        },
+        "params": [
+          {
+            "name": "T",
+            "type": 16
+          },
+          {
+            "name": "E",
+            "type": 8
+          }
+        ],
+        "path": [
+          "Result"
+        ]
+      }
+    },
+    {
       "id": 16,
+      "type": {
+        "def": {
+          "tuple": [
+            17,
+            17
+          ]
+        }
+      }
+    },
+    {
+      "id": 17,
+      "type": {
+        "def": {
+          "primitive": "u128"
+        }
+      }
+    },
+    {
+      "id": 18,
       "type": {
         "def": {
           "variant": {
@@ -1704,7 +1827,7 @@
       }
     },
     {
-      "id": 17,
+      "id": 19,
       "type": {
         "def": {
           "primitive": "u64"
@@ -1712,7 +1835,7 @@
       }
     },
     {
-      "id": 18,
+      "id": 20,
       "type": {
         "def": {
           "variant": {
@@ -1720,7 +1843,7 @@
               {
                 "fields": [
                   {
-                    "type": 19
+                    "type": 21
                   }
                 ],
                 "index": 0,
@@ -1741,7 +1864,7 @@
         "params": [
           {
             "name": "T",
-            "type": 19
+            "type": 21
           },
           {
             "name": "E",
@@ -1754,7 +1877,7 @@
       }
     },
     {
-      "id": 19,
+      "id": 21,
       "type": {
         "def": {
           "variant": {
@@ -1762,7 +1885,7 @@
               {
                 "fields": [
                   {
-                    "type": 20
+                    "type": 22
                   }
                 ],
                 "index": 0,
@@ -1771,7 +1894,7 @@
               {
                 "fields": [
                   {
-                    "type": 10
+                    "type": 8
                   }
                 ],
                 "index": 1,
@@ -1783,11 +1906,11 @@
         "params": [
           {
             "name": "T",
-            "type": 20
+            "type": 22
           },
           {
             "name": "E",
-            "type": 10
+            "type": 8
           }
         ],
         "path": [
@@ -1796,19 +1919,19 @@
       }
     },
     {
-      "id": 20,
+      "id": 22,
       "type": {
         "def": {
           "tuple": [
-            9,
-            9,
-            9
+            17,
+            17,
+            17
           ]
         }
       }
     },
     {
-      "id": 21,
+      "id": 23,
       "type": {
         "def": {
           "sequence": {
@@ -1818,7 +1941,7 @@
       }
     },
     {
-      "id": 22,
+      "id": 24,
       "type": {
         "def": {
           "variant": {
@@ -1826,7 +1949,7 @@
               {
                 "fields": [
                   {
-                    "type": 23
+                    "type": 25
                   }
                 ],
                 "index": 0,
@@ -1847,7 +1970,7 @@
         "params": [
           {
             "name": "T",
-            "type": 23
+            "type": 25
           },
           {
             "name": "E",
@@ -1857,58 +1980,6 @@
         "path": [
           "Result"
         ]
-      }
-    },
-    {
-      "id": 23,
-      "type": {
-        "def": {
-          "variant": {
-            "variants": [
-              {
-                "fields": [
-                  {
-                    "type": 24
-                  }
-                ],
-                "index": 0,
-                "name": "Ok"
-              },
-              {
-                "fields": [
-                  {
-                    "type": 10
-                  }
-                ],
-                "index": 1,
-                "name": "Err"
-              }
-            ]
-          }
-        },
-        "params": [
-          {
-            "name": "T",
-            "type": 24
-          },
-          {
-            "name": "E",
-            "type": 10
-          }
-        ],
-        "path": [
-          "Result"
-        ]
-      }
-    },
-    {
-      "id": 24,
-      "type": {
-        "def": {
-          "sequence": {
-            "type": 9
-          }
-        }
       }
     },
     {
@@ -1929,7 +2000,7 @@
               {
                 "fields": [
                   {
-                    "type": 5
+                    "type": 8
                   }
                 ],
                 "index": 1,
@@ -1945,7 +2016,7 @@
           },
           {
             "name": "E",
-            "type": 5
+            "type": 8
           }
         ],
         "path": [
@@ -1957,12 +2028,22 @@
       "id": 26,
       "type": {
         "def": {
+          "sequence": {
+            "type": 17
+          }
+        }
+      }
+    },
+    {
+      "id": 27,
+      "type": {
+        "def": {
           "variant": {
             "variants": [
               {
                 "fields": [
                   {
-                    "type": 9
+                    "type": 28
                   }
                 ],
                 "index": 0,
@@ -1971,7 +2052,7 @@
               {
                 "fields": [
                   {
-                    "type": 10
+                    "type": 5
                   }
                 ],
                 "index": 1,
@@ -1983,11 +2064,11 @@
         "params": [
           {
             "name": "T",
-            "type": 9
+            "type": 28
           },
           {
             "name": "E",
-            "type": 10
+            "type": 5
           }
         ],
         "path": [
@@ -1996,7 +2077,49 @@
       }
     },
     {
-      "id": 27,
+      "id": 28,
+      "type": {
+        "def": {
+          "variant": {
+            "variants": [
+              {
+                "fields": [
+                  {
+                    "type": 17
+                  }
+                ],
+                "index": 0,
+                "name": "Ok"
+              },
+              {
+                "fields": [
+                  {
+                    "type": 8
+                  }
+                ],
+                "index": 1,
+                "name": "Err"
+              }
+            ]
+          }
+        },
+        "params": [
+          {
+            "name": "T",
+            "type": 17
+          },
+          {
+            "name": "E",
+            "type": 8
+          }
+        ],
+        "path": [
+          "Result"
+        ]
+      }
+    },
+    {
+      "id": 29,
       "type": {
         "def": {
           "composite": {
@@ -2016,7 +2139,7 @@
       }
     },
     {
-      "id": 28,
+      "id": 30,
       "type": {
         "def": {
           "primitive": "u32"
@@ -2024,7 +2147,7 @@
       }
     },
     {
-      "id": 29,
+      "id": 31,
       "type": {
         "def": {
           "variant": {}
