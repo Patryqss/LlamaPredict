@@ -49,6 +49,18 @@ export class PredictorClient {
     );
   }
 
+  async burn(sender: string, signer: Signer, market_id: Number, amount: BN) {
+    return contractTx(
+      this.api,
+      sender,
+      signer,
+      this.contract,
+      "burn",
+      undefined,
+      [market_id, amount],
+    );
+  }
+
   async add_market(
     sender: string,
     signer: Signer,
