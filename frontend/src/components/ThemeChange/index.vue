@@ -10,34 +10,16 @@ defineOptions({
 const mode = useColorMode<CustomTheme>({
   attribute: "data-theme",
   modes: {
-    cupcake: "cupcake",
-    bumblebee: "bumblebee",
-    emerald: "emerald",
-    corporate: "corporate",
+    night: "night",
     synthwave: "synthwave",
-    retro: "retro",
-    cyberpunk: "cyberpunk",
-    valentine: "valentine",
     halloween: "halloween",
-    garden: "garden",
     forest: "forest",
-    aqua: "aqua",
-    lofi: "lofi",
-    pastel: "pastel",
-    fantasy: "fantasy",
-    wireframe: "wireframe",
-    black: "black",
     luxury: "luxury",
     dracula: "dracula",
-    cmyk: "cmyk",
     autumn: "autumn",
     business: "business",
-    acid: "acid",
-    lemonade: "lemonade",
-    night: "night",
-    coffee: "coffee",
-    winter: "winter",
   },
+  initialValue: "night"
 });
 
 const changeTheme = (event: MouseEvent, theme: CustomTheme) => {
