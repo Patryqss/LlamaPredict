@@ -195,8 +195,12 @@ class AccountStore {
     };
   }
 
-  async getMaxWin(marketId: number, amount: number, option: "A" | "B") {
-    if (!this.api) return 0;
+  async getPredictionStats(
+    marketId: number,
+    amount: number,
+    option: "A" | "B",
+  ) {
+    if (!this.api) return { maxWin: 0, slippage: 0 };
 
     const amountRaw = new BN(amount * 1e6);
     const market = await this.getMarket(marketId);
@@ -207,12 +211,20 @@ class AccountStore {
     );
 
     const optionId = option === "A" ? 1 : 0;
-    const res = await router.get_amount_out(
+    const amountOut = await router.get_amount_out(
       amountRaw,
       reserves[optionId],
       reserves[1 - optionId],
     );
-    return res.toNumber() / 1e6;
+
+    const slippage = router.calc_price_impact_pct(
+      amountRaw,
+      amountOut,
+      reserves[optionId],
+      reserves[1 - optionId],
+    );
+
+    return { maxWin: amountOut.toNumber() / 1e6, slippage };
   }
 
   private async mintTokens(marketId: number, amountRaw: BN) {

@@ -52,6 +52,11 @@ export function formatAssetAmount(
  */
 export function formatUSDAmount(value: string | number | null) {
   value = Number(value) || 0;
+  let wasNeg = false;
+  if (value < 0) {
+    wasNeg = true;
+    value = Math.abs(value);
+  }
 
   if (value >= 1)
     return (
@@ -76,6 +81,7 @@ export function formatUSDAmount(value: string | number | null) {
       .substring(0, 8)}`;
   else result = `${(whole + Number(fraction)).toLocaleString("en-US")}.00`;
 
+  if (wasNeg) result = "-" + result;
   if (Number(result) === 0) return "$0.00";
   return "$" + result;
 }

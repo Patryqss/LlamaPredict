@@ -36,6 +36,11 @@ const position = reactive({
 const route = useRoute();
 const market = ref(null as Market | null);
 
+watch(
+  () => accountStore.activeAccount,
+  () => updatePosition(),
+);
+
 onBeforeMount(async () => {
   const rawMarket = await accountStore.getMarket(Number(route.params.id));
   if (!rawMarket) {
@@ -86,18 +91,20 @@ async function updatePosition() {
 
   position.currentValue = positionData.positionValue;
   position.invested = marketData.deposited - marketData.claimed;
-  position.PnL = position.invested - position.currentValue;
+  position.PnL = position.currentValue - position.invested;
   if (positionData.balanceA > positionData.balanceB) position.prediction = "NO";
   else if (positionData.balanceA < positionData.balanceB)
     position.prediction = "YES";
 }
 async function calculateStats() {
   if (state.myPrediction !== null && Number(state.amount) > 0) {
-    state.maxWin = await accountStore.getMaxWin(
+    const predictionStats = await accountStore.getPredictionStats(
       Number(route.params.id),
       Number(state.amount),
       state.myPrediction ? "A" : "B",
     );
+    state.maxWin = predictionStats.maxWin;
+    state.slippage = predictionStats.slippage;
   }
 }
 function onClose() {
