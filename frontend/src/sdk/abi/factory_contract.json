@@ -1,12 +1,12 @@
 {
   "source": {
-    "hash": "0x07345fee118d5274016b2662493dffc71d5fe01705e2637566b497d6d57ad60b",
+    "hash": "0x8dded47d837d46c00286f757f4e0f90120be9ab7a24bfc2a34bb29e0d707726c",
     "language": "ink! 4.3.0",
-    "compiler": "rustc 1.71.0",
+    "compiler": "rustc 1.78.0-nightly",
     "build_info": {
       "build_mode": "Release",
-      "cargo_contract_version": "3.0.1",
-      "rust_toolchain": "stable-x86_64-unknown-linux-gnu",
+      "cargo_contract_version": "3.2.0",
+      "rust_toolchain": "nightly-x86_64-apple-darwin",
       "wasm_opt_settings": {
         "keep_debug_symbols": false,
         "optimization_passes": "Z"
@@ -20,7 +20,6 @@
       "Cardinal Cryptography"
     ]
   },
-  "image": null,
   "spec": {
     "constructors": [
       {

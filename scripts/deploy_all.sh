@@ -64,7 +64,11 @@ EOF
 
 cd ../predictor
 cargo contract build --release --offline
-PREDICTOR_ADDRESS=`az instantiate -x --args $PSP22C_HASH $ADMIN_ADDRESS | getcontract`
+PREDICTOR_ADDRESS=`az instantiate --salt $SALT -x --args $PSP22C_HASH $ADMIN_ADDRESS | getcontract`
 cat >> $BASE/.env.next <<EOF
 PREDICTOR_ADDRESS="$PREDICTOR_ADDRESS"
 EOF
+
+cd $BASE
+mv .env.next .env.testnet
+cp `ls -1 target/ink/*/*.json` frontend/src/sdk/abi/
