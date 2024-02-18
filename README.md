@@ -47,3 +47,19 @@ You can easily verify how oracle voted in the past. Even if oracle is going to c
 # How prediction market creator is incentivized?
 
 Prediction market creator provides initial liquidity and earns fees on DEXs. Also users waiting for the market to expire are loosing their collateral (few %). This is the main source of income for the creator.
+
+# What is so exciting about prediction market?
+
+You can use prediction market's tokens as underlying tokens for other prediction markets. This creates a lot of possibilities. You can introduce conditional probability, multi choice markets, options, futures, headging, etc. You can also use existing DEXs to trade those tokens, place limit orders, lend/borrow them, etc. You can also create your own centralized prediction market and use decentralized prediction markets for hedging.
+
+# How it aligns with Aleph Zero's vision?
+
+Each prediction market stores just hash of input. For users not knowing the input, it is just a random token. You can create private prediction markets, what aligns perfectly with Aleph Zero's vision of privacy. There are also a lot of math to do off chain.
+
+# Is it production ready?
+
+Unfortunately not yet. Collateral melting is not yet correct. There are also some things of burning by outcome, we have noticed during the hackathon and it was too late to change it.
+
+# Any more questions?
+
+We are prediction market enthusiasts and we are happy to answer any questions. 
