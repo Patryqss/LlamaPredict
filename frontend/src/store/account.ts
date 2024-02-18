@@ -127,7 +127,7 @@ class AccountStore {
       0,
     );
 
-    console.log(res);
+    return res.result?.txHash.toString();
   }
 
   async getMarkets() {
@@ -315,8 +315,6 @@ class AccountStore {
       Number(market.balanceA.replaceAll(",", "")),
     );
 
-    console.log(closePos)
-
     if (closePos.sell_outcome !== "NONE") {
       await router.swap_exact_tokens_for_tokens(
         this.activeAccount,
@@ -328,7 +326,6 @@ class AccountStore {
     }
 
     const updatedPosition = await this.getPosition(marketId);
-    console.log('after swap', updatedPosition);
     const predictor = new PredictorClient(
       this.api,
       contractAddresses.PREDICTOR_ADDRESS,

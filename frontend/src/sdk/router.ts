@@ -134,7 +134,6 @@ export class RouterClient {
     asset_a: string,
     asset_b: string,
   ): Promise<string> {
-    console.log(sender, asset_a, asset_b);
     let r = await contractQuery(
       this.api,
       sender,
@@ -143,7 +142,6 @@ export class RouterClient {
       undefined,
       [asset_a, asset_b],
     );
-    console.log(r.output?.toHuman());
     return wrapDecodeError(decodeOutput(r, this.contract, "get_pair"));
   }
 

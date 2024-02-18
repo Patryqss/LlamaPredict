@@ -9,7 +9,6 @@ export function parseMarket(
 ): Market {
   const tokenA = Number(rawMarket.balanceA.replaceAll(",", ""));
   const tokenB = Number(rawMarket.balanceB.replaceAll(",", ""));
-  console.log(tokenA, tokenB);
   const tokensSum = tokenA + tokenB;
 
   return {

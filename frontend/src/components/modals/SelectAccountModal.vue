@@ -11,7 +11,6 @@ function onAccountSelect(account: string) {
 
 function onConfirm() {
   accountStore.changeActiveAccount(chosenAccount.value);
-  console.log(chosenAccount.value);
 
   const dialog = document.getElementById(modalsID.SELECT_ACCOUNT);
   (dialog as any).close();

@@ -87,7 +87,6 @@ function onAmountChange(value: string) {
 }
 async function updatePosition() {
   const positionData = await accountStore.getPosition(Number(route.params.id));
-  console.log(positionData);
   const marketData = await accountStore.getUserMarketData(
     Number(route.params.id),
   );
@@ -117,10 +116,14 @@ async function onClose() {
   state.loadingClose = true;
 
   try {
-    const txnHash = await accountStore.closeMarket(Number(route.params.id), position.balanceA, position.balanceB);
+    const txnHash = await accountStore.closeMarket(
+      Number(route.params.id),
+      position.balanceA,
+      position.balanceB,
+    );
 
     if (txnHash) emitter.emit("txn-success", txnHash);
-  } catch(e) {
+  } catch (e) {
     console.error(e);
   }
 
@@ -213,11 +216,7 @@ async function onPredict() {
             <div>
               <p class="stat-title">Prediction</p>
               <p class="stat-value text-2xl">
-                {{
-                  position.prediction === null
-                    ? "-"
-                    : position.prediction
-                }}
+                {{ position.prediction === null ? "-" : position.prediction }}
               </p>
             </div>
             <div>

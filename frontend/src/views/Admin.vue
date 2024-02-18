@@ -66,12 +66,12 @@ async function addMarket() {
         class="input input-bordered input-primary text-neutral-content rounded-lg bg-opacity-20"
         autocomplete="off"
       />
-      <div class="form-control mt-5 opacity-70 w-max">
-      <label class="cursor-pointer label">
-        <span class="label-text mr-3">Private</span>
-        <input type="checkbox" disabled class="checkbox" />
-      </label>
-    </div>
+      <div class="form-control mt-5 w-max opacity-70">
+        <label class="label cursor-pointer">
+          <span class="label-text mr-3">Private</span>
+          <input type="checkbox" disabled class="checkbox" />
+        </label>
+      </div>
 
       <button class="btn btn-primary mt-5" @click="addMarket">
         <span
