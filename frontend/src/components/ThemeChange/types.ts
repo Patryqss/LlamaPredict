@@ -6,7 +6,7 @@ export declare type CustomTheme =
   | "luxury"
   | "dracula"
   | "autumn"
-  | "business"
+  | "business";
 export interface ThemeList {
   name: string;
   id: CustomTheme;

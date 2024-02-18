@@ -16,9 +16,7 @@
   "contract": {
     "name": "predictor",
     "version": "0.1.0",
-    "authors": [
-      "[your_name] <[your_email]>"
-    ]
+    "authors": ["[your_name] <[your_email]>"]
   },
   "spec": {
     "constructors": [
@@ -27,18 +25,14 @@
           {
             "label": "token_hash",
             "type": {
-              "displayName": [
-                "Hash"
-              ],
+              "displayName": ["Hash"],
               "type": 3
             }
           },
           {
             "label": "router",
             "type": {
-              "displayName": [
-                "AccountId"
-              ],
+              "displayName": ["AccountId"],
               "type": 0
             }
           }
@@ -48,10 +42,7 @@
         "label": "new",
         "payable": false,
         "returnType": {
-          "displayName": [
-            "ink_primitives",
-            "ConstructorResult"
-          ],
+          "displayName": ["ink_primitives", "ConstructorResult"],
           "type": 7
         },
         "selector": "0x9bae9d5e"
@@ -60,49 +51,34 @@
     "docs": [],
     "environment": {
       "accountId": {
-        "displayName": [
-          "AccountId"
-        ],
+        "displayName": ["AccountId"],
         "type": 0
       },
       "balance": {
-        "displayName": [
-          "Balance"
-        ],
+        "displayName": ["Balance"],
         "type": 6
       },
       "blockNumber": {
-        "displayName": [
-          "BlockNumber"
-        ],
+        "displayName": ["BlockNumber"],
         "type": 28
       },
       "chainExtension": {
-        "displayName": [
-          "ChainExtension"
-        ],
+        "displayName": ["ChainExtension"],
         "type": 29
       },
       "hash": {
-        "displayName": [
-          "Hash"
-        ],
+        "displayName": ["Hash"],
         "type": 3
       },
       "maxEventTopics": 4,
       "timestamp": {
-        "displayName": [
-          "Timestamp"
-        ],
+        "displayName": ["Timestamp"],
         "type": 5
       }
     },
     "events": [],
     "lang_error": {
-      "displayName": [
-        "ink",
-        "LangError"
-      ],
+      "displayName": ["ink", "LangError"],
       "type": 9
     },
     "messages": [
@@ -111,9 +87,7 @@
           {
             "label": "market_id",
             "type": {
-              "displayName": [
-                "u64"
-              ],
+              "displayName": ["u64"],
               "type": 5
             }
           }
@@ -124,10 +98,7 @@
         "mutates": false,
         "payable": false,
         "returnType": {
-          "displayName": [
-            "ink",
-            "MessageResult"
-          ],
+          "displayName": ["ink", "MessageResult"],
           "type": 10
         },
         "selector": "0x48bdc177"
@@ -137,18 +108,14 @@
           {
             "label": "account_id",
             "type": {
-              "displayName": [
-                "AccountId"
-              ],
+              "displayName": ["AccountId"],
               "type": 0
             }
           },
           {
             "label": "market_id",
             "type": {
-              "displayName": [
-                "u64"
-              ],
+              "displayName": ["u64"],
               "type": 5
             }
           }
@@ -159,10 +126,7 @@
         "mutates": false,
         "payable": false,
         "returnType": {
-          "displayName": [
-            "ink",
-            "MessageResult"
-          ],
+          "displayName": ["ink", "MessageResult"],
           "type": 16
         },
         "selector": "0x00a94438"
@@ -172,9 +136,7 @@
           {
             "label": "router",
             "type": {
-              "displayName": [
-                "AccountId"
-              ],
+              "displayName": ["AccountId"],
               "type": 0
             }
           }
@@ -185,10 +147,7 @@
         "mutates": true,
         "payable": false,
         "returnType": {
-          "displayName": [
-            "ink",
-            "MessageResult"
-          ],
+          "displayName": ["ink", "MessageResult"],
           "type": 20
         },
         "selector": "0x5a6d6019"
@@ -198,45 +157,35 @@
           {
             "label": "underlying_token",
             "type": {
-              "displayName": [
-                "AccountId"
-              ],
+              "displayName": ["AccountId"],
               "type": 0
             }
           },
           {
             "label": "hash",
             "type": {
-              "displayName": [
-                "Hash"
-              ],
+              "displayName": ["Hash"],
               "type": 3
             }
           },
           {
             "label": "resolved_at",
             "type": {
-              "displayName": [
-                "Timestamp"
-              ],
+              "displayName": ["Timestamp"],
               "type": 5
             }
           },
           {
             "label": "resolution_time",
             "type": {
-              "displayName": [
-                "u64"
-              ],
+              "displayName": ["u64"],
               "type": 5
             }
           },
           {
             "label": "collateral_rate",
             "type": {
-              "displayName": [
-                "u16"
-              ],
+              "displayName": ["u16"],
               "type": 4
             }
           }
@@ -247,10 +196,7 @@
         "mutates": true,
         "payable": false,
         "returnType": {
-          "displayName": [
-            "ink",
-            "MessageResult"
-          ],
+          "displayName": ["ink", "MessageResult"],
           "type": 25
         },
         "selector": "0x8d9513cb"
@@ -260,18 +206,14 @@
           {
             "label": "market_id",
             "type": {
-              "displayName": [
-                "u64"
-              ],
+              "displayName": ["u64"],
               "type": 5
             }
           },
           {
             "label": "amount",
             "type": {
-              "displayName": [
-                "u128"
-              ],
+              "displayName": ["u128"],
               "type": 6
             }
           }
@@ -282,10 +224,7 @@
         "mutates": true,
         "payable": false,
         "returnType": {
-          "displayName": [
-            "ink",
-            "MessageResult"
-          ],
+          "displayName": ["ink", "MessageResult"],
           "type": 20
         },
         "selector": "0xcfdd9aa2"
@@ -295,18 +234,14 @@
           {
             "label": "market_id",
             "type": {
-              "displayName": [
-                "u64"
-              ],
+              "displayName": ["u64"],
               "type": 5
             }
           },
           {
             "label": "amount",
             "type": {
-              "displayName": [
-                "u128"
-              ],
+              "displayName": ["u128"],
               "type": 6
             }
           }
@@ -317,10 +252,7 @@
         "mutates": true,
         "payable": false,
         "returnType": {
-          "displayName": [
-            "ink",
-            "MessageResult"
-          ],
+          "displayName": ["ink", "MessageResult"],
           "type": 20
         },
         "selector": "0xb1efc17b"
@@ -330,27 +262,21 @@
           {
             "label": "market_id",
             "type": {
-              "displayName": [
-                "u64"
-              ],
+              "displayName": ["u64"],
               "type": 5
             }
           },
           {
             "label": "amount",
             "type": {
-              "displayName": [
-                "u128"
-              ],
+              "displayName": ["u128"],
               "type": 6
             }
           },
           {
             "label": "is_a",
             "type": {
-              "displayName": [
-                "bool"
-              ],
+              "displayName": ["bool"],
               "type": 27
             }
           }
@@ -361,10 +287,7 @@
         "mutates": true,
         "payable": false,
         "returnType": {
-          "displayName": [
-            "ink",
-            "MessageResult"
-          ],
+          "displayName": ["ink", "MessageResult"],
           "type": 20
         },
         "selector": "0x0094aed4"
@@ -374,18 +297,14 @@
           {
             "label": "market_id",
             "type": {
-              "displayName": [
-                "u64"
-              ],
+              "displayName": ["u64"],
               "type": 5
             }
           },
           {
             "label": "is_a",
             "type": {
-              "displayName": [
-                "bool"
-              ],
+              "displayName": ["bool"],
               "type": 27
             }
           }
@@ -396,10 +315,7 @@
         "mutates": true,
         "payable": false,
         "returnType": {
-          "displayName": [
-            "ink",
-            "MessageResult"
-          ],
+          "displayName": ["ink", "MessageResult"],
           "type": 20
         },
         "selector": "0xb70199c5"
@@ -409,27 +325,21 @@
           {
             "label": "market_id",
             "type": {
-              "displayName": [
-                "u64"
-              ],
+              "displayName": ["u64"],
               "type": 5
             }
           },
           {
             "label": "outcome_a",
             "type": {
-              "displayName": [
-                "u128"
-              ],
+              "displayName": ["u128"],
               "type": 6
             }
           },
           {
             "label": "outcome_b",
             "type": {
-              "displayName": [
-                "u128"
-              ],
+              "displayName": ["u128"],
               "type": 6
             }
           }
@@ -440,10 +350,7 @@
         "mutates": true,
         "payable": false,
         "returnType": {
-          "displayName": [
-            "ink",
-            "MessageResult"
-          ],
+          "displayName": ["ink", "MessageResult"],
           "type": 20
         },
         "selector": "0x42bb1778"
@@ -453,18 +360,14 @@
           {
             "label": "market_id",
             "type": {
-              "displayName": [
-                "u64"
-              ],
+              "displayName": ["u64"],
               "type": 5
             }
           },
           {
             "label": "amount",
             "type": {
-              "displayName": [
-                "u128"
-              ],
+              "displayName": ["u128"],
               "type": 6
             }
           }
@@ -475,10 +378,7 @@
         "mutates": true,
         "payable": false,
         "returnType": {
-          "displayName": [
-            "ink",
-            "MessageResult"
-          ],
+          "displayName": ["ink", "MessageResult"],
           "type": 20
         },
         "selector": "0x54ee392f"
@@ -752,11 +652,7 @@
             ]
           }
         },
-        "path": [
-          "ink_primitives",
-          "types",
-          "AccountId"
-        ]
+        "path": ["ink_primitives", "types", "AccountId"]
       }
     },
     {
@@ -791,11 +687,7 @@
             ]
           }
         },
-        "path": [
-          "ink_primitives",
-          "types",
-          "Hash"
-        ]
+        "path": ["ink_primitives", "types", "Hash"]
       }
     },
     {
@@ -859,9 +751,7 @@
             "type": 9
           }
         ],
-        "path": [
-          "Result"
-        ]
+        "path": ["Result"]
       }
     },
     {
@@ -885,10 +775,7 @@
             ]
           }
         },
-        "path": [
-          "ink_primitives",
-          "LangError"
-        ]
+        "path": ["ink_primitives", "LangError"]
       }
     },
     {
@@ -928,9 +815,7 @@
             "type": 9
           }
         ],
-        "path": [
-          "Result"
-        ]
+        "path": ["Result"]
       }
     },
     {
@@ -961,9 +846,7 @@
             "type": 12
           }
         ],
-        "path": [
-          "Option"
-        ]
+        "path": ["Option"]
       }
     },
     {
@@ -990,11 +873,7 @@
             ]
           }
         },
-        "path": [
-          "predictor",
-          "predictor",
-          "MarketResponse"
-        ]
+        "path": ["predictor", "predictor", "MarketResponse"]
       }
     },
     {
@@ -1071,11 +950,7 @@
             ]
           }
         },
-        "path": [
-          "predictor",
-          "predictor",
-          "Market"
-        ]
+        "path": ["predictor", "predictor", "Market"]
       }
     },
     {
@@ -1113,11 +988,7 @@
             ]
           }
         },
-        "path": [
-          "conditional_psp22",
-          "conditional_psp22",
-          "CallBuilder"
-        ]
+        "path": ["conditional_psp22", "conditional_psp22", "CallBuilder"]
       }
     },
     {
@@ -1157,9 +1028,7 @@
             "type": 9
           }
         ],
-        "path": [
-          "Result"
-        ]
+        "path": ["Result"]
       }
     },
     {
@@ -1190,9 +1059,7 @@
             "type": 18
           }
         ],
-        "path": [
-          "Option"
-        ]
+        "path": ["Option"]
       }
     },
     {
@@ -1219,11 +1086,7 @@
             ]
           }
         },
-        "path": [
-          "predictor",
-          "predictor",
-          "UserResponse"
-        ]
+        "path": ["predictor", "predictor", "UserResponse"]
       }
     },
     {
@@ -1245,11 +1108,7 @@
             ]
           }
         },
-        "path": [
-          "predictor",
-          "predictor",
-          "UserMarketData"
-        ]
+        "path": ["predictor", "predictor", "UserMarketData"]
       }
     },
     {
@@ -1289,9 +1148,7 @@
             "type": 9
           }
         ],
-        "path": [
-          "Result"
-        ]
+        "path": ["Result"]
       }
     },
     {
@@ -1331,9 +1188,7 @@
             "type": 22
           }
         ],
-        "path": [
-          "Result"
-        ]
+        "path": ["Result"]
       }
     },
     {
@@ -1527,11 +1382,7 @@
             ]
           }
         },
-        "path": [
-          "predictor",
-          "errors",
-          "PredictorError"
-        ]
+        "path": ["predictor", "errors", "PredictorError"]
       }
     },
     {
@@ -1579,11 +1430,7 @@
             ]
           }
         },
-        "path": [
-          "psp22",
-          "errors",
-          "PSP22Error"
-        ]
+        "path": ["psp22", "errors", "PSP22Error"]
       }
     },
     {
@@ -1631,9 +1478,7 @@
             "type": 9
           }
         ],
-        "path": [
-          "Result"
-        ]
+        "path": ["Result"]
       }
     },
     {
@@ -1673,9 +1518,7 @@
             "type": 22
           }
         ],
-        "path": [
-          "Result"
-        ]
+        "path": ["Result"]
       }
     },
     {
@@ -1700,11 +1543,7 @@
         "def": {
           "variant": {}
         },
-        "path": [
-          "ink_env",
-          "types",
-          "NoChainExtension"
-        ]
+        "path": ["ink_env", "types", "NoChainExtension"]
       }
     }
   ],

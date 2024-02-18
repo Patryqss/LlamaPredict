@@ -79,18 +79,25 @@ function onAmountChange(value: string) {
 }
 async function updatePosition() {
   const positionData = await accountStore.getPosition(Number(route.params.id));
-  console.log(positionData)
-  const marketData = await accountStore.getUserMarketData(Number(route.params.id));
+  console.log(positionData);
+  const marketData = await accountStore.getUserMarketData(
+    Number(route.params.id),
+  );
 
   position.currentValue = positionData.positionValue;
   position.invested = marketData.deposited - marketData.claimed;
   position.PnL = position.invested - position.currentValue;
-  if (positionData.balanceA > positionData.balanceB) position.prediction = 'NO';
-  else if (positionData.balanceA < positionData.balanceB) position.prediction = 'YES';
+  if (positionData.balanceA > positionData.balanceB) position.prediction = "NO";
+  else if (positionData.balanceA < positionData.balanceB)
+    position.prediction = "YES";
 }
 async function calculateStats() {
   if (state.myPrediction !== null && Number(state.amount) > 0) {
-    state.maxWin = await accountStore.getMaxWin(Number(route.params.id), Number(state.amount), state.myPrediction ? 'A' : 'B');
+    state.maxWin = await accountStore.getMaxWin(
+      Number(route.params.id),
+      Number(state.amount),
+      state.myPrediction ? "A" : "B",
+    );
   }
 }
 function onClose() {
@@ -134,7 +141,9 @@ async function onPredict() {
 
   try {
     const txnHash = await accountStore.predict(
-      Number(route.params.id), Number(state.amount), state.myPrediction ? 'A' : 'B'
+      Number(route.params.id),
+      Number(state.amount),
+      state.myPrediction ? "A" : "B",
     );
 
     if (txnHash) emitter.emit("txn-success", txnHash);
@@ -297,7 +306,11 @@ async function onPredict() {
 
         <button
           class="btn btn-primary mt-5 w-full"
-          :disabled="!!state.amountError || !!state.predictError || !accountStore.activeAccount"
+          :disabled="
+            !!state.amountError ||
+            !!state.predictError ||
+            !accountStore.activeAccount
+          "
           @click="onSubmit"
         >
           <span

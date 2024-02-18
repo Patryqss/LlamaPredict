@@ -56,7 +56,9 @@ async function onMint() {
             v-if="state.isLoading"
             class="loading loading-spinner loading-md"
           />
-          {{ accountStore.activeAccount ? 'MINT' : 'Connect to be able to Mint' }}
+          {{
+            accountStore.activeAccount ? "MINT" : "Connect to be able to Mint"
+          }}
         </button>
       </div>
     </div>

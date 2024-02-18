@@ -4,7 +4,12 @@ import * as minty_psp from "./abi/minty_psp22.json";
 import * as conditional_psp from "./abi/conditional_psp22.json";
 import { Signer } from "@polkadot/api/types";
 import { BN } from "@polkadot/util";
-import { contractTx, contractQuery, wrapDecodeError, decodeOutput } from "./interact";
+import {
+  contractTx,
+  contractQuery,
+  wrapDecodeError,
+  decodeOutput,
+} from "./interact";
 import { process_number } from "./utils";
 
 export class PSP22Client {
@@ -29,7 +34,9 @@ export class PSP22Client {
       undefined,
       [user],
     );
-    return process_number(wrapDecodeError(decodeOutput(r, this.contract, "PSP22::balance_of")));
+    return process_number(
+      wrapDecodeError(decodeOutput(r, this.contract, "PSP22::balance_of")),
+    );
   }
 
   async totalSupply(): Promise<BN> {
@@ -41,10 +48,17 @@ export class PSP22Client {
       undefined,
       [],
     );
-    return process_number(wrapDecodeError(decodeOutput(r, this.contract, "PSP22::total_supply")));
+    return process_number(
+      wrapDecodeError(decodeOutput(r, this.contract, "PSP22::total_supply")),
+    );
   }
 
-  async increaseAllowance(sender: string, signer: Signer, spender: string, amount: BN) {
+  async increaseAllowance(
+    sender: string,
+    signer: Signer,
+    spender: string,
+    amount: BN,
+  ) {
     return contractTx(
       this.api,
       sender,
@@ -52,7 +66,7 @@ export class PSP22Client {
       this.contract,
       "PSP22::increase_allowance",
       undefined,
-      [spender, amount]
+      [spender, amount],
     );
   }
 }

@@ -113,7 +113,7 @@ export function decodeOutput(
 export function wrapDecodeError({
   output,
   decodedOutput,
-  isError
+  isError,
 }: {
   output: any;
   decodedOutput: string;

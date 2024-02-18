@@ -19,7 +19,7 @@ const mode = useColorMode<CustomTheme>({
     autumn: "autumn",
     business: "business",
   },
-  initialValue: "night"
+  initialValue: "night",
 });
 
 const changeTheme = (event: MouseEvent, theme: CustomTheme) => {
