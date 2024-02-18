@@ -42,11 +42,13 @@ export class RouterClient {
         let client_b = new PSP22Client(this.api, token_b);
         let client_lp = new PSP22Client(this.api, token_lp);
 
-        let [total_a, total_b] = await this.get_reserves(user, token_a, token_b);
+        let [total_a, total_b] = await this.get_reserves(token_a, token_b);
         let total_lp = await client_lp.totalSupply();
         let balance_a = await client_a.balanceOf(user);
         let balance_b = await client_b.balanceOf(user);
         let balance_lp = await client_lp.balanceOf(user);
+        const balance_a_cache = balance_a.clone();
+        const balance_b_cache = balance_b.clone();
 
         balance_a = balance_a.add(balance_lp.mul(total_a).div(total_lp));
         balance_b = balance_b.add(balance_lp.mul(total_b).div(total_lp));
@@ -69,7 +71,7 @@ export class RouterClient {
             dolla = dolla.add(balance_a.muln(total_b.toNumber() / (total_a.toNumber() + total_b.toNumber())));
         }
 
-        return dolla;
+        return {balance_a: balance_a_cache, balance_b: balance_b_cache, position_value: dolla};
     }
 
     async get_pair(
@@ -77,6 +79,7 @@ export class RouterClient {
         asset_a: string,
         asset_b: string,
     ): Promise<string> {
+      console.log(sender, asset_a, asset_b)
         let r = await contractQuery(
             this.api,
             sender,
@@ -85,6 +88,7 @@ export class RouterClient {
             undefined,
             [asset_a, asset_b]
         );
+        console.log(r.output?.toHuman());
         return wrapDecodeError(decodeOutput(r, this.contract, "get_pair"));
     }
 
@@ -102,37 +106,35 @@ export class RouterClient {
     }
 
     async get_reserves(
-        sender: string,
         asset_a: string,
         asset_b: string,
     ): Promise<Array<BN>> {
         let r = await contractQuery(
             this.api,
-            sender,
+            '',
             this.contract,
             "Router::get_reserves",
             undefined,
             [asset_a, asset_b]
         )
-        let [a,b] = wrapDecodeError(decodeOutput(r, this.contract, "Router::get_reserves"));
+        let [a,b] = wrapDecodeError(decodeOutput(r, this.contract, "Router::get_reserves")).Ok;
         return [process_number(a), process_number(b)]
     }
 
     async get_amount_out(
-        sender: string,
         amount_in: BN,
         this_amount: BN,
         other_amount: BN,
     ): Promise<BN> {
         let r = await contractQuery(
             this.api,
-            sender,
+            '',
             this.contract,
             "Router::get_amount_out",
             undefined,
             [amount_in, this_amount, other_amount]
         )
-        return process_number(wrapDecodeError(decodeOutput(r, this.contract, "Router::get_amount_out")));
+        return process_number(wrapDecodeError(decodeOutput(r, this.contract, "Router::get_amount_out")).Ok);
     }
 
     async swap_exact_tokens_for_tokens(
@@ -168,7 +170,7 @@ export class RouterClient {
             this.contract,
             "Router::add_liquidity",
             undefined,
-            [asset_a, asset_b, amount_a, amount_b, this.calc_min_rcv(amount_a), this.calc_min_rcv(amount_b), sender, Date.now() + 1e6]
+            [asset_a, asset_b, amount_a, amount_b, new BN(0), new BN(0), sender, Date.now() + 1e6]
         )
     }
 }

@@ -12,6 +12,7 @@ import { USDClient, PredictorClient, RouterClient } from "~/sdk";
 import { getFromLocalStorage } from "~/utils";
 import { emitter } from "~/main";
 import { contractAddresses } from "~/config";
+import { process_number } from "~/sdk/utils";
 
 type InjectedExtension = Awaited<ReturnType<typeof web3Enable>>[number];
 type InjectedAccountWithMeta = Awaited<ReturnType<typeof web3Accounts>>[number];
@@ -99,7 +100,7 @@ class AccountStore {
     const sdk = new USDClient(this.api, contractAddresses.USD_ADDRESS);
     const res = await sdk.balanceOf(this.activeAccount);
 
-    this.balance = (res.output?.toPrimitive() as any).ok / 1e6;
+    this.balance = res.toNumber() / 1e6;
   }
 
   async addMarket(title: string, description: string, expiredAt: string) {
@@ -157,22 +158,51 @@ class AccountStore {
   }
 
   async getPosition(marketId: number) {
-    if (!this.api || !this.activeAccount) return 0;
+    if (!this.api || !this.activeAccount) return { positionValue: 0, balanceA: 0, balanceB: 0 };
 
     const market = await this.getMarket(marketId);
     const router = new RouterClient(this.api, contractAddresses.ROUTER_ADDRESS);
 
-    const position = await router.get_position_value(this.activeAccount, market.market.tokenA.inner.accountId, market.market.tokenB.inner.accountId)
-    return position;
+    const positionData = await router.get_position_value(this.activeAccount, market.market.tokenA.inner.accountId, market.market.tokenB.inner.accountId)
+    return {
+      positionValue: positionData.position_value.toNumber() / 1e6,
+      balanceA: positionData.balance_a.toNumber() / 1e6,
+      balanceB: positionData.balance_b.toNumber() / 1e6,
+    }
   }
 
-  async addLiquidity(marketId: number, amount: number) {
-    if (!this.api || !this.activeAccount) return;
+  async getUserMarketData(marketId: number) {
+    if (!this.api || !this.activeAccount) return { claimed: 0, deposited: 0 };
+
+    const predictor = new PredictorClient(
+      this.api,
+      contractAddresses.PREDICTOR_ADDRESS,
+    );
+
+    const res = await predictor.get_user_market_data(this.activeAccount, marketId);
+    const userData = (res.output?.toHuman() as any).Ok.user;
+    return {
+      claimed: process_number(userData.claimed).toNumber() / 1e6,
+      deposited: process_number(userData.deposited).toNumber() / 1e6,
+    };
+  }
+
+  async getMaxWin(marketId: number, amount: number, option: 'A' | 'B') {
+    if (!this.api) return 0;
 
     const amountRaw = new BN(amount * 1e6);
     const market = await this.getMarket(marketId);
+    const router = new RouterClient(this.api, contractAddresses.ROUTER_ADDRESS);
+    const reserves = await router.get_reserves(market.market.tokenA.inner.accountId, market.market.tokenB.inner.accountId)
+
+    const optionId = option === 'A' ? 1 : 0;
+    const res = await router.get_amount_out(amountRaw, reserves[optionId], reserves[1 - optionId])
+    return res.toNumber() / 1e6;
+  }
+
+  private async mintTokens(marketId: number, amountRaw: BN) {
+    if (!this.api || !this.activeAccount) return;
     const addressInjector = await web3FromAddress(this.activeAccount);
-    console.log(market);
 
     const usd = new USDClient(this.api, contractAddresses.USD_ADDRESS);
     await usd.increaseAllowance(
@@ -181,7 +211,6 @@ class AccountStore {
       contractAddresses.PREDICTOR_ADDRESS,
       amountRaw,
     );
-    console.log("after inc");
 
     const predictor = new PredictorClient(
       this.api,
@@ -194,7 +223,16 @@ class AccountStore {
       marketId,
       amountRaw,
     );
-    console.log("after mint");
+  }
+
+  async addLiquidity(marketId: number, amount: number) {
+    if (!this.api || !this.activeAccount) return;
+
+    const amountRaw = new BN(amount * 1e6);
+    const market = await this.getMarket(marketId);
+    const addressInjector = await web3FromAddress(this.activeAccount);
+
+    await this.mintTokens(marketId, amountRaw);
 
     const router = new RouterClient(this.api, contractAddresses.ROUTER_ADDRESS);
 
@@ -207,21 +245,27 @@ class AccountStore {
       amountRaw,
     );
 
-    console.log(res);
     return res.result?.txHash.toString();
   }
 
-  async predict(marketId: number) {
+  async predict(marketId: number, amount: number, option: 'A' | 'B') {
     if (!this.api || !this.activeAccount) return;
 
+    const amountRaw = new BN(amount * 1e6);
     const market = await this.getMarket(marketId);
     const addressInjector = await web3FromAddress(this.activeAccount);
 
+    await this.mintTokens(marketId, amountRaw);
+
     const router = new RouterClient(this.api, contractAddresses.ROUTER_ADDRESS);
+    const tokenA = market.market.tokenA.inner.accountId;
+    const tokenB = market.market.tokenB.inner.accountId
 
-    // router.
+    const res = await router.swap_exact_tokens_for_tokens(this.activeAccount, addressInjector.signer, amountRaw, new BN(0),
+    option === 'B' ? [tokenA, tokenB] : [tokenB, tokenA]
+    )
 
-    return 'hash'
+    return res.result?.txHash.toString();
   }
 
   disconnect() {

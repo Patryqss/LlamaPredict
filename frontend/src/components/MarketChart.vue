@@ -6,7 +6,7 @@ import { formatPctValue } from "~/utils";
 const dateFormat = "MMM dd, HH:mm";
 
 const state = reactive({
-  isLoading: false, // TODO: start with true, fetch real values and then change this to false
+  isLoading: false,
   activeData: {
     lastPoint: -1,
     date: "-",
@@ -18,6 +18,7 @@ const state = reactive({
 });
 
 onBeforeMount(() => {
+  // Mocked data for hackathon purposes. Normally it would be fetched from BE
   state.xAxisData = [
     new Date("02-16-2024 02:13").toString(),
     new Date("02-16-2024 04:58").toString(),

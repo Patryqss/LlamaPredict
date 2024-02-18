@@ -24,11 +24,10 @@ const state = reactive({
   loadingTxn: false,
   maxWin: 0,
   slippage: 0,
-  fee: 0,
 });
 
 const position = reactive({
-  prediction: null,
+  prediction: null as string | null,
   invested: 0,
   PnL: 0,
   currentValue: 0,
@@ -56,7 +55,7 @@ onBeforeMount(async () => {
   market.value = parseMarket(matchingJSON, Number(route.params.id), rawMarket);
   state.loadingMarket = false;
 
-  position.currentValue = await accountStore.getPosition(Number(route.params.id));
+  updatePosition();
 });
 
 function onTypeChange() {
@@ -69,6 +68,7 @@ function onTypeChange() {
 function onPredictChoice(value: boolean) {
   state.predictError = "";
   state.myPrediction = value;
+  calculateStats();
 }
 function onAmountChange(value: string) {
   state.amountError = "";
@@ -77,8 +77,21 @@ function onAmountChange(value: string) {
 
   if (!state.amountError) calculateStats();
 }
-function calculateStats() {
-  // TODO
+async function updatePosition() {
+  const positionData = await accountStore.getPosition(Number(route.params.id));
+  console.log(positionData)
+  const marketData = await accountStore.getUserMarketData(Number(route.params.id));
+
+  position.currentValue = positionData.positionValue;
+  position.invested = marketData.deposited - marketData.claimed;
+  position.PnL = position.invested - position.currentValue;
+  if (positionData.balanceA > positionData.balanceB) position.prediction = 'NO';
+  else if (positionData.balanceA < positionData.balanceB) position.prediction = 'YES';
+}
+async function calculateStats() {
+  if (state.myPrediction !== null && Number(state.amount) > 0) {
+    state.maxWin = await accountStore.getMaxWin(Number(route.params.id), Number(state.amount), state.myPrediction ? 'A' : 'B');
+  }
 }
 function onClose() {
   // TODO
@@ -89,6 +102,8 @@ async function onSubmit() {
   if (state.type === "ADD_LIQ") await onAddLiq();
   else await onPredict();
 
+  accountStore.udpateBalance();
+  updatePosition();
   state.loadingTxn = false;
 }
 async function onAddLiq() {
@@ -104,7 +119,6 @@ async function onAddLiq() {
     );
 
     if (txnHash) emitter.emit("txn-success", txnHash);
-    accountStore.udpateBalance();
   } catch (e) {
     console.error(e);
   }
@@ -120,11 +134,11 @@ async function onPredict() {
 
   try {
     const txnHash = await accountStore.predict(
-      Number(route.params.id)
+      Number(route.params.id), Number(state.amount), state.myPrediction ? 'A' : 'B'
     );
 
     if (txnHash) emitter.emit("txn-success", txnHash);
-    accountStore.udpateBalance();
+    state.maxWin = 0;
   } catch (e) {
     console.error(e);
   }
@@ -234,22 +248,22 @@ async function onPredict() {
             <button
               class="btn btn-primary flex-1"
               :class="
-                state.myPrediction === false &&
-                'outline-accent outline outline-4 outline-offset-2'
-              "
-              @click="() => onPredictChoice(false)"
-            >
-              No
-            </button>
-            <button
-              class="btn btn-primary flex-1"
-              :class="
                 state.myPrediction === true &&
                 'outline-accent outline outline-4 outline-offset-2'
               "
               @click="() => onPredictChoice(true)"
             >
               Yes
+            </button>
+            <button
+              class="btn btn-primary flex-1"
+              :class="
+                state.myPrediction === false &&
+                'outline-accent outline outline-4 outline-offset-2'
+              "
+              @click="() => onPredictChoice(false)"
+            >
+              No
             </button>
           </div>
           <div v-if="state.predictError" class="label">
@@ -277,12 +291,6 @@ async function onPredict() {
             <p>Slippage:</p>
             <p class="text-right">
               {{ formatPctValue(state.slippage) }}
-            </p>
-          </div>
-          <div class="flex w-full items-center justify-between">
-            <p>Fee:</p>
-            <p class="text-right">
-              {{ formatPctValue(state.fee) }}
             </p>
           </div>
         </div>

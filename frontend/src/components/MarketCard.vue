@@ -36,11 +36,11 @@ defineProps({
       <p>{{ description }}</p>
       <div class="flex gap-x-1 text-center shadow-xl">
         <div class="bg-primary/20 flex-1 rounded-l-3xl px-4 py-2">
-          <p class="text-sm opacity-80">No</p>
+          <p class="text-sm opacity-80">Yes</p>
           <p class="font-bold">{{ formatPctValue(shortPct) }}</p>
         </div>
         <div class="bg-primary/20 flex-1 rounded-r-3xl px-4 py-2">
-          <p class="text-sm opacity-80">Yes</p>
+          <p class="text-sm opacity-80">No</p>
           <p class="font-bold">{{ formatPctValue(longPct) }}</p>
         </div>
       </div>

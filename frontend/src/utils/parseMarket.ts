@@ -7,14 +7,17 @@ export function parseMarket(
   id: number,
   rawMarket: any,
 ): Market {
-  const tokensSum = rawMarket.balanceA + rawMarket.balanceB;
+  const tokenA = Number(rawMarket.balanceA.replaceAll(',', ''));
+  const tokenB = Number(rawMarket.balanceB.replaceAll(',', ''));
+  console.log(tokenA, tokenB)
+  const tokensSum = tokenA + tokenB;
 
   return {
     id,
     title: jsonMarket.title,
     description: jsonMarket.description,
-    shortPct: 100 - (rawMarket.balanceA / tokensSum) * 100,
-    longPct: 100 - (rawMarket.balanceB / tokensSum) * 100,
+    shortPct: 100 - (tokenA / tokensSum) * 100,
+    longPct: 100 - (tokenB / tokensSum) * 100,
     expireDate: new Date(
       Number(rawMarket.market.expiredAt.replaceAll(",", "")),
     ),

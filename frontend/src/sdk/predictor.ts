@@ -33,13 +33,12 @@ export class PredictorClient {
     }
 
     async get_user_market_data(
-        sender: string,
         user: string,
         market_id: Number,
     ) {
         return contractQuery(
             this.api,
-            sender,
+            '',
             this.contract,
             "get_user_market_data",
             undefined,
