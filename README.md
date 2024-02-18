@@ -56,10 +56,6 @@ You can use prediction market's tokens as underlying tokens for other prediction
 
 Each prediction market stores just hash of input. For users not knowing the input, it is just a random token. You can create private prediction markets, what aligns perfectly with Aleph Zero's vision of privacy. There are also a lot of math to do off chain.
 
-# Is it production ready?
-
-Unfortunately not yet. Collateral melting is not yet correct. There are also some things of burning by outcome, we have noticed during the hackathon and it was too late to change it.
-
 # Any more questions?
 
 We are prediction market enthusiasts and we are happy to answer any questions. 
