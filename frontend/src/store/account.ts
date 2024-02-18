@@ -299,6 +299,52 @@ class AccountStore {
     return res.result?.txHash.toString();
   }
 
+  async closeMarket(marketId: number, balanceA: number, balanceB: number) {
+    if (!this.api || !this.activeAccount) return;
+
+    const market = await this.getMarket(marketId);
+    const addressInjector = await web3FromAddress(this.activeAccount);
+    const tokenA = market.market.tokenA.inner.accountId;
+    const tokenB = market.market.tokenB.inner.accountId;
+
+    const router = new RouterClient(this.api, contractAddresses.ROUTER_ADDRESS);
+    const closePos = router.calculate_close_position(
+      balanceA * 1e6,
+      balanceB * 1e6,
+      Number(market.balanceA.replaceAll(",", "")),
+      Number(market.balanceA.replaceAll(",", "")),
+    );
+
+    console.log(closePos)
+
+    if (closePos.sell_outcome !== "NONE") {
+      await router.swap_exact_tokens_for_tokens(
+        this.activeAccount,
+        addressInjector.signer,
+        new BN(closePos.to_swap),
+        new BN(0),
+        closePos.sell_outcome === "B" ? [tokenB, tokenA] : [tokenA, tokenB],
+      );
+    }
+
+    const updatedPosition = await this.getPosition(marketId);
+    console.log('after swap', updatedPosition);
+    const predictor = new PredictorClient(
+      this.api,
+      contractAddresses.PREDICTOR_ADDRESS,
+    );
+
+    const min = Math.min(updatedPosition.balanceA, updatedPosition.balanceB);
+    const res = await predictor.burn(
+      this.activeAccount,
+      addressInjector.signer,
+      marketId,
+      new BN(min * 1e6),
+    );
+
+    return res.result?.txHash.toString();
+  }
+
   disconnect() {
     this.extensions = [];
     this.accounts = [];

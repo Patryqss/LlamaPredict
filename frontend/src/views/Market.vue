@@ -22,6 +22,7 @@ const state = reactive({
   type: "PREDICT" as MarketTxn,
   loadingMarket: true,
   loadingTxn: false,
+  loadingClose: false,
   maxWin: 0,
   slippage: 0,
 });
@@ -31,6 +32,8 @@ const position = reactive({
   invested: 0,
   PnL: 0,
   currentValue: 0,
+  balanceA: 0,
+  balanceB: 0,
 });
 
 const route = useRoute();
@@ -89,12 +92,15 @@ async function updatePosition() {
     Number(route.params.id),
   );
 
+  position.balanceA = positionData.balanceA;
+  position.balanceB = positionData.balanceB;
   position.currentValue = positionData.positionValue;
   position.invested = marketData.deposited - marketData.claimed;
   position.PnL = position.currentValue - position.invested;
-  if (positionData.balanceA > positionData.balanceB) position.prediction = "NO";
-  else if (positionData.balanceA < positionData.balanceB)
+  if (positionData.balanceA > positionData.balanceB)
     position.prediction = "YES";
+  else if (positionData.balanceA < positionData.balanceB)
+    position.prediction = "NO";
 }
 async function calculateStats() {
   if (state.myPrediction !== null && Number(state.amount) > 0) {
@@ -107,8 +113,20 @@ async function calculateStats() {
     state.slippage = predictionStats.slippage;
   }
 }
-function onClose() {
-  // TODO
+async function onClose() {
+  state.loadingClose = true;
+
+  try {
+    const txnHash = await accountStore.closeMarket(Number(route.params.id), position.balanceA, position.balanceB);
+
+    if (txnHash) emitter.emit("txn-success", txnHash);
+  } catch(e) {
+    console.error(e);
+  }
+
+  accountStore.udpateBalance();
+  updatePosition();
+  state.loadingClose = false;
 }
 async function onSubmit() {
   state.loadingTxn = true;
@@ -199,8 +217,6 @@ async function onPredict() {
                   position.prediction === null
                     ? "-"
                     : position.prediction
-                      ? "YES"
-                      : "NO"
                 }}
               </p>
             </div>

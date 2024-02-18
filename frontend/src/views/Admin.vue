@@ -3,10 +3,9 @@ import { ADMIN_ADDRESS } from "~/config";
 import { router } from "~/router";
 
 const state = reactive({
-  title: "BTC Price",
-  description:
-    "Will the value of Bitcoin be above $50,000.00 on 18th February 2024?",
-  expireDate: "2024-02-20T03:36",
+  title: "",
+  description: "",
+  expireDate: "",
   isLoading: false,
   error: "",
 });
@@ -67,6 +66,12 @@ async function addMarket() {
         class="input input-bordered input-primary text-neutral-content rounded-lg bg-opacity-20"
         autocomplete="off"
       />
+      <div class="form-control mt-5 opacity-70 w-max">
+      <label class="cursor-pointer label">
+        <span class="label-text mr-3">Private</span>
+        <input type="checkbox" disabled class="checkbox" />
+      </label>
+    </div>
 
       <button class="btn btn-primary mt-5" @click="addMarket">
         <span

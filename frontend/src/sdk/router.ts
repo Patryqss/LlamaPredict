@@ -107,13 +107,13 @@ export class RouterClient {
   ) {
     let sell_outcome: string;
     if (user_a > user_b) {
-        sell_outcome = "A";
+      sell_outcome = "A";
     } else if (user_a < user_b) {
-        sell_outcome = "B";
-        [total_a, total_b] = [total_b, total_a];
-        [user_a, user_b] = [user_b, user_a]
+      sell_outcome = "B";
+      [total_a, total_b] = [total_b, total_a];
+      [user_a, user_b] = [user_b, user_a];
     } else {
-        return {sell_outcome: "NONE", to_swap: 0};
+      return { sell_outcome: "NONE", to_swap: 0 };
     }
 
     // now a > b, because of the whack swap we did above
@@ -124,7 +124,8 @@ export class RouterClient {
     let to_swap = root_delta + a - A - B;
 
     return {
-        sell_outcome, to_swap
+      sell_outcome,
+      to_swap,
     };
   }
 
